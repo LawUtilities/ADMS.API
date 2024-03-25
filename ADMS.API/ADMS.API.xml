@@ -1,0 +1,2733 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.Controllers.DocumentController">
+            <summary>
+            Document actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.DocumentController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
+            <summary>
+            Document Controller constructor
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CreateDocument(System.Guid,ADMS.API.Models.DocumentForCreationDto)">
+            <summary>
+            Creates a document attached to a specified matter
+            </summary>
+            <param name="matterId">matter to add the document to</param>
+            <param name="document">document to add</param>
+            <returns></returns>
+            <response code="200">Returns the created document</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CopyDocument(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Copies a document from one matter to another
+            </summary>
+            <param name="matterId">matter to copy document to</param>
+            <param name="document">document to be copied</param>
+            <returns>true if document copied, false otherwise</returns>
+            <response code="200">Returns the created document</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetMDAUFromHistoryAsync(System.Guid)">
+            <summary>
+            retrieve matter document activity user from list
+            </summary>
+            <param name="id">Matter Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetMDAUToHistoryAsync(System.Guid)">
+            <summary>
+            retrieve matter document activity user to list
+            </summary>
+            <param name="id">Matter Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.MoveDocument(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Copies a document from one matter to another
+            </summary>
+            <param name="matterId">matter to copy document to</param>
+            <param name="document">document to be copied</param>
+            <returns>true if document copied, false otherwise</returns>
+            <response code="200">Returns the created document</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.DeleteDocument(System.Guid,System.Guid)">
+            <summary>
+            Delete specified document Id
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="id">document to be deleted</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocument(System.Guid,System.Guid,System.Boolean)">
+            <summary>
+            Get specific Document
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="id">Document Id to retrieve</param>
+            <param name="includeRevisions">Whether to include revisions with the returned data</param>
+            <returns>An IActionResult</returns>
+            <response code="200">Returns the requestedDocument</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CheckoutDocument(System.Guid,System.Guid)">
+            <summary>
+            Check out document
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="id">document id to be checked out</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CheckinDocument(System.Guid,System.Guid)">
+            <summary>
+            Check in document
+            </summary>
+            <param name="matterId">Matter document belongs to</param>
+            <param name="id">document id to be checked in</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocumentHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            gets specific document history
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="id">Document Id to retrieve</param>
+            <returns>document history</returns>
+            <response code="200">Returns the requested document history</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocuments(System.Guid,System.String,System.String,System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            Retrieves desired documents.
+            </summary>
+            <param name="matterId">Id of the matter related to the documents in question</param>
+            <param name="filename">filename required</param>
+            <param name="searchQuery">additional search parameters</param>
+            <param name="isDeleted">indicates if deleted documents are returned</param>
+            <param name="pageNumber">the number of the paged results desired</param>
+            <param name="pageSize">how large the record set is per page</param>
+            <returns>An IActionResult</returns>
+            <response code="200">Returns the requested document</response>
+            <response code="400">An error occured</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.PartiallyUpdateDocument(System.Guid,System.Guid,Microsoft.AspNetCore.JsonPatch.JsonPatchDocument{ADMS.API.Models.DocumentDto})">
+            <summary>
+            Updated document with nerw changes
+            </summary>
+            <param name="matterId">Matter document belongs to</param>
+            <param name="id">document id to be patched</param>
+            <param name="patchDocument">updates to be applied</param>
+            <returns>IACtionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.UpdateDocument(System.Guid,System.Guid,ADMS.API.Models.DocumentForUpdateDto)">
+            <summary>
+            Updates document details
+            </summary>
+            <param name="matterId">Matter document belongs to</param>
+            <param name="id">document id to be updated</param>
+            <param name="document">document details in need of updating</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="T:ADMS.API.Controllers.FileController">
+            <summary>
+            File actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.FileController},ADMS.API.Services.IAdmsRepository)">
+            <summary>
+            File Controller Constructor
+            </summary>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.UploadExistingFileAsync(System.Guid,System.Guid,System.Guid,Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)">
+            <summary>
+            Upload an existing file to the ADMS system
+            </summary>
+            <param name="matterId">Matter to save the document to</param>
+            <param name="documentId">Document to add file to</param>
+            <param name="revisionId">Revision to add file as</param>
+            <param name="fileUpload">file to be uploaded</param>
+            <param name="cancelToken">cancellation token</param>
+            <returns>IActionResult</returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.DownloadFile(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Download the specified file from the ADMS system
+            </summary>
+            <param name="matterId"></param>
+            <param name="documentId"></param>
+            <param name="revisionId"></param>
+            <returns></returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.DownloadPDF(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Download the specified PDF file from the ADMS system
+            </summary>
+            <param name="matterId"></param>
+            <param name="documentId"></param>
+            <param name="revisionId"></param>
+            <returns></returns>
+            <response code="200">PDF Downloaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">PDF not created</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.VerifyFileType(System.Guid,System.Guid,System.Guid,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Verifies if the file to be uploaded matches the type identified
+            </summary>
+            <param name="matterId"></param>
+            <param name="documentId"></param>
+            <param name="revisionId"></param>
+            <param name="fileUpload">File to be verified</param>
+            <returns>IActionResult</returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.CheckExistsAsync(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Checks to see if Matter, Document and Revision exists
+            </summary>
+            <param name="matterId">matter to check</param>
+            <param name="documentId">document to check</param>
+            <param name="revisionId">revision to check</param>
+            <returns>bool if all three exist, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.ConvertToPDF(System.String,System.String,System.String)">
+            <summary>
+            convert an original document to PDF if possible
+            </summary>
+            <param name="folder">Matter folder containing original file</param>
+            <param name="originalFileName">Original file</param>
+            <param name="pdfFileName">PDF filename</param>
+            <returns>True if converted, false otherwise</returns>
+        </member>
+        <member name="T:ADMS.API.Controllers.MatterController">
+            <summary>
+            Matter actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.MatterController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
+            <summary>
+            Matter Controller Constructor
+            </summary>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+            <param name="mapper">atomapper to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.CreateMatter(ADMS.API.Models.MatterForCreationDto)">
+            <summary>
+            Creates a matter
+            </summary>
+            <param name="matter">matter to add</param>
+            <returns></returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.DeleteMatter(System.Guid)">
+            <summary>
+            Delete specified matter
+            </summary>
+            <param name="id">matter to be deleted</param>
+            <returns></returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMatterAsync(System.Guid,System.Boolean)">
+            <summary>
+            gets specific matter
+            </summary>
+            <param name="id">Matter Id to retrieve</param>
+            <param name="includeDocuments">Include documents in returned matter</param>
+            <returns>list of matter</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMDAUFromHistoryAsync(System.Guid)">
+            <summary>
+            retrieve matter document activity user from list
+            </summary>
+            <param name="id">Matter Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMDAUToHistoryAsync(System.Guid)">
+            <summary>
+            retrieve matter document activity user to list
+            </summary>
+            <param name="id">Matter Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.MatterHistoryExists(System.Guid)">
+            <summary>
+            Check if Matter History Exists
+            </summary>
+            <param name="id">Matter Id to retrieve</param>
+            <returns>True if Matter History exists, false otherwise</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMatterHistoryAsync(System.Guid)">
+            <summary>
+            gets specific matter history
+            </summary>
+            <param name="id">Matter to retrieve</param>
+            <returns>Matter history</returns>
+            <response code="200">Returns the requested matter history</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.RestoreMatterAsync(System.Guid)">
+            <summary>
+            undelete specific matter
+            </summary>
+            <param name="id">Matter Id to restore</param>
+            <returns>true if restored, false otherwise</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMattersAsync(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            gets list of matters
+            </summary>
+            <param name="description">matter description</param>
+            <param name="includeArchived">include archived matters</param>
+            <param name="includeDeleted">include deleted matters</param>
+            <returns>list of matters not including documents</returns>
+            <response code="200">Returns the requested matters</response>
+            <response code="400">An error occured</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.UpdateMatter(System.Guid,ADMS.API.Models.MatterForUpdateDto)">
+            <summary>
+            Updates matter details
+            </summary>
+            <param name="id">Matter Id</param>
+            <param name="matter">matter to be updated</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.UploadNewFileAsync(System.Guid,Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)">
+            <summary>
+            Upload a new file to the ADMS system
+            </summary>
+            <param name="id">Matter to save the document to</param>
+            <param name="fileUpload">file to be uploaded</param>
+            <param name="cancelToken">cancellation token</param>
+            <returns>IActionResult</returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.AddCustomDocumentProperties(System.String,System.String,System.Guid,System.Guid,System.Guid,ADMS.API.Controllers.MatterController.DocumentType)">
+            <summary>
+            Adds custom document properties to various office documents
+            </summary>
+            <param name="tempFile">temporary file used to add properties</param>
+            <param name="fileName">final filename to save file to</param>
+            <param name="documentId">document Id to add</param>
+            <param name="revisionId">revision Id to add</param>
+            <param name="matterId">matter Id to add</param>
+            <param name="docType">type of document to add properties to</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.AddOrUpdateDocumentProperty(System.Object,System.String,System.String,ADMS.API.Controllers.MatterController.DocumentType)">
+            <summary>
+            Add or update individual document property
+            </summary>
+            <param name="document">document to add property to</param>
+            <param name="propertyName">specific property to add</param>
+            <param name="propertyValue">specific value to add</param>
+            <param name="docType">type of document to add property to</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.SetDocumentProperty(System.Object,System.String,System.String,ADMS.API.Controllers.MatterController.DocumentType)">
+            <summary>
+            Sets specific document property
+            </summary>
+            <param name="document">document to add property to</param>
+            <param name="propertyName">specific property to add</param>
+            <param name="propertyValue">specific value to add</param>
+            <param name="docType">type of document to add property to</param>
+        </member>
+        <member name="F:ADMS.API.Controllers.MatterController.wordExtensionsToFormatType">
+            <summary>
+            Word extension to Syncfusion format
+            </summary>
+        </member>
+        <member name="F:ADMS.API.Controllers.MatterController.excelExtensionsToFormatType">
+            <summary>
+            Excel extension to Syncfusion format
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Controllers.MatterController.DocumentType">
+            <summary>
+            Office document types
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Controllers.RevisionController">
+            <summary>
+            Matter actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.RevisionController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
+            <summary>
+            Revision Controller Constructor
+            </summary>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+            <param name="mapper">atomapper to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.CreateRevision(System.Guid,System.Guid,ADMS.API.Models.RevisionForCreationDto)">
+            <summary>
+            Creates a revision
+            </summary>
+            <param name="matterId">Matter to be added to</param>
+            <param name="documentId">Document to add revision to</param>
+            <param name="revision">revision to add</param>
+            <returns></returns>
+            <response code="200">Returns the created revision</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.DeleteRevision(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Delete specified revision
+            </summary>
+            <param name="matterId">Matter containing the docunment in question</param>
+            <param name="documentId">document containing revision to be deleted</param>
+            <param name="id">revision to be deleted</param>
+            <returns></returns>
+            <response code="204">Deletion undertaken</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, Document or Revision not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.GetRevisionAsync(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            gets specific revision
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document containing revision</param>
+            <param name="id">Revision Id to retrieve</param>
+            <returns>revision to be retrieved</returns>
+            <response code="200">Returns the requested matters</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, document or revision not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.GetRevisionHistoryAsync(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            gets specific revision history
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document containing revision</param>
+            <param name="id">Revision Id to retrieve</param>
+            <returns>revision to be retrieved</returns>
+            <response code="200">Returns the requested matters</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, document or revision not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.GetRevisionsAsync(System.Guid,System.Guid,System.Boolean)">
+            <summary>
+            gets list of revisions
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document to retrieve revisions for</param>
+            <param name="includeDeleted">include deleted revisions</param>
+            <returns>list of revisions</returns>
+            <response code="200">Returns the requested revisions</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.UpdateRevision(System.Guid,System.Guid,System.Guid,ADMS.API.Models.RevisionForUpdateDto)">
+            <summary>
+            Updates revision details
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">Document containing revision</param>
+            <param name="id">Revision Id</param>
+            <param name="revision">revision to be updated</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, Document or Revision not found</response>
+        </member>
+        <member name="T:ADMS.API.DbContexts.AdmsContext">
+            <summary>
+            ADMS Context for database access
+            </summary>
+            <remarks>
+            Adms constructor
+            </remarks>
+            <param name="options"></param>
+        </member>
+        <member name="M:ADMS.API.DbContexts.AdmsContext.#ctor(Microsoft.EntityFrameworkCore.DbContextOptions{ADMS.API.DbContexts.AdmsContext})">
+            <summary>
+            ADMS Context for database access
+            </summary>
+            <remarks>
+            Adms constructor
+            </remarks>
+            <param name="options"></param>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.Documents">
+            <summary>
+            Documents database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.DocumentActivities">
+            <summary>
+            DocumentActivities database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.Matters">
+            <summary>
+            Matters database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.MatterActivities">
+            <summary>
+            MatterActivities database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.DocumentActivityUsers">
+            <summary>
+            DocumentActivityUsers database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.MatterDocumentActivities">
+            <summary>
+            MatterDocumentActivities database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUsersFrom database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUsersTo database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.RevisionActivities">
+            <summary>
+            RevisionActivities database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.Revisions">
+            <summary>
+            Revisions database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.Users">
+            <summary>
+            Users database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.MatterActivityUsers">
+            <summary>
+            MatterActivityUsers database set for database access
+            </summary>
+        </member>
+        <member name="P:ADMS.API.DbContexts.AdmsContext.RevisionActivityUsers">
+            <summary>
+            RevisionActivityUsers database set for database access
+            </summary>
+        </member>
+        <member name="M:ADMS.API.DbContexts.AdmsContext.OnModelCreating(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <summary>
+            On Model Creating method
+            </summary>
+            <param name="modelBuilder">model builder in use</param>
+        </member>
+        <member name="T:ADMS.API.Entities.Document">
+            <summary>
+            Document Entity Framework class
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Id">
+            <summary>
+            ID, key field
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.FileName">
+            <summary>
+            file name of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.MatterId">
+            <summary>
+            Matter Id linked to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Matter">
+            <summary>
+            Matter the document is linked to
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.IsDeleted">
+            <summary>
+            Identifies if this document has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Revisions">
+            <summary>
+            Document revisions
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.DocumentActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUser
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUser
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.DocumentActivity">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.DocumentActivity.#ctor">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivity.Id">
+            <summary>
+            Document Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivity.Activity">
+            <summary>
+            Document Activity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivity.DocumentActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.DocumentActivityUser">
+            <summary>
+            Document Activity User join
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.DocumentId">
+            <summary>
+            Document Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.Document">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.DocumentActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.DocumentActivity">
+            <summary>
+            DocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.Matter">
+            <summary>
+            Matter for document storage
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.Id">
+            <summary>
+            Matter primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.Description">
+            <summary>
+            Matter description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.IsDeleted">
+            <summary>
+            Identifies if the Matter has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.Documents">
+            <summary>
+            Documents linked to the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.MatterDocumentActivityUsersFrom">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.MatterDocumentActivityUsersTo">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterActivity">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.MatterActivity.#ctor">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivity.Id">
+            <summary>
+            Matter Activity Primary Key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivity.Activity">
+            <summary>
+            name of the activity being undertaken
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivity.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterActivityUser">
+            <summary>
+            shared type entity for many to many tables
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.Matter">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.MatterActivityId">
+            <summary>
+            Matter Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.MatterActivity">
+            <summary>
+            MatterActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+            [Key]
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivity">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.MatterDocumentActivity.#ctor">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.Id">
+            <summary>
+            Matter Document Activity Primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.MatterDocumentActivityUsersFrom">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.MatterDocumentActivityUsersTo">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivityUserFrom">
+            <summary>
+            Matter DocumentActivity User linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivityUserTo">
+            <summary>
+            Matter DocumentActivity User linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.RevisionActivity">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.RevisionActivity.#ctor">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivity.Id">
+            <summary>
+            Revision Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivity.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivity.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.RevisionActivityUser">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.RevisionId">
+            <summary>
+            Revision Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.Revision">
+            <summary>
+            Revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.RevisionActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.RevisionActivity">
+            <summary>
+            RevisionActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.Revision">
+            <summary>
+            document revisions
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.Id">
+            <summary>
+            Revision primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.DocumentId">
+            <summary>
+            Document ID linked to this revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.Document">
+            <summary>
+            Document linked to this revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.IsDeleted">
+            <summary>
+            Indicates if a revision is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.User">
+            <summary>
+            User information
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.Id">
+            <summary>
+            user primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.Name">
+            <summary>
+            user name
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.DocumentActivityUsers">
+            <summary>
+            Document Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.MatterDocumentActivityUsersFrom">
+            <summary>
+            Matter Document Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.MatterDocumentActivityUsersTo">
+            <summary>
+            Matter Document Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Migrations.CreateDatabaseAndSeedTestData">
+            <inheritdoc />
+        </member>
+        <member name="M:ADMS.API.Migrations.CreateDatabaseAndSeedTestData.Up(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:ADMS.API.Migrations.CreateDatabaseAndSeedTestData.Down(Microsoft.EntityFrameworkCore.Migrations.MigrationBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="M:ADMS.API.Migrations.CreateDatabaseAndSeedTestData.BuildTargetModel(Microsoft.EntityFrameworkCore.ModelBuilder)">
+            <inheritdoc />
+        </member>
+        <member name="T:ADMS.API.Models.DocumentActivityDto">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityDto.Id">
+            <summary>
+            Document Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityDto.Activity">
+            <summary>
+            Document Activity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityDto.DocumentActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentActivityUserDto">
+            <summary>
+            Document Activity User join
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentId">
+            <summary>
+            Document Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.Document">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentActivity">
+            <summary>
+            DocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentDto">
+            <summary>
+            Document DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Id">
+            <summary>
+            Id of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.FileName">
+            <summary>
+            Filename of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.IsDeleted">
+            <summary>
+            is the file deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Revisions">
+            <summary>
+            revisions assigned to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentForCreationDto">
+            <summary>
+            Document DTO used to create new documents
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.FileName">
+            <summary>
+            Filename of the document to be created
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.Extension">
+            <summary>
+            Extension for the file in question
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.CreationDate">
+            <summary>
+            Creation date for file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.ModificationDate">
+            <summary>
+            Modification date for file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentForUpdateDto">
+            <summary>
+            Document For Update Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.FileName">
+            <summary>
+            filename for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.Extension">
+            <summary>
+            file extension for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.IsDeleted">
+            <summary>
+            indicates if the document is deleted
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentWithoutRevisionsDto">
+            <summary>
+            Document DTO without Revisions included
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Id">
+            <summary>
+            ID for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.FileName">
+            <summary>
+            filename for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Extension">
+            <summary>
+            file extension for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.IsDeleted">
+            <summary>
+            indicates if the document is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentWithRevisionsDto">
+            <summary>
+            Document DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Id">
+            <summary>
+            Id of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.FileName">
+            <summary>
+            Filename of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.IsDeleted">
+            <summary>
+            indicates if the document is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Revisions">
+            <summary>
+            revisions assigned to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterActivityDto">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityDto.Id">
+            <summary>
+            Matter Activity Primary Key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityDto.Activity">
+            <summary>
+            name of the activity being undertaken
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityDto.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterActivityUserDto">
+            <summary>
+            shared type entity for many to many tables
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.Matter">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterActivityId">
+            <summary>
+            Matter Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterActivity">
+            <summary>
+            MatterActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+            [Key]
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityDto">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.Id">
+            <summary>
+            Matter Document Activity Primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityUserFromDto">
+            <summary>
+            MatterDocumentActivityUserFrom linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.LocalCreatedAtDateString">
+            <summary>
+            local created at timestring
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityUserToDto">
+            <summary>
+            MatterDocumentActivityUserTo linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.LocalCreatedAtDateString">
+            <summary>
+            local created at timestring
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDto">
+            <summary>
+            Matter Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.Id">
+            <summary>
+            Matter primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.Description">
+            <summary>
+            Matter description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.IsDeleted">
+            <summary>
+            Identifies if the Matter has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.Documents">
+            <summary>
+            Documents linked to the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterForCreationDto">
+            <summary>
+            Matter for creation Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForCreationDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForCreationDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForCreationDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterForUpdateDto">
+            <summary>
+            Matter For Update Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForUpdateDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForUpdateDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForUpdateDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterWithDocumentsDto">
+            <summary>
+            Matter including documents Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Id">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.IsDeleted">
+            <summary>
+            indicates if the matter is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Documents">
+            <summary>
+            Documents linked to the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterWithoutDocumentsDto">
+            <summary>
+            Matter Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.Id">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.IsDeleted">
+            <summary>
+            indicates if the matter is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionActivityDto">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityDto.Id">
+            <summary>
+            Revision Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityDto.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityDto.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionActivityUserDto">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionId">
+            <summary>
+            Revision Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.Revision">
+            <summary>
+            Revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivity">
+            <summary>
+            RevisionActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionDto">
+            <summary>
+            Revision DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.Id">
+            <summary>
+            Revision primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.IsDeleted">
+            <summary>
+            indicates if the revision is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.LocalCreationDateString">
+            <summary>
+            Local Creation Date string
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.LocalModificationDateString">
+            <summary>
+            Local Modification Date string
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionForCreationDto">
+            <summary>
+            Revision Dto for creation of new revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.IsDeleted">
+            <summary>
+            indicates if the revision is deleted
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionForUpdateDto">
+            <summary>
+            Revision Dto for update of new revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.UserDto">
+            <summary>
+            User information
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.Id">
+            <summary>
+            user primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.Name">
+            <summary>
+            user name
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.DocumentActivityUsers">
+            <summary>
+            Document Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.DocumentActivityProfile">
+            <summary>
+            Document Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.DocumentActivityProfile.#ctor">
+            <summary>
+            Document Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.DocumentActivityUserProfile">
+            <summary>
+            Document Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.DocumentActivityUserProfile.#ctor">
+            <summary>
+            Document Activity User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.DocumentProfile">
+            <summary>
+            Automapper profile
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.DocumentProfile.#ctor">
+            <summary>
+            Document profile constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterActivityProfile">
+            <summary>
+            Matter Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterActivityProfile.#ctor">
+            <summary>
+            Matter Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterActivityUserProfile">
+            <summary>
+            Matter Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterActivityUserProfile.#ctor">
+            <summary>
+            Matter Activity User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterDocumentActivityProfile">
+            <summary>
+            Matter Document Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterDocumentActivityProfile.#ctor">
+            <summary>
+            Matter Document Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterDocumentActivityUserFromProfile">
+            <summary>
+            Matter Document Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterDocumentActivityUserFromProfile.#ctor">
+            <summary>
+            MatterDocumentActivityUserFrom Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterDocumentActivityUserToProfile">
+            <summary>
+            Matter Document Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterDocumentActivityUserToProfile.#ctor">
+            <summary>
+            MatterDocumentActivityUserTo Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterProfile">
+            <summary>
+            Automapper profile
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterProfile.#ctor">
+            <summary>
+            Matter profile constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.RevisionActivityProfile">
+            <summary>
+            Revision Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.RevisionActivityProfile.#ctor">
+            <summary>
+            Revision Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.RevisionActivityUserProfile">
+            <summary>
+            Revision Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.RevisionActivityUserProfile.#ctor">
+            <summary>
+            Revision Activity User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.RevisionProfile">
+            <summary>
+            Revision Profile fpr autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.RevisionProfile.#ctor">
+            <summary>
+            Revision Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.UserProfile">
+            <summary>
+            User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.UserProfile.#ctor">
+            <summary>
+            User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Services.AdmsRepository">
+            <summary>
+            Adms Repository containing implementation details.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Services.AdmsRepository},ADMS.API.DbContexts.AdmsContext,AutoMapper.IMapper)">
+            <summary>
+            Adms Context constructor
+            </summary>
+            <param name="logger">logging mechanism</param>
+            <param name="context">context to use</param>
+            <param name="mapper">Data Mapper to convert from Dto to entity class</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.AddDocumentAsync(System.Guid,ADMS.API.Models.DocumentForCreationDto)">
+            <summary>
+            Add document to existing task.
+            </summary>
+            <param name="matterId">matter to add document to</param>
+            <param name="document">document to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckinDocumentAsync(System.Guid)">
+            <summary>
+            Checks in document after editing
+            </summary>
+            <param name="documentId">document to be checked in</param>
+            <returns>true if document checked in, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckoutDocumentAsync(System.Guid)">
+            <summary>
+            Check out document for editing
+            </summary>
+            <param name="documentId">document to be checked out</param>
+            <returns>true if checked out, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.DeleteDocumentAsync(ADMS.API.Models.DocumentDto)">
+            <summary>
+            Deletes a specified document
+            </summary>
+            <param name="document">document to be deleted</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckDocumentExistsAsync(System.Guid)">
+            <summary>
+            Document existence check
+            </summary>
+            <param name="documentId">document to check existence of</param>
+            <returns>true if document exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetDocumentAsync(System.Guid,System.Boolean)">
+            <summary>
+            Gets documents and conditionally revisions based on a selected document id
+            </summary>
+            <param name="documentId">docuent to retrieve</param>
+            <param name="includeRevisions">include revisions with return data</param>
+            <returns>Document</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetDocumentByFileNameAsync(System.Guid,System.String)">
+            <summary>
+            Gets a documnt by the filename entered
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="fileName">filename required</param>
+            <returns>Diocument matching file name</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetDocumentsAsync(System.Guid,System.Boolean)">
+            <summary>
+            Gets a llist of documents without filter
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="includeDeleted">includes deleted documents</param>
+            <returns>list of documents</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetDocumentsAsync(System.Guid,System.String,System.String,System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            Gets document
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="fileName">filename to search for</param>
+            <param name="searchQuery">additional parameters to search for</param>
+            <param name="includeDeleted">include deleted documents</param>
+            <param name="pageNumber">page number in use</param>
+            <param name="pageSize">page size in use</param>
+            <returns>List of documents and pagination metadata</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetDocumentWithHistoryByIdAsync(System.Guid)">
+            <summary>
+            Retrieves document history by specified Id
+            </summary>
+            <param name="id">document history to retrieve</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetDcumentActivityByActivity(System.String)">
+            <summary>
+            Retrieves document activity by activity
+            </summary>
+            <param name="activity">activity to retrieve</param>
+            <returns>DocumentActivity</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.AddMatterAsync(ADMS.API.Models.MatterDto)">
+            <summary>
+            Add a matter to the matters collection
+            </summary>
+            <param name="matter">matter to be added</param>
+            <returns>matter created</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckMatterExists(System.Guid)">
+            <summary>
+            Check if a matter exists
+            </summary>
+            <param name="matterId">matter to check</param>
+            <returns>true if exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckMatterExists(System.String)">
+            <summary>
+            Check if a matter exists
+            </summary>
+            <param name="description">description of matter to identify</param>
+            <returns>true if exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.DeleteMatterAsync(ADMS.API.Models.MatterDto)">
+            <summary>
+            Deletes a metter
+            </summary>
+            <param name="matter">matter to be deleted</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetMattersAsync(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Gets list of matters ordered by description
+            </summary>
+            <param name="description">matter description being searched for</param>
+            <param name="includeArchived">include archived matters in returned result</param>
+            <param name="includeDeleted">include deleted matters in returned data</param>
+            <returns>IEnumerable Matter</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetMatterAsync(System.Guid,System.Boolean)">
+            <summary>
+            Get matter by id
+            </summary>
+            <param name="matterId">matter id to retrieve</param>
+            <param name="includeDocuments">include documents in returned matter</param>
+            <returns>matter</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.RestoreMatterAsync(System.Guid)">
+            <summary>
+            Restore Matter by id
+            </summary>
+            <param name="matterId">matter id to restore</param>
+            <returns>True if matter restored, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetMatterWithHistoryByIdAsync(System.Guid)">
+            <summary>
+            Retrieves matter history by specified Id
+            </summary>
+            <param name="id">matter history to retrieve</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetMDAUFromHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            Get matter document activity user from list
+            </summary>
+            <param name="matterId">matter to retrieve data for</param>
+            <param name="documentId">document to retrieve data for</param>
+            <returns>collection of matter document activity user histories</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetMDAUToHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            Get matter document activity user from list
+            </summary>
+            <param name="matterId">matter to retrieve data for</param>
+            <param name="documentId">document to retrieve data for</param>
+            <returns>collection of matter document activity user histories</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.DoesMatterHistoryExists(System.Guid)">
+            <summary>
+            Identifies if matter history exists
+            </summary>
+            <param name="id">Matter to check</param>
+            <returns>true if Matter History exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetMatterActivityByActivity(System.String)">
+            <summary>
+            Gets MatterActivity by activity
+            </summary>
+            <param name="activity">activity to retrieve</param>
+            <returns>MatterActivity</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckRevisionActivityExists(System.String)">
+            <summary>
+            checks if a revision activity already exists
+            </summary>
+            <param name="activity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetRevisionActivityByActivityAsync(System.String)">
+            <summary>
+            Gets revision activity for given activity
+            </summary>
+            <param name="activity"></param>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.UpdateRevisionsAsync(System.Guid,System.Guid,System.Guid,ADMS.API.Models.RevisionDto)">
+            <summary>
+            Update specified revision
+            </summary>
+            <param name="matterId">Matter containing revision to update</param>
+            <param name="documentId">Document containing revision to be updated</param>
+            <param name="revisionId">Revision to be updated</param>
+            <param name="revision">Revision containing data to be updated</param>
+            <returns>Updated revision</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.AddRevisionAsync(System.Guid,ADMS.API.Models.RevisionDto)">
+            <summary>
+            Adds revision to document
+            </summary>
+            <param name="documentId">document to be added to </param>
+            <param name="revision">revision to add</param>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CheckRevisionExistsAsync(System.Guid)">
+            <summary>
+            Checks if revision Id exists
+            </summary>
+            <param name="id">revision to check</param>
+            <returns>true if exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.DeleteRevisionAsync(ADMS.API.Models.RevisionDto)">
+            <summary>
+            Deletes a specified revision
+            </summary>
+            <param name="revision">The revision to be deleted</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetRevisionByIdAsync(System.Guid)">
+            <summary>
+            Retrieves revision by specified Id
+            </summary>
+            <param name="id">revision to retrieve</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetRevisionWithHistoryByIdAsync(System.Guid)">
+            <summary>
+            Retrieves revision history by specified Id
+            </summary>
+            <param name="id">revision to retrieve</param>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetRevisionsAsync(System.Guid,System.Boolean)">
+            <summary>
+            Get list of revisions
+            </summary>
+            <param name="documentId">document to retrieve revisions for</param>
+            <param name="includeDeleted">include deleted revisions</param>
+            <returns>list of revisions</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.GetUserByUsername(System.String)">
+            <summary>
+            Gets a user by username
+            </summary>
+            <param name="username">username being requested</param>
+            <returns>User</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.SaveChangesAsync">
+            <summary>
+            persists the saved data to the database
+            </summary>
+            <returns>true if data could be saved to the database, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.CopyDocumentAsync(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Copy document from one matter to another as a new document
+            </summary>
+            <param name="document">document to be copied</param>
+            <param name="matterId">new matter to copy to</param>
+            <returns>true if copied, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.AdmsRepository.MoveDocumentAsync(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Move document from onw matter to another
+            </summary>
+            <param name="document">document to be moved</param>
+            <param name="matterId">new matter to move document to</param>
+            <returns>true if moved, false otherwise</returns>
+            <exception cref="T:System.NotImplementedException"></exception>
+        </member>
+        <member name="T:ADMS.API.Services.IAdmsRepository">
+            <summary>
+            ADMS Repository identifying actions used.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.AddDocumentAsync(System.Guid,ADMS.API.Models.DocumentForCreationDto)">
+            <summary>
+            Adds document to selected matter
+            </summary>
+            <param name="matterId">matter Id to add to</param>
+            <param name="document">document to be added</param>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckDocumentExistsAsync(System.Guid)">
+            <summary>
+            Checks to see if a specified document exists
+            </summary>
+            <param name="documentId">Document ID to be checked</param>
+            <returns>True if the document exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckinDocumentAsync(System.Guid)">
+            <summary>
+            Checkin document
+            </summary>
+            <param name="documentId">document to be checked out</param>
+            <returns>true if checked in, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckoutDocumentAsync(System.Guid)">
+            <summary>
+            Checkout document for editing
+            </summary>
+            <param name="documentId">document to be checked out</param>
+            <returns>true if checked out, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.DeleteDocumentAsync(ADMS.API.Models.DocumentDto)">
+            <summary>
+            Deletes a document
+            </summary>
+            <param name="document">document to be deleted</param>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetDocumentsAsync(System.Guid,System.Boolean)">
+            <summary>
+            Gets a list of Documents.
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="includeDeleted">include deleted documents</param>
+            <returns>A list of documents</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetDocumentsAsync(System.Guid,System.String,System.String,System.Boolean,System.Int32,System.Int32)">
+            <summary>
+            Gets a filtered set of Documents
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="fileName">Filename to search for</param>
+            <param name="searchQuery">Additional search terms to find</param>
+            <param name="includeDeleted">include deleted documents</param>
+            <param name="pageNumber">Page Number being sought.</param>
+            <param name="pageSize">Number of records per page.</param>
+            <returns>Document and pagination information.</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetDocumentAsync(System.Guid,System.Boolean)">
+            <summary>
+            Gets a single document details
+            </summary>
+            <param name="documentId">Document Id</param>
+            <param name="includeRevisions">Should the document return with revision information</param>
+            <returns>Document and associated revisions</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetDocumentByFileNameAsync(System.Guid,System.String)">
+            <summary>
+            Gets a document by entered filename
+            </summary>
+            <param name="matterId">matter containing document(s)</param>
+            <param name="fileName">File name of the document being searched.</param>
+            <returns>Document</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetDocumentWithHistoryByIdAsync(System.Guid)">
+            <summary>
+            retrieve document history by id
+            </summary>
+            <param name="id">document to retrieve history from</param>
+            <returns>Document history to be retrieved</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CopyDocumentAsync(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Copy document from one matter to another
+            </summary>
+            <param name="document">document to copy</param>
+            <param name="matterId">matter to copy document to</param>
+            <returns>true if copied, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.MoveDocumentAsync(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Move document from one matter to another
+            </summary>
+            <param name="document">document to be moved</param>
+            <param name="matterId">matter to be moved to</param>
+            <returns>true if moved, false if not</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetDcumentActivityByActivity(System.String)">
+            <summary>
+            Gets a DocumentActivity by activity
+            </summary>
+            <param name="activity">activity to be retrieved</param>
+            <returns>DocumentActivity</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.AddMatterAsync(ADMS.API.Models.MatterDto)">
+            <summary>
+            Adds a matter to the repository
+            </summary>
+            <param name="matter">matter to be added.</param>
+            <returns>matter that has been created</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckMatterExists(System.Guid)">
+            <summary>
+            Checks if matter exists
+            </summary>
+            <param name="matterId">Matter to check</param>
+            <returns>true if exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckMatterExists(System.String)">
+            <summary>
+            Checks if matter exists
+            </summary>
+            <param name="description">description of matter to identify</param>
+            <returns>true if exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.DeleteMatterAsync(ADMS.API.Models.MatterDto)">
+            <summary>
+            Delete matter
+            </summary>
+            <param name="matter">matter to be deleted</param>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetMattersAsync(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            Gets list of matters not including documents
+            </summary>
+            <param name="description">matter description</param>
+            <param name="includeArchived">include archived matters</param>
+            <param name="includeDeleted">include deleted matters</param>
+            <returns>list of matters</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetMatterAsync(System.Guid,System.Boolean)">
+            <summary>
+            Gets a matter by Id
+            </summary>
+            <param name="matterId">matter to return</param>
+            <param name="includeDocuments">include documents with returned matter</param>
+            <returns>Matter</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.RestoreMatterAsync(System.Guid)">
+            <summary>
+            Restore Matter by id
+            </summary>
+            <param name="matterId">matter id to restore</param>
+            <returns>True if matter restored, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetMatterWithHistoryByIdAsync(System.Guid)">
+            <summary>
+            retrieve matter history by id
+            </summary>
+            <param name="id">matter to retrieve history from</param>
+            <returns>Matter with history to be retrieved</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetMDAUFromHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            Get matter document activity user from list
+            </summary>
+            <param name="matterId">matter to retrieve data for</param>
+            <param name="documentId">document to retrieve data for</param>
+            <returns>collection of matter document activity user histories</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetMDAUToHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            Get matter document activity user to list
+            </summary>
+            <param name="matterId">matter to retrieve data for</param>
+            <param name="documentId">document to retrieve data for</param>
+            <returns>collection of matter document activity user histories</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.DoesMatterHistoryExists(System.Guid)">
+            <summary>
+            Identifies if matter history exists
+            </summary>
+            <param name="id">Matter to check</param>
+            <returns>true if Matter History exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetMatterActivityByActivity(System.String)">
+            <summary>
+            Gets a MatterActivity by activity
+            </summary>
+            <param name="activity">activity to be retrieved</param>
+            <returns>MatterActivity</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.AddRevisionAsync(System.Guid,ADMS.API.Models.RevisionDto)">
+            <summary>
+            Ad revision to selected document
+            </summary>
+            <param name="documentId">Document to add the revision to</param>
+            <param name="revision">revision to add</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckRevisionExistsAsync(System.Guid)">
+            <summary>
+            Checks to see if a specified revision exists
+            </summary>
+            <param name="id">Revision ID to be checked</param>
+            <returns>True if the document exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.DeleteRevisionAsync(ADMS.API.Models.RevisionDto)">
+            <summary>
+            Deletes a revision from a document
+            </summary>
+            <param name="revision">The revision to be deleted</param>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetRevisionByIdAsync(System.Guid)">
+            <summary>
+            retrieve revision by id
+            </summary>
+            <param name="id">revision to be deleted</param>
+            <returns>Revision to be retrieved</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetRevisionWithHistoryByIdAsync(System.Guid)">
+            <summary>
+            retrieve revision history by revision id
+            </summary>
+            <param name="id">revision to be deleted</param>
+            <returns>Revision to be retrieved</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetRevisionsAsync(System.Guid,System.Boolean)">
+            <summary>
+            Get list of revisions
+            </summary>
+            <param name="documentId">Document Id to retrieve revisions for</param>
+            <param name="includeDeleted">include deleted revisions</param>
+            <returns>list of revisions</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.UpdateRevisionsAsync(System.Guid,System.Guid,System.Guid,ADMS.API.Models.RevisionDto)">
+            <summary>
+            update revision
+            </summary>
+            <param name="matterId">Matter containing revision</param>
+            <param name="documentId">Document being updated</param>
+            <param name="revisionId">Revision to be updated</param>
+            <param name="revision">Revision details to update</param>
+            <returns>list of revisions</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetRevisionActivityByActivityAsync(System.String)">
+            <summary>
+            Gets a revision activity by activity name
+            </summary>
+            <param name="activity">activity name being sourced</param>
+            <returns>RevisionActivity</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.CheckRevisionActivityExists(System.String)">
+            <summary>
+            Identifies if a revision activity exists by activity description
+            </summary>
+            <param name="activity">activity being checked</param>
+            <returns>true if activity exists, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.GetUserByUsername(System.String)">
+            <summary>
+            Get a user by enterted username
+            </summary>
+            <param name="username">username being requested</param>
+            <returns>User</returns>
+        </member>
+        <member name="M:ADMS.API.Services.IAdmsRepository.SaveChangesAsync">
+            <summary>
+            persists data to database
+            </summary>
+            <returns>true if successfull, false otherwise</returns>
+        </member>
+        <member name="T:ADMS.API.Services.PaginationMetadata">
+            <summary>
+            Pagination Metadata class
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Services.PaginationMetadata.TotalItemCount">
+            <summary>
+            Toital Item Count
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Services.PaginationMetadata.TotalPageCount">
+            <summary>
+            Total Page Count
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Services.PaginationMetadata.PageSize">
+            <summary>
+            Page Size
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Services.PaginationMetadata.CurrentPage">
+            <summary>
+            Current Page Number
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Services.PaginationMetadata.#ctor(System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Pagination Metadata Constructor
+            </summary>
+            <param name="totalItemCount">total item count</param>
+            <param name="pageSize">page size</param>
+            <param name="currentPage">current page</param>
+        </member>
+    </members>
+</doc>
