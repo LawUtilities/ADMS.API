@@ -16,31 +16,22 @@ namespace ADMS.API.Controllers
     /// <summary>
     /// Document actions
     /// </summary>
+    /// <remarks>
+    /// Document Controller constructor
+    /// </remarks>
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/matters/{matterId}/documents")]
-    public class DocumentController : ControllerBase
+    public class DocumentController(
+        ILogger<DocumentController> logger,
+        IAdmsRepository admsRepository,
+        IMapper mapper) : ControllerBase
     {
-        private readonly ILogger<DocumentController> _logger;
-        private readonly IAdmsRepository _admsRepository;
-        private readonly IMapper _mapper;
+        private readonly ILogger<DocumentController> _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+        private readonly IAdmsRepository _admsRepository = admsRepository ?? throw new ArgumentNullException(nameof(admsRepository));
+        private readonly IMapper _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
 
         const int maxDocumentsPageSize = 50;
-        private const string ServerFilesPath = @"C:\Dev\Repos\ADMSServerFiles";
-        private const string PdfFolderName = "PDF";
-
-        /// <summary>
-        /// Document Controller constructor
-        /// </summary>
-        public DocumentController(
-            ILogger<DocumentController> logger,
-            IAdmsRepository admsRepository,
-            IMapper mapper)
-        {
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _admsRepository = admsRepository ?? throw new ArgumentNullException(nameof(admsRepository));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
-        }
 
         #region Actions
 
@@ -102,8 +93,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while creating document: {document}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while creating document: {document}",
+                                    args: exception);
                 return BadRequest();
             }
         }
@@ -171,8 +162,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while copying document: {document}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while copying document: {document}",
+                                    args: exception);
                 return BadRequest();
             }
         }
@@ -203,8 +194,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving Document with id: {{id}}";
-                _logger.LogCritical(errorMessage, exception);
+                _logger.LogCritical(message: "An error occured while retrieving Document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -235,8 +226,7 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving Document with id: {{id}}";
-                _logger.LogCritical(errorMessage, exception);
+                _logger.LogCritical("An error occured while retrieving Document with id: {id}", exception);
                 return BadRequest("An error occured");
             }
         }
@@ -292,8 +282,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while creating document: {document}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while creating document: {document}",
+                                    args: exception);
                 return BadRequest();
             }
         }
@@ -343,8 +333,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving Document with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while retrieving Document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -392,8 +382,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving Document with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while retrieving Document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -428,8 +418,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while checking out document with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while checking out document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -464,8 +454,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while checking in document with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while checking in document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -507,8 +497,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving document history with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while retrieving document history with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -558,8 +548,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving Documents";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while retrieving documentsfrom Matter: {matterId}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -640,8 +630,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving Document with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while retrieving Document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }
@@ -708,8 +698,8 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while updating Document with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                _logger.LogCritical(message: "An error occured while updating Document with id: {id}",
+                                    args: exception);
                 return BadRequest("An error occured");
             }
         }

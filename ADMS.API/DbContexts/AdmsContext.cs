@@ -1,4 +1,5 @@
 ﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
 using Microsoft.EntityFrameworkCore;
 

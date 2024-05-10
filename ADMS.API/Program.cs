@@ -10,7 +10,7 @@ using Serilog;
 
 using System.Reflection;
 
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXxfeHZVRGJfVk1/W0Q=");
+Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NBaF5cXmZCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdnWXpecXRXRmNdVU1+V0s=");
 
 Log.Logger = new LoggerConfiguration()
     .MinimumLevel.Information()

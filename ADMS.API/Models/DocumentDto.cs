@@ -38,21 +38,21 @@ namespace ADMS.API.Models
         /// <summary>
         /// revisions assigned to the document
         /// </summary>
-        public ICollection<RevisionDto> Revisions { get; set; } = new HashSet<RevisionDto>();
+        public ICollection<RevisionDto> Revisions { get; set; } = [];
 
         /// <summary>
         /// document activities user
         /// </summary>
-        public ICollection<DocumentActivityUserDto> DocumentActivityUsers { get; set; } = new HashSet<DocumentActivityUserDto>();
+        public ICollection<DocumentActivityUserDto> DocumentActivityUsers { get; set; } = [];
 
         /// <summary>
         /// MatterDocumentActivityUserFrom
         /// </summary>
-        public ICollection<MatterDocumentActivityUserFromDto> MatterDocumentActivityUsersFrom { get; set; } = new HashSet<MatterDocumentActivityUserFromDto>();
+        public ICollection<MatterDocumentActivityUserFromDto> MatterDocumentActivityUsersFrom { get; set; } = [];
 
         /// <summary>
         /// MatterDocumentActivityUserTo
         /// </summary>
-        public ICollection<MatterDocumentActivityUserToDto> MatterDocumentActivityUsersTo { get; set; } = new HashSet<MatterDocumentActivityUserToDto>();
+        public ICollection<MatterDocumentActivityUserToDto> MatterDocumentActivityUsersTo { get; set; } = [];
     }
 }

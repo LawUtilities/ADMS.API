@@ -8,6 +8,7 @@ namespace ADMS.API.Services
     /// </summary>
     public interface IAdmsRepository
     {
+
         #region Documents
 
         /// <summary>

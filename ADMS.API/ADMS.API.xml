@@ -8,11 +8,17 @@
             <summary>
             Document actions
             </summary>
+            <remarks>
+            Document Controller constructor
+            </remarks>
         </member>
         <member name="M:ADMS.API.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.DocumentController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
             <summary>
-            Document Controller constructor
+            Document actions
             </summary>
+            <remarks>
+            Document Controller constructor
+            </remarks>
         </member>
         <member name="M:ADMS.API.Controllers.DocumentController.CreateDocument(System.Guid,ADMS.API.Models.DocumentForCreationDto)">
             <summary>
@@ -412,11 +418,20 @@
             <summary>
             Matter actions
             </summary>
+            <remarks>
+            Revision Controller Constructor
+            </remarks>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+            <param name="mapper">atomapper to use</param>
         </member>
         <member name="M:ADMS.API.Controllers.RevisionController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.RevisionController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
             <summary>
-            Revision Controller Constructor
+            Matter actions
             </summary>
+            <remarks>
+            Revision Controller Constructor
+            </remarks>
             <param name="logger">logger to be used by this controller</param>
             <param name="admsRepository">repository to use</param>
             <param name="mapper">atomapper to use</param>
@@ -2147,11 +2162,20 @@
             <summary>
             Adms Repository containing implementation details.
             </summary>
+            <remarks>
+            Adms Context constructor
+            </remarks>
+            <param name="logger">logging mechanism</param>
+            <param name="context">context to use</param>
+            <param name="mapper">Data Mapper to convert from Dto to entity class</param>
         </member>
         <member name="M:ADMS.API.Services.AdmsRepository.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Services.AdmsRepository},ADMS.API.DbContexts.AdmsContext,AutoMapper.IMapper)">
             <summary>
-            Adms Context constructor
+            Adms Repository containing implementation details.
             </summary>
+            <remarks>
+            Adms Context constructor
+            </remarks>
             <param name="logger">logging mechanism</param>
             <param name="context">context to use</param>
             <param name="mapper">Data Mapper to convert from Dto to entity class</param>

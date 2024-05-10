@@ -13,30 +13,23 @@ namespace ADMS.API.Controllers
     /// <summary>
     /// Matter actions
     /// </summary>
+    /// <remarks>
+    /// Revision Controller Constructor
+    /// </remarks>
+    /// <param name="logger">logger to be used by this controller</param>
+    /// <param name="admsRepository">repository to use</param>
+    /// <param name="mapper">atomapper to use</param>
     [ApiController]
     [ApiVersion("1.0")]
     [Route("api/v{version:apiVersion}/matters/{matterId}/documents/{documentId}/revisions")]
-    public class RevisionController : ControllerBase
+    public class RevisionController(
+        ILogger<RevisionController> logger,
+        IAdmsRepository admsRepository,
+        IMapper mapper) : ControllerBase
     {
-        private readonly ILogger<RevisionController> _logger;
-        private readonly IAdmsRepository _admsRepository;
-        private readonly IMapper _mapper;
-
-        /// <summary>
-        /// Revision Controller Constructor
-        /// </summary>
-        /// <param name="logger">logger to be used by this controller</param>
-        /// <param name="admsRepository">repository to use</param>
-        /// <param name="mapper">atomapper to use</param>
-        public RevisionController(
-            ILogger<RevisionController> logger,
-            IAdmsRepository admsRepository,
-            IMapper mapper)
-        {
-            _logger = logger;
-            _admsRepository = admsRepository;
-            _mapper = mapper;
-        }
+        private readonly ILogger<RevisionController> _logger = logger;
+        private readonly IAdmsRepository _admsRepository = admsRepository;
+        private readonly IMapper _mapper = mapper;
 
         /// <summary>
         /// Creates a revision
@@ -88,12 +81,21 @@ namespace ADMS.API.Controllers
 
                 Revision? createdRevision = await _admsRepository.AddRevisionAsync(documentId, finalRevision);
 
-                return await _admsRepository.SaveChangesAsync() ? (ActionResult<RevisionDto>)Ok(createdRevision) : (ActionResult<RevisionDto>)BadRequest("Could not create revision");
+                return await _admsRepository.SaveChangesAsync() ?
+                    (ActionResult<RevisionDto>)Ok(createdRevision) :
+                    (ActionResult<RevisionDto>)BadRequest("Could not create revision");
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while creating revision: {revision}";
-                _logger.LogCritical(exception: exception, message: errorMessage);
+                if (exception == null)
+                    return BadRequest("An error occured");
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    return BadRequest("An error occured");
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "An error occured while creating revision: {revision}",
+                                    args: [exception.StackTrace]);
                 return BadRequest("An error occured");
             }
         }
@@ -152,8 +154,15 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while deleting revision with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                if (exception == null)
+                    return BadRequest("An error occured");
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    return BadRequest("An error occured");
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "An error occured while deleting revision with id: {id}",
+                                    args: [exception.StackTrace]);
                 return BadRequest("An error occured");
             }
         }
@@ -199,8 +208,15 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving revision with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                if (exception == null)
+                    return BadRequest("An error occured");
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    return BadRequest("An error occured");
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "An error occured while retrieving revision with id: {id}",
+                                    args: [exception.StackTrace]);
                 return BadRequest("An error occured");
             }
         }
@@ -249,8 +265,15 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving revision history with id: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                if (exception == null)
+                    return BadRequest("An error occured");
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    return BadRequest("An error occured");
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "An error occured while retrieving revision history with id: {id}",
+                                    args: [exception.StackTrace]);
                 return BadRequest("An error occured");
             }
         }
@@ -291,8 +314,15 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while retrieving revisions for document with id: {documentId}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                if (exception == null)
+                    return BadRequest("An error occured");
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    return BadRequest("An error occured");
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "An error occured while retrieving revisions for document with id: {documentId}",
+                                    args: [exception.StackTrace]);
                 return BadRequest("An error occured");
             }
         }
@@ -349,8 +379,15 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                string errorMessage = $"An error occured while updating Revision with revisionId: {id}";
-                _logger.LogCritical(message: errorMessage, args: exception);
+                if (exception == null)
+                    return BadRequest("An error occured");
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    return BadRequest("An error occured");
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "An error occured while updating Revision with revisionId: {id}",
+                                    args: [exception.StackTrace]);
                 return BadRequest("An error occured");
             }
         }

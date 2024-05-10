@@ -12,31 +12,23 @@ namespace ADMS.API.Services
     /// <summary>
     /// Adms Repository containing implementation details.
     /// </summary>
-    public class AdmsRepository : IAdmsRepository
+    /// <remarks>
+    /// Adms Context constructor
+    /// </remarks>
+    /// <param name="logger">logging mechanism</param>
+    /// <param name="context">context to use</param>
+    /// <param name="mapper">Data Mapper to convert from Dto to entity class</param>
+    public class AdmsRepository(
+        ILogger<AdmsRepository> logger,
+        AdmsContext context,
+        IMapper mapper) : IAdmsRepository
     {
-        private readonly ILogger<AdmsRepository> _logger;
-        private readonly AdmsContext _context;
-        private readonly IMapper _mapper;
+        private readonly ILogger<AdmsRepository> _logger = logger;
+        private readonly AdmsContext _context = context;
+        private readonly IMapper _mapper = mapper;
 
         // TODO: Add config for these parameters
         private const string ServerFilesPath = @"C:\Dev\Repos\ADMSServerFiles";
-        private const string PdfFolderName = "PDF";
-
-        /// <summary>
-        /// Adms Context constructor
-        /// </summary>
-        /// <param name="logger">logging mechanism</param>
-        /// <param name="context">context to use</param>
-        /// <param name="mapper">Data Mapper to convert from Dto to entity class</param>
-        public AdmsRepository(
-            ILogger<AdmsRepository> logger, 
-            AdmsContext context,
-            IMapper mapper)
-        {
-            _logger = logger;
-            _context = context;
-            _mapper = mapper;
-        }
 
         #region Documents
 
@@ -106,8 +98,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error adding document: {document} to matter: {matterId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error adding document: {document} to matter: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -168,8 +165,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking document in with id: {documentId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error checking in document with id: {documentId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -230,8 +232,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking document out with id: {documentId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error checking out document in with id: {documentId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -298,8 +305,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error deleting document: {document}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error deleting document: {document}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -321,8 +333,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking for document with id:: {documentId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error checking for document with id: {documentId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -347,6 +364,7 @@ namespace ADMS.API.Services
                         .Include(d => d.Revisions)
                         .Where(d => d.Id == documentId)
                         .OrderBy(d => d.FileName)
+                        .AsSplitQuery()
                         .SingleAsync();
                 }
 
@@ -359,8 +377,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting document with id:: {documentId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting document with id: {documentId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -397,8 +420,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting document with filename:: {fileName}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting document with filename: {fileName}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -435,8 +463,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting documents with matterId:: {matterId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting document list with matterId: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -500,14 +533,20 @@ namespace ADMS.API.Services
                     .OrderBy(c => c.FileName)
                     .Skip(pageSize * (pageNumber - 1))
                     .Take(pageSize)
+                    .AsSplitQuery()
                     .ToListAsync();
 
                 return (collectionToReturn, paginationMetadata);
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting documents with matterId:: {matterId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting paginated document list with matterId: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -531,12 +570,18 @@ namespace ADMS.API.Services
                 return await documentWithActivityAndHistory
                     .AsNoTracking()
                     .OrderBy(dau => dau.CreatedAt)
+                    .AsSplitQuery()
                     .ToListAsync();
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting revision with id: {id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting document with historical data with id: {id}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -562,8 +607,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting document activity:: {activity}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting document activity with activity: {activity}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -650,8 +700,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error adding matter: {matter.Description}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error adding matter: {matter}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -673,8 +728,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking matter with id: {matterId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error checking if matter exists with id: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -696,8 +756,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking matter with description: {description}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error checking if matter exists with description: {description}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -764,8 +829,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error deleting matter with description: {matter.Description}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error deleting matter: {matter}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -787,7 +857,7 @@ namespace ADMS.API.Services
             {
                 if (_context.Matters is not IQueryable<Matter> collection)
                 {
-                    return new List<Matter>();
+                    return [];
                 }
                 else
                 {
@@ -864,6 +934,7 @@ namespace ADMS.API.Services
                     var resultss = await collection
                         .OrderBy(m => m.Description)
                         .Include(m => m.MatterActivityUsers)
+                        .AsSplitQuery()
                         .ToListAsync();
 
                     return resultss;
@@ -871,8 +942,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting matters";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting matter list.",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -904,6 +980,7 @@ namespace ADMS.API.Services
                         .AsNoTracking()
                         .Include(m => m.Documents.OrderBy(d => d.FileName))
                         .Where(m => m.Id == matterId)
+                        .AsSplitQuery()
                         .SingleAsync();
                 }
                 return await _context
@@ -914,8 +991,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting matter with id: {matterId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting matter with id: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -989,8 +1071,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error deleting matter with description: {matterDescription}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error restoring deleted matter with id: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1011,7 +1098,8 @@ namespace ADMS.API.Services
                     .Include(m => m.MatterActivityUsers)
                         .ThenInclude(m => m.User)
                     .Include(m => m.MatterActivityUsers)
-                        .ThenInclude(m => m.MatterActivity);
+                        .ThenInclude(m => m.MatterActivity)
+                    .AsSplitQuery();
 
                 return await MatterReturned
                     .AsNoTracking()
@@ -1020,8 +1108,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting matter history with id: {id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting matter with historical data with id: {matterId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1041,7 +1134,7 @@ namespace ADMS.API.Services
                 List<MatterDocumentActivityUserFrom> histories = [];
                 if (matterId == Guid.Empty && documentId == Guid.Empty)
                 {
-                    return new List<MatterDocumentActivityUserFromDto>();
+                    return [];
                 }
                 if (matterId != Guid.Empty)
                 {
@@ -1055,6 +1148,7 @@ namespace ADMS.API.Services
                             .Include(md => md.Document)
                             .Include(md => md.User)
                             .OrderBy(mdauf => mdauf.CreatedAt)
+                            .AsSplitQuery()
                             .ToListAsync();
                     }
                     else
@@ -1067,6 +1161,7 @@ namespace ADMS.API.Services
                             .Include(md => md.Document)
                             .Include(md => md.User)
                             .OrderBy(mdau => mdau.CreatedAt)
+                            .AsSplitQuery()
                             .ToListAsync();
                     }
                 }
@@ -1082,6 +1177,7 @@ namespace ADMS.API.Services
                             .Include(md => md.Document)
                             .Include(md => md.User)
                             .OrderBy(mdau => mdau.CreatedAt)
+                            .AsSplitQuery()
                             .ToListAsync();
                     }
                 }
@@ -1095,25 +1191,28 @@ namespace ADMS.API.Services
                 {
                     if (documentId != Guid.Empty)
                     {
-                        errorMessage = $"Error getting matter and document history with id's: {matterId}, {documentId}";
+                        errorMessage = "Error getting matter and document history with id's: {matterId}, {documentId}";
                     }
                     else
                     {
-                        errorMessage = $"Error getting matter history with id's: {matterId}";
+                        errorMessage = "Error getting matter history with id's: {matterId}";
                     }
                 }
                 else
                 {
                     if (documentId != Guid.Empty)
                     {
-                        errorMessage = $"Error getting document history with id's: {documentId}";
+                        errorMessage = "Error getting document history with id's: {documentId}";
                     }
                     else
                     {
-                        errorMessage = $"An error occured while retrieving data...";
+                        errorMessage = "An error occured while retrieving data...";
                     }
                 }
-                _logger.LogCritical(errorMessage, exception);
+
+                _logger.LogCritical(exception: exception,
+                                    message: "{errorMessage}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1133,7 +1232,7 @@ namespace ADMS.API.Services
                 List<MatterDocumentActivityUserTo> histories = [];
                 if (matterId == Guid.Empty && documentId == Guid.Empty)
                 {
-                    return new List<MatterDocumentActivityUserToDto>();
+                    return [];
                 }
                 if (matterId != Guid.Empty)
                 {
@@ -1149,6 +1248,7 @@ namespace ADMS.API.Services
                             .Include(md => md.Document)
                             .Include(md => md.User)
                             .OrderBy(mdauf => mdauf.CreatedAt)
+                            .AsSplitQuery()
                             .ToListAsync();
                     }
                     else
@@ -1161,6 +1261,7 @@ namespace ADMS.API.Services
                             .Include(md => md.Document)
                             .Include(md => md.User)
                             .OrderBy(mdau => mdau.CreatedAt)
+                            .AsSplitQuery()
                             .ToListAsync();
                     }
                 }
@@ -1176,6 +1277,7 @@ namespace ADMS.API.Services
                             .Include(md => md.Document)
                             .Include(md => md.User)
                             .OrderBy(mdau => mdau.CreatedAt)
+                            .AsSplitQuery()
                             .ToListAsync();
                     }
                 }
@@ -1189,25 +1291,28 @@ namespace ADMS.API.Services
                 {
                     if (documentId != Guid.Empty)
                     {
-                        errorMessage = $"Error getting matter and document history with id's: {matterId}, {documentId}";
+                        errorMessage = "Error getting matter and document history with id's: {matterId}, {documentId}";
                     }
                     else
                     {
-                        errorMessage = $"Error getting matter history with id's: {matterId}";
+                        errorMessage = "Error getting matter history with id's: {matterId}";
                     }
                 }
                 else
                 {
                     if (documentId != Guid.Empty)
                     {
-                        errorMessage = $"Error getting document history with id's: {documentId}";
+                        errorMessage = "Error getting document history with id's: {documentId}";
                     }
                     else
                     {
-                        errorMessage = $"An error occured while retrieving data...";
+                        errorMessage = "An error occured while retrieving data...";
                     }
                 }
-                _logger.LogCritical(errorMessage, exception);
+
+                _logger.LogCritical(exception: exception,
+                                    message: "{errorMessage}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1228,8 +1333,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting matter history with id: {id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting matter historical data with id: {id}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1255,8 +1365,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting matter activity by activity: {activity}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting matter activity with activity: {activity}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1282,8 +1397,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking revision activity: {activity}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting revision activity with activity: {activity}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1305,8 +1425,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting revision activity by activity: {activity}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting revision activity with activity: {activity}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1370,8 +1495,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error updating revision: {revision}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error updating revision: {revision}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1444,8 +1576,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error adding revision to document: {documentId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error adding revision to document with id: {documentId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1467,8 +1606,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error checking revision with id: {id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error finding revision with id: {id}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1539,8 +1685,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error deleting revision with id: {revision.Id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error deleting revision with id: {id}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1562,8 +1715,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting revision with id: {id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting revision with id: {id}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1587,12 +1747,20 @@ namespace ADMS.API.Services
                 return await revisionWithActivityAndHistory
                     .AsNoTracking()
                     .OrderBy(rau => rau.CreatedAt)
+                    .AsSplitQuery()
                     .ToListAsync();
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting revision with id: {id}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting revision history with id: {id}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1626,8 +1794,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting revisions with document id: {documentId}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting revisions with document id: {documentId}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1654,8 +1829,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error getting username with value: {username}";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error getting username with value: {username}",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1674,8 +1856,15 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error saving changes to the database";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                {
+                    throw;
+                }
+                _logger.LogCritical(exception: exception,
+                                    message: "Error saving changes to the database",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1820,8 +2009,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error saving changes to the database";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error saving changes to the database",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
@@ -1960,8 +2154,13 @@ namespace ADMS.API.Services
             }
             catch (Exception exception)
             {
-                string errorMessage = $"Error saving changes to the database";
-                _logger.LogCritical(errorMessage, exception);
+                if (exception == null)
+                    throw;
+                if (string.IsNullOrEmpty(exception.StackTrace))
+                    throw;
+                _logger.LogCritical(exception: exception,
+                                    message: "Error saving changes to the database",
+                                    args: [exception.StackTrace]);
                 throw;
             }
         }
