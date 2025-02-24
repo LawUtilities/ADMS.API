@@ -1,5 +1,7 @@
 ﻿using ADMS.API.Entities;
+using ADMS.API.Helpers;
 using ADMS.API.Models;
+using ADMS.API.ResourceParameters;
 
 namespace ADMS.API.Services
 {
@@ -18,15 +20,23 @@ namespace ADMS.API.Services
         /// <param name="document">document to be added</param>
         /// <returns></returns>
         Task<Document?> AddDocumentAsync(
-            Guid matterId, 
+            Guid matterId,
             DocumentForCreationDto document);
 
+        /*
         /// <summary>
-        /// Checks to see if a specified document exists
+        /// Add Document
+        /// </summary>
+        /// <param name="document">Document to be added</param>
+        void AddDocument(Document document);
+        */
+
+        /// <summary>
+        /// see if a specified document exists
         /// </summary>
         /// <param name="documentId">Document ID to be checked</param>
         /// <returns>True if the document exists, false otherwise</returns>
-        Task<bool> CheckDocumentExistsAsync(
+        Task<bool> DocumentExistsAsync(
             Guid documentId);
 
         /// <summary>
@@ -53,32 +63,36 @@ namespace ADMS.API.Services
             DocumentDto document);
 
         /// <summary>
-        /// Gets a list of Documents.
+        /// Gets a list of Documents for a specified matter.
         /// </summary>
         /// <param name="matterId">matter containing document(s)</param>
         /// <param name="includeDeleted">include deleted documents</param>
         /// <returns>A list of documents</returns>
-        Task<IEnumerable<Document?>> GetDocumentsAsync(
-            Guid matterId, 
+        Task<IEnumerable<Document>> GetDocumentsAsync(
+            Guid matterId,
             bool includeDeleted = false);
+
+        /// <summary>
+        /// Gets a list of Documents for a specified matter via a search.
+        /// </summary>
+        /// <param name="matterId">matter containing document(s)</param>
+        /// <param name="documentsResourceParameters">parameters of document list to be retrieved</param>
+        /// <returns>A list of documents</returns>
+        Task<PagedList<Document>> GetDocumentsAsync(
+            Guid matterId, 
+            DocumentsResourceParameters documentsResourceParameters);
 
         /// <summary>
         /// Gets a filtered set of Documents
         /// </summary>
         /// <param name="matterId">matter containing document(s)</param>
-        /// <param name="fileName">Filename to search for</param>
-        /// <param name="searchQuery">Additional search terms to find</param>
+        /// <param name="documentsResourceParameters">search parameters to locate</param>
         /// <param name="includeDeleted">include deleted documents</param>
-        /// <param name="pageNumber">Page Number being sought.</param>
-        /// <param name="pageSize">Number of records per page.</param>
         /// <returns>Document and pagination information.</returns>
-        Task<(IEnumerable<Document>, PaginationMetadata)> GetDocumentsAsync(
-            Guid matterId, 
-            string? fileName, 
-            string? searchQuery, 
-            bool includeDeleted, 
-            int pageNumber, 
-            int pageSize);
+        Task<(IEnumerable<Document>, PaginationMetadata)> GetPagedDocumentsAsync(
+                    Guid matterId,
+                    DocumentsResourceParameters documentsResourceParameters,
+                    bool includeDeleted);
 
         /// <summary>
         /// Gets a single document details
@@ -91,22 +105,30 @@ namespace ADMS.API.Services
             bool includeRevisions);
 
         /// <summary>
-        /// Gets a document by entered filename
+        /// Get specific document
+        /// </summary>
+        /// <param name="documentId">document to be retrieved</param>
+        /// <returns>document retrieved</returns>
+        Task<Document?> GetDocumentAsync(
+            Guid documentId);
+
+        /// <summary>
+        /// Gets a list of documents by entered filename
         /// </summary>
         /// <param name="matterId">matter containing document(s)</param>
         /// <param name="fileName">File name of the document being searched.</param>
         /// <returns>Document</returns>
-        Task<Document?> GetDocumentByFileNameAsync(
+        Task<IEnumerable<Document>> GetDocumentsByFileNameAsync(
             Guid matterId, 
             string fileName);
 
         /// <summary>
         /// retrieve document history by id
         /// </summary>
-        /// <param name="id">document to retrieve history from</param>
+        /// <param name="documentId">document to retrieve history from</param>
         /// <returns>Document history to be retrieved</returns>
         Task<IEnumerable<DocumentActivityUser>> GetDocumentWithHistoryByIdAsync(
-            Guid id);
+            Guid documentId);
 
         /// <summary>
         /// Copy document from one matter to another
@@ -128,6 +150,14 @@ namespace ADMS.API.Services
             Guid matterId,
             DocumentWithoutRevisionsDto document);
 
+        /// <summary>
+        /// Updates a document with new details
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        Task<Document?> UpdateDocumentAsync(
+            Document document);
+
         #endregion Documents
 
         #region DocumentActivity
@@ -135,10 +165,24 @@ namespace ADMS.API.Services
         /// <summary>
         /// Gets a DocumentActivity by activity
         /// </summary>
-        /// <param name="activity">activity to be retrieved</param>
+        /// <param name="activityName">activity to be retrieved</param>
         /// <returns>DocumentActivity</returns>
-        Task<DocumentActivity?> GetDcumentActivityByActivity(
-            string activity);
+        Task<DocumentActivity> GetDocumentActivityByActivityNameAsync(
+            string activityName);
+
+        /// <summary>
+        /// Add document audit record
+        /// </summary>
+        /// <param name="audit">audit record to add</param>
+        Task AddDocumentAuditAsync(
+            DocumentActivityUser audit);
+
+        /// <summary>
+        /// Get document audit record
+        /// </summary>
+        /// <param name="documentId">Document record to retrieve audits for</param>
+        Task<IEnumerable<DocumentActivityUserMinimalDto>> GetDocumentAuditsAsync(
+            Guid documentId);
 
         #endregion DocumentActivity
 
@@ -147,8 +191,8 @@ namespace ADMS.API.Services
         /// <summary>
         /// Adds a matter to the repository
         /// </summary>
-        /// <param name="matter">matter to be added.</param>
-        /// <returns>matter that has been created</returns>
+        /// <param name="matter">Matter to be added</param>
+        /// <returns>Matter that has been created</returns>
         Task<Matter?> AddMatterAsync(
             MatterDto matter);
 
@@ -157,21 +201,22 @@ namespace ADMS.API.Services
         /// </summary>
         /// <param name="matterId">Matter to check</param>
         /// <returns>true if exists, false otherwise</returns>
-        Task<bool> CheckMatterExists(
+        Task<bool> MatterExistsAsync(
             Guid matterId);
 
         /// <summary>
-        /// Checks if matter exists
+        /// Checks if matter name exists
         /// </summary>
-        /// <param name="description">description of matter to identify</param>
+        /// <param name="matterName">name of matter to identify</param>
         /// <returns>true if exists, false otherwise</returns>
-        Task<bool> CheckMatterExists(
-            string description);
+        Task<bool> MatterNameExistsAsync(
+            string matterName);
 
         /// <summary>
         /// Delete matter
         /// </summary>
         /// <param name="matter">matter to be deleted</param>
+        /// <returns>true if matter deleted, false otherwise</returns>
         Task<bool> DeleteMatterAsync(
             MatterDto matter);
 
@@ -208,18 +253,31 @@ namespace ADMS.API.Services
         /// <summary>
         /// retrieve matter history by id
         /// </summary>
-        /// <param name="id">matter to retrieve history from</param>
+        /// <param name="matterId">matter to retrieve history from</param>
         /// <returns>Matter with history to be retrieved</returns>
         Task<Matter> GetMatterWithHistoryByIdAsync(
-            Guid id);
+            Guid matterId);
 
+        /// <summary>
+        /// retrieves an extended audit history
+        /// </summary>
+        /// <param name="matterId">matter to retrieve data for</param>
+        /// <param name="documentId">document to retrieve data for</param>
+        /// <param name="direction">operation:  From / To</param>
+        /// <returns></returns>
+        Task<IEnumerable<MatterDocumentActivityUserMinimalDto>> GetExtendedAuditsAsync(
+            Guid matterId,
+            Guid documentId,
+            string direction);
+
+        /*
         /// <summary>
         /// Get matter document activity user from list
         /// </summary>
         /// <param name="matterId">matter to retrieve data for</param>
         /// <param name="documentId">document to retrieve data for</param>
         /// <returns>collection of matter document activity user histories</returns>
-        Task<ICollection<MatterDocumentActivityUserFromDto>> GetMDAUFromHistoryAsync(
+        Task<IEnumerable<MatterDocumentActivityUserFrom>> GetMDAUFromHistoryAsync(
             Guid matterId,
             Guid documentId);
 
@@ -229,17 +287,17 @@ namespace ADMS.API.Services
         /// <param name="matterId">matter to retrieve data for</param>
         /// <param name="documentId">document to retrieve data for</param>
         /// <returns>collection of matter document activity user histories</returns>
-        Task<ICollection<MatterDocumentActivityUserToDto>> GetMDAUToHistoryAsync(
+        Task<IEnumerable<MatterDocumentActivityUserTo>> GetMDAUToHistoryAsync(
             Guid matterId,
             Guid documentId);
-
+        */
         /// <summary>
         /// Identifies if matter history exists
         /// </summary>
-        /// <param name="id">Matter to check</param>
+        /// <param name="matterId">Matter to check</param>
         /// <returns>true if Matter History exists, false otherwise</returns>
-        Task<bool> DoesMatterHistoryExists(
-            Guid id);
+        Task<bool> DoesMatterHistoryExistAsync(
+            Guid matterId);
 
         #endregion Matters
 
@@ -248,10 +306,10 @@ namespace ADMS.API.Services
         /// <summary>
         /// Gets a MatterActivity by activity
         /// </summary>
-        /// <param name="activity">activity to be retrieved</param>
+        /// <param name="activityName">activity to be retrieved</param>
         /// <returns>MatterActivity</returns>
-        Task<MatterActivity?> GetMatterActivityByActivity(
-            string activity);
+        Task<MatterActivity?> GetMatterActivityByActivityNameAsync(
+            string activityName);
 
         #endregion MatterActivity
 
@@ -270,10 +328,10 @@ namespace ADMS.API.Services
         /// <summary>
         /// Checks to see if a specified revision exists
         /// </summary>
-        /// <param name="id">Revision ID to be checked</param>
+        /// <param name="revisionId">Revision ID to be checked</param>
         /// <returns>True if the document exists, false otherwise</returns>
-        Task<bool> CheckRevisionExistsAsync(
-            Guid id);
+        Task<bool> RevisionExistsAsync(
+            Guid revisionId);
 
         /// <summary>
         /// Deletes a revision from a document
@@ -285,18 +343,18 @@ namespace ADMS.API.Services
         /// <summary>
         /// retrieve revision by id
         /// </summary>
-        /// <param name="id">revision to be deleted</param>
+        /// <param name="revisionId">revision to be deleted</param>
         /// <returns>Revision to be retrieved</returns>
         Task<Revision?> GetRevisionByIdAsync(
-            Guid id);
+            Guid revisionId);
 
         /// <summary>
         /// retrieve revision history by revision id
         /// </summary>
-        /// <param name="id">revision to be deleted</param>
+        /// <param name="revisionId">revision to be deleted</param>
         /// <returns>Revision to be retrieved</returns>
         Task<IEnumerable<RevisionActivityUser>> GetRevisionWithHistoryByIdAsync(
-            Guid id);
+            Guid revisionId);
 
         /// <summary>
         /// Get list of revisions
@@ -316,7 +374,7 @@ namespace ADMS.API.Services
         /// <param name="revisionId">Revision to be updated</param>
         /// <param name="revision">Revision details to update</param>
         /// <returns>list of revisions</returns>
-        Task<Revision?> UpdateRevisionsAsync(
+        Task<Revision?> UpdateRevisionAsync(
             Guid matterId, 
             Guid documentId, 
             Guid revisionId, 
@@ -329,18 +387,18 @@ namespace ADMS.API.Services
         /// <summary>
         /// Gets a revision activity by activity name
         /// </summary>
-        /// <param name="activity">activity name being sourced</param>
+        /// <param name="activityName">activity name being sourced</param>
         /// <returns>RevisionActivity</returns>
-        Task<RevisionActivity?> GetRevisionActivityByActivityAsync(
-            string activity);
+        Task<RevisionActivity?> GetRevisionActivityByActivityNameAsync(
+            string activityName);
 
         /// <summary>
         /// Identifies if a revision activity exists by activity description
         /// </summary>
-        /// <param name="activity">activity being checked</param>
+        /// <param name="activityName">activity being checked</param>
         /// <returns>true if activity exists, false otherwise</returns>
-        Task<bool> CheckRevisionActivityExists(
-            string activity);
+        Task<bool> RevisionActivityExistsAsync(
+            string activityName);
 
         #endregion Revision Activities
 
@@ -351,7 +409,7 @@ namespace ADMS.API.Services
         /// </summary>
         /// <param name="username">username being requested</param>
         /// <returns>User</returns>
-        Task<User?> GetUserByUsername(
+        Task<User?> GetUserByUsernameAsync(
             string username);
 
         #endregion User Actions

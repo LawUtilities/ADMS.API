@@ -13,6 +13,7 @@ namespace ADMS.API.Profiles
         public MatterDocumentActivityProfile()
         {
             CreateMap<Entities.MatterDocumentActivity, Models.MatterDocumentActivityDto>();
+            CreateMap<Entities.MatterDocumentActivity, Models.MatterDocumentActivityMinimalDto>();
 
             CreateMap<Models.MatterDocumentActivityDto , Entities.MatterDocumentActivity>();
         }

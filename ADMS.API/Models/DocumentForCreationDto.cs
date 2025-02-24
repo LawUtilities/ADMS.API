@@ -20,20 +20,13 @@ namespace ADMS.API.Models
         public required string Extension { get; set; }
 
         /// <summary>
-        /// Creation date for file
-        /// </summary>
-        [Required]
-        public required DateTime CreationDate { get; set; } = DateTime.Now.ToUniversalTime();
-
-        /// <summary>
-        /// Modification date for file
-        /// </summary>
-        [Required]
-        public required DateTime ModificationDate { get; set; } = DateTime.Now.ToUniversalTime();
-
-        /// <summary>
         /// indicates if the document is checkedout
         /// </summary>
         public bool IsCheckedOut { get; set; }
+
+        /// <summary>
+        /// revisions assigned to the document
+        /// </summary>
+        public ICollection<RevisionDto> Revisions { get; set; } = [];
     }
 }

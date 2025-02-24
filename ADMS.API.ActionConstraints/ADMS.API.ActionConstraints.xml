@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API.ActionConstraints</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.ActionConstraints.RequestHeaderMatchesMediaTypeAttribute">
+            <summary>
+            Validates request header
+            </summary>
+        </member>
+        <member name="M:ADMS.API.ActionConstraints.RequestHeaderMatchesMediaTypeAttribute.#ctor(System.String,System.String,System.String[])">
+            <summary>
+            RequestHeaderMatchesMediaTypeAttribute constructor
+            </summary>
+            <param name="requestHeaderToMatch">Request Header to Match</param>
+            <param name="mediaType">media Type</param>
+            <param name="otherMediaTypes">other Media Types</param>
+            <exception cref="T:System.ArgumentNullException">requestHeaderToMatch is null</exception>
+            <exception cref="T:System.ArgumentException">media type or other media types are null</exception>
+        </member>
+        <member name="P:ADMS.API.ActionConstraints.RequestHeaderMatchesMediaTypeAttribute.Order">
+            <summary>
+            Search Order
+            </summary>
+        </member>
+        <member name="M:ADMS.API.ActionConstraints.RequestHeaderMatchesMediaTypeAttribute.Accept(Microsoft.AspNetCore.Mvc.ActionConstraints.ActionConstraintContext)">
+            <summary>
+            Verifies match
+            </summary>
+            <param name="context">context to match</param>
+            <returns>true if matched, false otherwise</returns>
+        </member>
+    </members>
+</doc>

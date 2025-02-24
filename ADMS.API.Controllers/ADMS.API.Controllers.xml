@@ -1,0 +1,539 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API.Controllers</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.Controllers.DocumentAuditController">
+            <summary>
+            Document Audit actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentAuditController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.DocumentAuditController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper,Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory)">
+            <summary>
+            Document Audit actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentAuditController.CreateDocumentAudit(System.Guid,System.Guid,ADMS.API.Models.DocumentActivityUserDto)">
+            <summary>
+            Creates Audit record for Document
+            </summary>
+            <param name="matterId">matter document belongs to</param>
+            <param name="documentId">document to create audit record for</param>
+            <param name="audit">audit record to create</param>
+            <returns>DocumentActivityUser record</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentAuditController.GetDocumentAudits(System.Guid,System.Guid)">
+            <summary>
+            Get Audits for specified document
+            </summary>
+            <param name="matterId">matter document belongs to</param>
+            <param name="documentId">document to get audit records for</param>
+            <returns>DocumentActivityUser record</returns>
+        </member>
+        <member name="T:ADMS.API.Controllers.DocumentController">
+            <summary>
+            Document actions
+            </summary>
+            <remarks>
+            Document Controller constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.DocumentController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper,ADMS.API.Services.IPropertyMappingService,ADMS.API.Services.IPropertyCheckerService,Microsoft.AspNetCore.Mvc.Infrastructure.ProblemDetailsFactory)">
+            <summary>
+            Document actions
+            </summary>
+            <remarks>
+            Document Controller constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CreateDocument(System.Guid,ADMS.API.Models.DocumentForCreationDto)">
+            <summary>
+            Create new document
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <param name="document">document to create</param>
+            <returns>Document</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetMDAUFromHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            retrieve matter document activity user from list
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <param name="documentId">Document Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetMDAUToHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            retrieve matter document activity user to list
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <param name="documentId">Document Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.MoveDocument(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)">
+            <summary>
+            Copies a document from one matter to another
+            </summary>
+            <param name="matterId">matter to copy document to</param>
+            <param name="document">document to be copied</param>
+            <returns>true if document copied, false otherwise</returns>
+            <response code="200">Returns the created document</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.DeleteDocument(System.Guid,System.Guid)">
+            <summary>
+            Delete specified document Id
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document to be deleted</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CheckoutDocument(System.Guid,System.Guid)">
+            <summary>
+            Check out document
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document id to be checked out</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CheckinDocument(System.Guid,System.Guid)">
+            <summary>
+            Check in document
+            </summary>
+            <param name="matterId">Matter document belongs to</param>
+            <param name="documentId">document id to be checked in</param>
+            <returns>IActionResult</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocumentHistoryAsync(System.Guid,System.Guid)">
+            <summary>
+            gets specific document history
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">Document Id to retrieve</param>
+            <returns>document history</returns>
+            <response code="200">Returns the requested document history</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocuments(System.Guid,ADMS.API.ResourceParameters.DocumentsResourceParameters)">
+            <summary>
+            Get document lists
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentsResourceParameters">document search details</param>
+            <returns>list of documents to be returned</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocumentWithLinks(System.Guid,System.Guid,System.String)">
+            <summary>
+            specific document with HATEOAS links
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">Document Id to retrieve</param>
+            <param name="fields">extra fields if necessary</param>
+            <returns>document containing HATEOAS links</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.UpdateDocument(System.Guid,System.Guid,ADMS.API.Models.DocumentForUpdateDto)">
+            <summary>
+            Updates document details
+            </summary>
+            <param name="matterId">Matter document belongs to</param>
+            <param name="documentId">document id to be updated</param>
+            <param name="document">document details in need of updating</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.GetDocumentOptions">
+            <summary>
+            retrieve document options
+            </summary>
+            <returns>OK</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CreateLinksForDocuments(ADMS.API.ResourceParameters.DocumentsResourceParameters,System.Boolean,System.Boolean)">
+            <summary>
+            Create HATEOAS links for document list
+            </summary>
+            <param name="documentsResourceParameters">document details to source data for</param>
+            <param name="hasNext">find next document</param>
+            <param name="hasPrevious">find previous document</param>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CreateLinksForDocument(System.Guid,System.Guid,System.String)">
+            <summary>
+            Create HATEOAS links for specific document
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">Document Id to retrieve</param>
+            <param name="fields">document fields to use</param>
+            <returns>links for specified document</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.DocumentController.CreateDocumentsResourceUri(ADMS.API.ResourceParameters.DocumentsResourceParameters,ADMS.API.Helpers.ResourceUriType)">
+            <summary>
+            Generate document URI
+            </summary>
+            <param name="documentsResourceParameters">document details</param>
+            <param name="type">type of link to create</param>
+            <returns>link</returns>
+        </member>
+        <member name="T:ADMS.API.Controllers.FileController">
+            <summary>
+            File actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.FileController},ADMS.API.Services.IAdmsRepository)">
+            <summary>
+            File Controller Constructor
+            </summary>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.UploadExistingFileAsync(System.Guid,System.Guid,System.Guid,Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)">
+            <summary>
+            Upload an existing file to the ADMS system
+            </summary>
+            <param name="matterId">Matter to save the document to</param>
+            <param name="documentId">Document to add file to</param>
+            <param name="revisionId">Revision to add file as</param>
+            <param name="fileUpload">file to be uploaded</param>
+            <param name="cancelToken">cancellation token</param>
+            <returns>IActionResult</returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.DownloadFile(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Download the specified file from the ADMS system
+            </summary>
+            <param name="matterId"></param>
+            <param name="documentId"></param>
+            <param name="revisionId"></param>
+            <returns></returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.DownloadPDF(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Download the specified PDF file from the ADMS system
+            </summary>
+            <param name="matterId"></param>
+            <param name="documentId"></param>
+            <param name="revisionId"></param>
+            <returns></returns>
+            <response code="200">PDF Downloaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">PDF not created</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.VerifyFileType(System.Guid,System.Guid,System.Guid,Microsoft.AspNetCore.Http.IFormFile)">
+            <summary>
+            Verifies if the file to be uploaded matches the type identified
+            </summary>
+            <param name="matterId"></param>
+            <param name="documentId"></param>
+            <param name="revisionId"></param>
+            <param name="fileUpload">File to be verified</param>
+            <returns>IActionResult</returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.CheckExistsAsync(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Checks to see if Matter, Document and Revision exists
+            </summary>
+            <param name="matterId">matter to check</param>
+            <param name="documentId">document to check</param>
+            <param name="revisionId">revision to check</param>
+            <returns>bool if all three exist, false otherwise</returns>
+        </member>
+        <member name="M:ADMS.API.Controllers.FileController.ConvertToPDF(System.String,System.String,System.String)">
+            <summary>
+            convert an original document to PDF if possible
+            </summary>
+            <param name="folder">Matter folder containing original file</param>
+            <param name="originalFileName">Original file</param>
+            <param name="pdfFileName">PDF filename</param>
+            <returns>True if converted, false otherwise</returns>
+        </member>
+        <member name="T:ADMS.API.Controllers.MatterController">
+            <summary>
+            Matter actions
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.MatterController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
+            <summary>
+            Matter Controller Constructor
+            </summary>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+            <param name="mapper">atomapper to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.CreateMatter(ADMS.API.Models.MatterForCreationDto)">
+            <summary>
+            Creates a matter
+            </summary>
+            <param name="matter">matter to add</param>
+            <returns></returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.DeleteMatter(System.Guid)">
+            <summary>
+            Delete specified matter
+            </summary>
+            <param name="matterId">matter to be deleted</param>
+            <returns></returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMatterAsync(System.Guid,System.Boolean)">
+            <summary>
+            gets specific matter
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <param name="includeDocuments">Include documents in returned matter</param>
+            <returns>list of matter</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMDAUFromHistoryAsync(System.Guid)">
+            <summary>
+            retrieve matter document activity user from list
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMDAUToHistoryAsync(System.Guid)">
+            <summary>
+            retrieve matter document activity user to list
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <returns>list of matter document activity users</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.MatterHistoryExists(System.Guid)">
+            <summary>
+            Check if Matter History Exists
+            </summary>
+            <param name="matterId">Matter Id to retrieve</param>
+            <returns>True if Matter History exists, false otherwise</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMatterHistoryAsync(System.Guid)">
+            <summary>
+            gets specific matter history
+            </summary>
+            <param name="matterId">Matter to retrieve</param>
+            <returns>Matter history</returns>
+            <response code="200">Returns the requested matter history</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.RestoreMatterAsync(System.Guid)">
+            <summary>
+            undelete specific matter
+            </summary>
+            <param name="matterId">Matter Id to restore</param>
+            <returns>true if restored, false otherwise</returns>
+            <response code="200">Returns the requested matter</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.GetMattersAsync(System.String,System.Boolean,System.Boolean)">
+            <summary>
+            gets list of matters
+            </summary>
+            <param name="description">matter description</param>
+            <param name="includeArchived">include archived matters</param>
+            <param name="includeDeleted">include deleted matters</param>
+            <returns>list of matters not including documents</returns>
+            <response code="200">Returns the requested matters</response>
+            <response code="400">An error occured</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.UpdateMatter(System.Guid,ADMS.API.Models.MatterForUpdateDto)">
+            <summary>
+            Updates matter details
+            </summary>
+            <param name="matterId">Matter Id</param>
+            <param name="matter">matter to be updated</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.UploadNewFileAsync(System.Guid,Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)">
+            <summary>
+            Upload a new file to the ADMS system
+            </summary>
+            <param name="matterId">Matter to save the document to</param>
+            <param name="fileUpload">file to be uploaded</param>
+            <param name="cancelToken">cancellation token</param>
+            <returns>IActionResult</returns>
+            <response code="200">Document uploaded</response>
+            <response code="400">An error occured</response>
+            <response code="404">Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.AddCustomDocumentProperties(System.String,System.String,System.Guid,System.Guid,System.Guid,ADMS.API.Controllers.MatterController.DocumentType)">
+            <summary>
+            Adds custom document properties to various office documents
+            </summary>
+            <param name="tempFile">temporary file used to add properties</param>
+            <param name="fileName">final filename to save file to</param>
+            <param name="documentId">document Id to add</param>
+            <param name="revisionId">revision Id to add</param>
+            <param name="matterId">matter Id to add</param>
+            <param name="docType">type of document to add properties to</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.AddOrUpdateDocumentProperty(System.Object,System.String,System.String,ADMS.API.Controllers.MatterController.DocumentType)">
+            <summary>
+            Add or update individual document property
+            </summary>
+            <param name="document">document to add property to</param>
+            <param name="propertyName">specific property to add</param>
+            <param name="propertyValue">specific value to add</param>
+            <param name="docType">type of document to add property to</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.MatterController.SetDocumentProperty(System.Object,System.String,System.String,ADMS.API.Controllers.MatterController.DocumentType)">
+            <summary>
+            Sets specific document property
+            </summary>
+            <param name="document">document to add property to</param>
+            <param name="propertyName">specific property to add</param>
+            <param name="propertyValue">specific value to add</param>
+            <param name="docType">type of document to add property to</param>
+        </member>
+        <member name="F:ADMS.API.Controllers.MatterController.wordExtensionsToFormatType">
+            <summary>
+            Word extension to Syncfusion format
+            </summary>
+        </member>
+        <member name="F:ADMS.API.Controllers.MatterController.excelExtensionsToFormatType">
+            <summary>
+            Excel extension to Syncfusion format
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Controllers.MatterController.DocumentType">
+            <summary>
+            Office document types
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Controllers.RevisionController">
+            <summary>
+            Matter actions
+            </summary>
+            <remarks>
+            Revision Controller Constructor
+            </remarks>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+            <param name="mapper">atomapper to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.#ctor(Microsoft.Extensions.Logging.ILogger{ADMS.API.Controllers.RevisionController},ADMS.API.Services.IAdmsRepository,AutoMapper.IMapper)">
+            <summary>
+            Matter actions
+            </summary>
+            <remarks>
+            Revision Controller Constructor
+            </remarks>
+            <param name="logger">logger to be used by this controller</param>
+            <param name="admsRepository">repository to use</param>
+            <param name="mapper">atomapper to use</param>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.CreateRevision(System.Guid,System.Guid,ADMS.API.Models.RevisionForCreationDto)">
+            <summary>
+            Creates a revision
+            </summary>
+            <param name="matterId">Matter to be added to</param>
+            <param name="documentId">Document to add revision to</param>
+            <param name="revision">revision to add</param>
+            <returns></returns>
+            <response code="200">Returns the created revision</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.DeleteRevision(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            Delete specified revision
+            </summary>
+            <param name="matterId">Matter containing the docunment in question</param>
+            <param name="documentId">document containing revision to be deleted</param>
+            <param name="id">revision to be deleted</param>
+            <returns></returns>
+            <response code="204">Deletion undertaken</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, Document or Revision not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.GetRevisionAsync(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            gets specific revision
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document containing revision</param>
+            <param name="id">Revision Id to retrieve</param>
+            <returns>revision to be retrieved</returns>
+            <response code="200">Returns the requested matters</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, document or revision not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.GetRevisionHistoryAsync(System.Guid,System.Guid,System.Guid)">
+            <summary>
+            gets specific revision history
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document containing revision</param>
+            <param name="id">Revision Id to retrieve</param>
+            <returns>revision to be retrieved</returns>
+            <response code="200">Returns the requested matters</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, document or revision not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.GetRevisionsAsync(System.Guid,System.Guid,System.Boolean)">
+            <summary>
+            gets list of revisions
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">document to retrieve revisions for</param>
+            <param name="includeDeleted">include deleted revisions</param>
+            <returns>list of revisions</returns>
+            <response code="200">Returns the requested revisions</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter or Document not found</response>
+        </member>
+        <member name="M:ADMS.API.Controllers.RevisionController.UpdateRevision(System.Guid,System.Guid,System.Guid,ADMS.API.Models.RevisionForUpdateDto)">
+            <summary>
+            Updates revision details
+            </summary>
+            <param name="matterId">Matter containing document</param>
+            <param name="documentId">Document containing revision</param>
+            <param name="id">Revision Id</param>
+            <param name="revision">revision to be updated</param>
+            <returns>IActionResult</returns>
+            <response code="204">Returns No Content</response>
+            <response code="400">An error occured</response>
+            <response code="404">Matter, Document or Revision not found</response>
+        </member>
+    </members>
+</doc>

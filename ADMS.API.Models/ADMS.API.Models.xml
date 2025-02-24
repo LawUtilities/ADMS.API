@@ -1,0 +1,1391 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API.Models</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.Models.DocumentActivityDto">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityDto.Id">
+            <summary>
+            Document Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityDto.Activity">
+            <summary>
+            Document Activity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityDto.DocumentActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentActivityMinimalDto">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityMinimalDto.Activity">
+            <summary>
+            Document Activity
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentActivityUserDto">
+            <summary>
+            Document Activity User join
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentId">
+            <summary>
+            Document Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.Document">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentActivity">
+            <summary>
+            DocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentActivityUserMinimalDto">
+            <summary>
+            Document Activity User join
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.DocumentId">
+            <summary>
+            Document Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.DocumentActivity">
+            <summary>
+            DocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentAuditDto">
+            <summary>
+            Document Audit Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentAuditDto.DocumentActivityUserAudit">
+            <summary>
+            List of document activity by users
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentAuditDto.MatterDocumentActivityUserFromAudit">
+            <summary>
+            List matter document from activity by users
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentAuditDto.MatterDocumentActivityUserToAudit">
+            <summary>
+            List of matter document to activity by users
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentDto">
+            <summary>
+            Document DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Id">
+            <summary>
+            Id of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.FileName">
+            <summary>
+            Filename of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.IsDeleted">
+            <summary>
+            is the file deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Revisions">
+            <summary>
+            revisions assigned to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentForCreationDto">
+            <summary>
+            Document DTO used to create new documents
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.FileName">
+            <summary>
+            Filename of the document to be created
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.Extension">
+            <summary>
+            Extension for the file in question
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentForUpdateDto">
+            <summary>
+            Document For Update Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.FileName">
+            <summary>
+            filename for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.Extension">
+            <summary>
+            file extension for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.IsDeleted">
+            <summary>
+            indicates if the document is deleted
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentFullDto">
+            <summary>
+            Document DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.Id">
+            <summary>
+            Id of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.FileName">
+            <summary>
+            Filename of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.IsDeleted">
+            <summary>
+            is the file deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.Revisions">
+            <summary>
+            revisions assigned to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentMinimalDto">
+            <summary>
+            Document DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.Id">
+            <summary>
+            Id of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.FileName">
+            <summary>
+            Filename of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.IsDeleted">
+            <summary>
+            is the file deleted
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentWithoutRevisionsDto">
+            <summary>
+            Document DTO without Revisions included
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Id">
+            <summary>
+            ID for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.FileName">
+            <summary>
+            filename for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Extension">
+            <summary>
+            file extension for the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.IsDeleted">
+            <summary>
+            indicates if the document is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentWithRevisionsDto">
+            <summary>
+            Document DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Id">
+            <summary>
+            Id of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.FileName">
+            <summary>
+            Filename of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.IsDeleted">
+            <summary>
+            indicates if the document is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Revisions">
+            <summary>
+            revisions assigned to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.DocumentActivityUsers">
+            <summary>
+            document activities user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.LinkDto">
+            <summary>
+            Link model
+            </summary>
+            <remarks>
+            Constructor
+            </remarks>
+            <param name="href">URL</param>
+            <param name="rel">relationship</param>
+            <param name="method">method</param>
+        </member>
+        <member name="M:ADMS.API.Models.LinkDto.#ctor(System.String,System.String,System.String)">
+            <summary>
+            Link model
+            </summary>
+            <remarks>
+            Constructor
+            </remarks>
+            <param name="href">URL</param>
+            <param name="rel">relationship</param>
+            <param name="method">method</param>
+        </member>
+        <member name="P:ADMS.API.Models.LinkDto.Href">
+            <summary>
+            URL to return
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.LinkDto.Rel">
+            <summary>
+            Relationship
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.LinkDto.Method">
+            <summary>
+            Method
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterActivityDto">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityDto.Id">
+            <summary>
+            Matter Activity Primary Key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityDto.Activity">
+            <summary>
+            name of the activity being undertaken
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityDto.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterActivityMinimalDto">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityMinimalDto.Id">
+            <summary>
+            Matter Activity Primary Key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityMinimalDto.Activity">
+            <summary>
+            name of the activity being undertaken
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterActivityUserDto">
+            <summary>
+            shared type entity for many to many tables
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.Matter">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterActivityId">
+            <summary>
+            Matter Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterActivity">
+            <summary>
+            MatterActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+            [Key]
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterActivityUserMinimalDto">
+            <summary>
+            shared type entity for many to many tables
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.Matter">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterActivityId">
+            <summary>
+            Matter Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterActivity">
+            <summary>
+            MatterActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+            [Key]
+        </member>
+        <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityDto">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.Id">
+            <summary>
+            Matter Document Activity Primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityMinimalDto">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityMinimalDto.Id">
+            <summary>
+            Matter Document Activity Primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityMinimalDto.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityUserDto">
+            <summary>
+            MatterDocumentActivityUser table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            local created at timestring
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityUserFromDto">
+            <summary>
+            MatterDocumentActivityUserFrom linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.LocalCreatedAtDateString">
+            <summary>
+            local created at timestring
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityUserMinimalDto">
+            <summary>
+            MatterDocumentActivityUser table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.Matter">
+            <summary>
+            Matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.LocalCreatedAtDateString">
+            <summary>
+            local created at timestring
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDocumentActivityUserToDto">
+            <summary>
+            MatterDocumentActivityUserTo linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.LocalCreatedAtDateString">
+            <summary>
+            local created at timestring
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterDto">
+            <summary>
+            Matter Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.Id">
+            <summary>
+            Matter primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.Description">
+            <summary>
+            Matter description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.IsDeleted">
+            <summary>
+            Identifies if the Matter has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.Documents">
+            <summary>
+            Documents linked to the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterForCreationDto">
+            <summary>
+            Matter for creation Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForCreationDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForCreationDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForCreationDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterForUpdateDto">
+            <summary>
+            Matter For Update Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForUpdateDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForUpdateDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterForUpdateDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterMinimalDto">
+            <summary>
+            Matter Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterMinimalDto.Id">
+            <summary>
+            Matter primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterMinimalDto.Description">
+            <summary>
+            Matter description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterMinimalDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterMinimalDto.IsDeleted">
+            <summary>
+            Identifies if the Matter has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterMinimalDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterMinimalDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterWithDocumentsDto">
+            <summary>
+            Matter including documents Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Id">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.IsDeleted">
+            <summary>
+            indicates if the matter is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Documents">
+            <summary>
+            Documents linked to the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithDocumentsDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.MatterWithoutDocumentsDto">
+            <summary>
+            Matter Dto
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.Id">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.Description">
+            <summary>
+            Matter Description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.IsDeleted">
+            <summary>
+            indicates if the matter is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.LocalCreationDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionActivityDto">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityDto.Id">
+            <summary>
+            Revision Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityDto.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityDto.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionActivityMinimalDto">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityMinimalDto.Id">
+            <summary>
+            Revision Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityMinimalDto.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionActivityUserDto">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionId">
+            <summary>
+            Revision Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.Revision">
+            <summary>
+            Revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivity">
+            <summary>
+            RevisionActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionActivityUserMinimalDto">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionId">
+            <summary>
+            Revision Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.Revision">
+            <summary>
+            Revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionActivity">
+            <summary>
+            RevisionActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.LocalCreatedAtDateString">
+            <summary>
+            Local timezone Creation Date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionDto">
+            <summary>
+            Revision DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.Id">
+            <summary>
+            Revision primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.IsDeleted">
+            <summary>
+            indicates if the revision is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.LocalCreationDateString">
+            <summary>
+            Local Creation Date string
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionDto.LocalModificationDateString">
+            <summary>
+            Local Modification Date string
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionForCreationDto">
+            <summary>
+            Revision Dto for creation of new revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.IsDeleted">
+            <summary>
+            indicates if the revision is deleted
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionForUpdateDto">
+            <summary>
+            Revision Dto for update of new revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.RevisionMinimalDto">
+            <summary>
+            Revision DTO
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.Id">
+            <summary>
+            Revision primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.IsDeleted">
+            <summary>
+            indicates if the revision is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.LocalCreationDateString">
+            <summary>
+            Local Creation Date string
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.LocalModificationDateString">
+            <summary>
+            Local Modification Date string
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.UserDto">
+            <summary>
+            User information
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.Id">
+            <summary>
+            user primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.Name">
+            <summary>
+            user name
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.DocumentActivityUsers">
+            <summary>
+            Document Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUserFrom
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserDto.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUserTo
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Models.UserMinimalDto">
+            <summary>
+            Minimal User information
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserMinimalDto.Id">
+            <summary>
+            user primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.UserMinimalDto.Name">
+            <summary>
+            user name
+            </summary>
+        </member>
+    </members>
+</doc>

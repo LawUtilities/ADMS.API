@@ -1,0 +1,138 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API.Profiles</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.Profiles.DocumentActivityProfile">
+            <summary>
+            Document Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.DocumentActivityProfile.#ctor">
+            <summary>
+            Document Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.DocumentActivityUserProfile">
+            <summary>
+            Document Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.DocumentActivityUserProfile.#ctor">
+            <summary>
+            Document Activity User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.DocumentProfile">
+            <summary>
+            Automapper profile
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.DocumentProfile.#ctor">
+            <summary>
+            Document profile constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterActivityProfile">
+            <summary>
+            Matter Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterActivityProfile.#ctor">
+            <summary>
+            Matter Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterActivityUserProfile">
+            <summary>
+            Matter Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterActivityUserProfile.#ctor">
+            <summary>
+            Matter Activity User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterDocumentActivityProfile">
+            <summary>
+            Matter Document Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterDocumentActivityProfile.#ctor">
+            <summary>
+            Matter Document Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterDocumentActivityUserFromProfile">
+            <summary>
+            Matter Document Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterDocumentActivityUserFromProfile.#ctor">
+            <summary>
+            MatterDocumentActivityUser Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterDocumentActivityUserToProfile">
+            <summary>
+            Matter Document Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterDocumentActivityUserToProfile.#ctor">
+            <summary>
+            MatterDocumentActivityUser Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.MatterProfile">
+            <summary>
+            Automapper profile
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.MatterProfile.#ctor">
+            <summary>
+            Matter profile constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.RevisionActivityProfile">
+            <summary>
+            Revision Activity Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.RevisionActivityProfile.#ctor">
+            <summary>
+            Revision Activity Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.RevisionActivityUserProfile">
+            <summary>
+            Revision Activity User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.RevisionActivityUserProfile.#ctor">
+            <summary>
+            Revision Activity User Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.RevisionProfile">
+            <summary>
+            Revision Profile fpr autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.RevisionProfile.#ctor">
+            <summary>
+            Revision Profile Constructor
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Profiles.UserProfile">
+            <summary>
+            User Profile for autopmapper
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Profiles.UserProfile.#ctor">
+            <summary>
+            User Profile Constructor
+            </summary>
+        </member>
+    </members>
+</doc>

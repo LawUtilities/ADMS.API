@@ -1,0 +1,603 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API.Entities</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.Entities.Document">
+            <summary>
+            Document Entity Framework class
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Id">
+            <summary>
+            ID, key field
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.FileName">
+            <summary>
+            file name of the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Extension">
+            <summary>
+            extension of the file
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.MatterId">
+            <summary>
+            Matter Id linked to the document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Matter">
+            <summary>
+            Matter the document is linked to
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.IsCheckedOut">
+            <summary>
+            indicates if the document is checkedout
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.IsDeleted">
+            <summary>
+            Identifies if this document has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.Revisions">
+            <summary>
+            Document revisions
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.DocumentActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.MatterDocumentActivityUsersFrom">
+            <summary>
+            MatterDocumentActivityUser
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Document.MatterDocumentActivityUsersTo">
+            <summary>
+            MatterDocumentActivityUser
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.DocumentActivity">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.DocumentActivity.#ctor">
+            <summary>
+            Document Activity List
+            </summary>
+            <remarks>
+            Document Activity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivity.Id">
+            <summary>
+            Document Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivity.Activity">
+            <summary>
+            Document Activity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivity.DocumentActivityUsers">
+            <summary>
+            Matter document activities
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.DocumentActivityUser">
+            <summary>
+            Document Activity User join
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.DocumentId">
+            <summary>
+            Document Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.Document">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.DocumentActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.DocumentActivity">
+            <summary>
+            DocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.DocumentActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.Matter">
+            <summary>
+            Matter for document storage
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.Id">
+            <summary>
+            Matter primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.Description">
+            <summary>
+            Matter description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.IsArchived">
+            <summary>
+            Identifies if the matter is archived
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.IsDeleted">
+            <summary>
+            Identifies if the Matter has been deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.CreationDate">
+            <summary>
+            Creation date of the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.Documents">
+            <summary>
+            Documents linked to the matter
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.MatterDocumentActivityUsersFrom">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Matter.MatterDocumentActivityUsersTo">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterActivity">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.MatterActivity.#ctor">
+            <summary>
+            Matter activity
+            </summary>
+            <remarks>
+            MatterActivity Constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivity.Id">
+            <summary>
+            Matter Activity Primary Key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivity.Activity">
+            <summary>
+            name of the activity being undertaken
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivity.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterActivityUser">
+            <summary>
+            shared type entity for many to many tables
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.Matter">
+            <summary>
+            Document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.MatterActivityId">
+            <summary>
+            Matter Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.MatterActivity">
+            <summary>
+            MatterActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+            [Key]
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivity">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.MatterDocumentActivity.#ctor">
+            <summary>
+            Matter document activities
+            </summary>
+            <remarks>
+            matter document activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.Id">
+            <summary>
+            Matter Document Activity Primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.MatterDocumentActivityUsersFrom">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivity.MatterDocumentActivityUsersTo">
+            <summary>
+            Matter MatterDocumentActivity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivityUser">
+            <summary>
+            MatterDocumentActivityUser table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivityUserFrom">
+            <summary>
+            Matter DocumentActivity User linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserFrom.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.MatterDocumentActivityUserTo">
+            <summary>
+            Matter DocumentActivity User linkage table
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.MatterId">
+            <summary>
+            Matter Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.Matter">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.DocumentId">
+            <summary>
+            What documentId was this action taken from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.Document">
+            <summary>
+            Matter document copied / moved from
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.MatterDocumentActivityId">
+            <summary>
+            Document Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.MatterDocumentActivity">
+            <summary>
+            MatterDocumentActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.MatterDocumentActivityUserTo.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.RevisionActivity">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Entities.RevisionActivity.#ctor">
+            <summary>
+            Revision Activity
+            </summary>
+            <remarks>
+            Revision Activity constructor
+            </remarks>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivity.Id">
+            <summary>
+            Revision Activity primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivity.Activity">
+            <summary>
+            Activity description
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivity.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.RevisionActivityUser">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.RevisionId">
+            <summary>
+            Revision Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.Revision">
+            <summary>
+            Revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.RevisionActivityId">
+            <summary>
+            Activity Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.RevisionActivity">
+            <summary>
+            RevisionActivity
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.UserId">
+            <summary>
+            User Id
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.User">
+            <summary>
+            User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.RevisionActivityUser.CreatedAt">
+            <summary>
+            entry created at
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.Revision">
+            <summary>
+            document revisions
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.Id">
+            <summary>
+            Revision primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.RevisionId">
+            <summary>
+            Revision number for the specified document
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.CreationDate">
+            <summary>
+            Creation date for the revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.ModificationDate">
+            <summary>
+            Revision modification date
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.DocumentId">
+            <summary>
+            Document ID linked to this revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.Document">
+            <summary>
+            Document linked to this revision
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.IsDeleted">
+            <summary>
+            Indicates if a revision is deleted
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.Revision.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Entities.User">
+            <summary>
+            User information
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.Id">
+            <summary>
+            user primary key
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.Name">
+            <summary>
+            user name
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.MatterActivityUsers">
+            <summary>
+            Matter activity user
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.DocumentActivityUsers">
+            <summary>
+            Document Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.RevisionActivityUsers">
+            <summary>
+            Revision Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.MatterDocumentActivityUsersFrom">
+            <summary>
+            Matter Document Activity User
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Entities.User.MatterDocumentActivityUsersTo">
+            <summary>
+            Matter Document Activity User
+            </summary>
+        </member>
+    </members>
+</doc>

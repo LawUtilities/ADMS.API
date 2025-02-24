@@ -8,13 +8,15 @@ namespace ADMS.API.Profiles
     public class MatterDocumentActivityUserToProfile : Profile
     {
         /// <summary>
-        /// MatterDocumentActivityUserTo Profile Constructor
+        /// MatterDocumentActivityUser Profile Constructor
         /// </summary>
         public MatterDocumentActivityUserToProfile()
         {
             CreateMap<Entities.MatterDocumentActivityUserTo, Models.MatterDocumentActivityUserToDto>();
+            CreateMap<Entities.MatterDocumentActivityUserTo, Models.MatterDocumentActivityUserMinimalDto>();
+            CreateMap<Entities.MatterDocumentActivityUserTo, Entities.MatterDocumentActivityUser>();
 
-            CreateMap<Models.MatterDocumentActivityUserToDto, Entities.MatterDocumentActivityUserTo>();
+            CreateMap<Models.MatterDocumentActivityUserToDto, Models.MatterDocumentActivityUserMinimalDto>();
         }
     }
 }

@@ -8,6 +8,8 @@ using AutoMapper;
 
 using Microsoft.AspNetCore.Mvc;
 
+using Syncfusion.DocIO.DLS;
+
 namespace ADMS.API.Controllers
 {
     /// <summary>
@@ -36,31 +38,37 @@ namespace ADMS.API.Controllers
         /// </summary>
         /// <param name="matterId">Matter to be added to</param>
         /// <param name="documentId">Document to add revision to</param>
-        /// <param name="revision">revision to add</param>
-        /// <returns></returns>
+        /// <param name="revision">Revision to add</param>
+        /// <returns>ActionResult of RevisionDto</returns>
         /// <response code="200">Returns the created revision</response>
-        /// <response code="400">An error occured</response>
+        /// <response code="400">An error occurred</response>
         /// <response code="404">Matter or Document not found</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RevisionDto>> CreateRevision(
-            Guid matterId, 
-            Guid documentId, 
+            Guid matterId,
+            Guid documentId,
             RevisionForCreationDto revision)
         {
             try
             {
-                if (!await _admsRepository.CheckMatterExists(matterId))
+                if (revision == null)
+                {
+                    return BadRequest("Revision cannot be null");
+                }
+
+                if (!await _admsRepository.MatterExistsAsync(matterId))
                 {
                     return NotFound("Matter not found");
                 }
 
-                if (!await _admsRepository.CheckDocumentExistsAsync(documentId))
+                if (!await _admsRepository.DocumentExistsAsync(documentId))
                 {
                     return NotFound("Document not found");
                 }
+
                 Document? documentForUpload = await _admsRepository.GetDocumentAsync(documentId, true);
 
                 if (!ModelState.IsValid)
@@ -79,7 +87,7 @@ namespace ADMS.API.Controllers
                     return BadRequest(ModelState);
                 }
 
-                Revision? createdRevision = await _admsRepository.AddRevisionAsync(documentId, finalRevision);
+                ADMS.API.Entities.Revision? createdRevision = await _admsRepository.AddRevisionAsync(documentId, finalRevision);
 
                 return await _admsRepository.SaveChangesAsync() ?
                     (ActionResult<RevisionDto>)Ok(createdRevision) :
@@ -87,177 +95,165 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                if (exception == null)
-                    return BadRequest("An error occured");
-                if (string.IsNullOrEmpty(exception.StackTrace))
-                {
-                    return BadRequest("An error occured");
-                }
-                _logger.LogCritical(exception: exception,
-                                    message: "An error occured while creating revision: {revision}",
-                                    args: [exception.StackTrace]);
-                return BadRequest("An error occured");
+                _logger.LogCritical(exception, "An error occurred while creating revision for matter {MatterId} and document {DocumentId}", matterId, documentId);
+                return BadRequest("An error occurred");
             }
         }
 
         /// <summary>
         /// Delete specified revision
         /// </summary>
-        /// <param name="matterId">Matter containing the docunment in question</param>
-        /// <param name="documentId">document containing revision to be deleted</param>
-        /// <param name="id">revision to be deleted</param>
-        /// <returns></returns>
+        /// <param name="matterId">Matter containing the document in question</param>
+        /// <param name="documentId">Document containing revision to be deleted</param>
+        /// <param name="revisionId">Revision to be deleted</param>
+        /// <returns>IActionResult</returns>
         /// <response code="204">Deletion undertaken</response>
-        /// <response code="400">An error occured</response>
+        /// <response code="400">An error occurred</response>
         /// <response code="404">Matter, Document or Revision not found</response>
-        [HttpDelete("{id}")]
+        [HttpDelete("{revisionId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteRevision(
             Guid matterId,
             Guid documentId,
-            Guid id)
+            Guid revisionId)
         {
             try
             {
-                if (!await _admsRepository.CheckMatterExists(matterId))
+                if (!await _admsRepository.MatterExistsAsync(matterId))
                 {
                     return NotFound("Matter not found");
                 }
 
-                if (!await _admsRepository.CheckDocumentExistsAsync(documentId))
+                if (!await _admsRepository.DocumentExistsAsync(documentId))
                 {
                     return NotFound("Document not found");
                 }
 
-                if (!await _admsRepository.CheckRevisionExistsAsync(id))
+                if (!await _admsRepository.RevisionExistsAsync(revisionId))
                 {
                     return NotFound("Revision not found");
                 }
 
-                Revision? revision = await _admsRepository.GetRevisionByIdAsync(id);
+                Entities.Revision? revision = await _admsRepository.GetRevisionByIdAsync(revisionId);
 
                 if (revision == null)
                 {
                     return NotFound("Revision not found");
                 }
-
-                if (await _admsRepository.DeleteRevisionAsync(_mapper.Map<RevisionDto>(revision)))
-                {
-                    return await _admsRepository.SaveChangesAsync() ? NoContent() : BadRequest("Unable to delete revision");
-                }
                 else
                 {
-                    return BadRequest("Unable to delete revision");
+
+                    if (await _admsRepository.DeleteRevisionAsync(_mapper.Map<RevisionDto>(revision)))
+                    {
+                        return await _admsRepository.SaveChangesAsync() ? NoContent() : BadRequest("Unable to delete revision");
+                    }
+                    else
+                    {
+                        return BadRequest("Unable to delete revision");
+                    }
                 }
             }
             catch (Exception exception)
             {
-                if (exception == null)
-                    return BadRequest("An error occured");
-                if (string.IsNullOrEmpty(exception.StackTrace))
-                {
-                    return BadRequest("An error occured");
-                }
-                _logger.LogCritical(exception: exception,
-                                    message: "An error occured while deleting revision with id: {id}",
-                                    args: [exception.StackTrace]);
-                return BadRequest("An error occured");
+                _logger.LogCritical(exception, "An error occurred while deleting revision with id: {RevisionId} for document {DocumentId} in matter {MatterId}", revisionId, documentId, matterId);
+                return BadRequest("An error occurred");
             }
         }
 
         /// <summary>
-        /// gets specific revision
+        /// Gets specific revision
         /// </summary>
         /// <param name="matterId">Matter containing document</param>
-        /// <param name="documentId">document containing revision</param>
-        /// <param name="id">Revision Id to retrieve</param>
-        /// <returns>revision to be retrieved</returns>
-        /// <response code="200">Returns the requested matters</response>
-        /// <response code="400">An error occured</response>
+        /// <param name="documentId">Document containing revision</param>
+        /// <param name="revisionId">Revision Id to retrieve</param>
+        /// <returns>Revision to be retrieved</returns>
+        /// <response code="200">Returns the requested revision</response>
+        /// <response code="400">An error occurred</response>
         /// <response code="404">Matter, document or revision not found</response>
-        [HttpGet("{id}")]
+        [HttpGet("{revisionId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRevisionAsync(
             Guid matterId,
             Guid documentId,
-            Guid id)
+            Guid revisionId)
         {
             try
             {
-                if (!await _admsRepository.CheckMatterExists(matterId))
+                if (!await _admsRepository.MatterExistsAsync(matterId))
                 {
                     return NotFound("Matter not found");
                 }
 
-                if (!await _admsRepository.CheckDocumentExistsAsync(documentId))
+                if (!await _admsRepository.DocumentExistsAsync(documentId))
                 {
                     return NotFound("Document not found");
                 }
 
-                if (!await _admsRepository.CheckRevisionExistsAsync(id))
+                if (!await _admsRepository.RevisionExistsAsync(revisionId))
                 {
                     return NotFound("Revision not found");
                 }
 
-                Revision? revision = await _admsRepository.GetRevisionByIdAsync(id);
+                Entities.Revision? revision = await _admsRepository.GetRevisionByIdAsync(revisionId);
+                if (revision == null)
+                {
+                    return NotFound("Revision not found");
+                }
+
                 return Ok(_mapper.Map<RevisionDto>(revision));
             }
             catch (Exception exception)
             {
-                if (exception == null)
-                    return BadRequest("An error occured");
-                if (string.IsNullOrEmpty(exception.StackTrace))
-                {
-                    return BadRequest("An error occured");
-                }
-                _logger.LogCritical(exception: exception,
-                                    message: "An error occured while retrieving revision with id: {id}",
-                                    args: [exception.StackTrace]);
-                return BadRequest("An error occured");
+                _logger.LogCritical(exception, "An error occurred while retrieving revision with id: {RevisionId} for document {DocumentId} in matter {MatterId}", revisionId, documentId, matterId);
+                return BadRequest("An error occurred");
             }
         }
 
         /// <summary>
-        /// gets specific revision history
+        /// Gets specific revision history
         /// </summary>
         /// <param name="matterId">Matter containing document</param>
-        /// <param name="documentId">document containing revision</param>
-        /// <param name="id">Revision Id to retrieve</param>
-        /// <returns>revision to be retrieved</returns>
-        /// <response code="200">Returns the requested matters</response>
-        /// <response code="400">An error occured</response>
+        /// <param name="documentId">Document containing revision</param>
+        /// <param name="revisionId">Revision Id to retrieve</param>
+        /// <returns>Revision history to be retrieved</returns>
+        /// <response code="200">Returns the requested revision history</response>
+        /// <response code="400">An error occurred</response>
         /// <response code="404">Matter, document or revision not found</response>
-        [HttpGet("{id}/GetHistory")]
+        [HttpGet("{revisionId}/GetHistory")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetRevisionHistoryAsync(
             Guid matterId,
             Guid documentId,
-            Guid id)
+            Guid revisionId)
         {
             try
             {
-                if (!await _admsRepository.CheckMatterExists(matterId))
+                if (!await _admsRepository.MatterExistsAsync(matterId))
                 {
                     return NotFound("Matter not found");
                 }
 
-                if (!await _admsRepository.CheckDocumentExistsAsync(documentId))
+                if (!await _admsRepository.DocumentExistsAsync(documentId))
                 {
                     return NotFound("Document not found");
                 }
 
-                if (!await _admsRepository.CheckRevisionExistsAsync(id))
+                if (!await _admsRepository.RevisionExistsAsync(revisionId))
                 {
                     return NotFound("Revision not found");
                 }
 
-                IEnumerable<RevisionActivityUser> revisionHistory = await _admsRepository.GetRevisionWithHistoryByIdAsync(id);
+                IEnumerable<RevisionActivityUser> revisionHistory = await _admsRepository.GetRevisionWithHistoryByIdAsync(revisionId);
+                if (revisionHistory == null || !revisionHistory.Any())
+                {
+                    return NotFound("Revision history not found");
+                }
 
                 IEnumerable<RevisionActivityUserDto> results = _mapper.Map<IEnumerable<RevisionActivityUserDto>>(revisionHistory);
 
@@ -265,28 +261,20 @@ namespace ADMS.API.Controllers
             }
             catch (Exception exception)
             {
-                if (exception == null)
-                    return BadRequest("An error occured");
-                if (string.IsNullOrEmpty(exception.StackTrace))
-                {
-                    return BadRequest("An error occured");
-                }
-                _logger.LogCritical(exception: exception,
-                                    message: "An error occured while retrieving revision history with id: {id}",
-                                    args: [exception.StackTrace]);
-                return BadRequest("An error occured");
+                _logger.LogCritical(exception, "An error occurred while retrieving revision history with id: {RevisionId} for document {DocumentId} in matter {MatterId}", revisionId, documentId, matterId);
+                return BadRequest("An error occurred");
             }
         }
 
         /// <summary>
-        /// gets list of revisions
+        /// Gets list of revisions
         /// </summary>
         /// <param name="matterId">Matter containing document</param>
-        /// <param name="documentId">document to retrieve revisions for</param>
-        /// <param name="includeDeleted">include deleted revisions</param>
-        /// <returns>list of revisions</returns>
+        /// <param name="documentId">Document to retrieve revisions for</param>
+        /// <param name="includeDeleted">Include deleted revisions</param>
+        /// <returns>List of revisions</returns>
         /// <response code="200">Returns the requested revisions</response>
-        /// <response code="400">An error occured</response>
+        /// <response code="400">An error occurred</response>
         /// <response code="404">Matter or Document not found</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -299,31 +287,28 @@ namespace ADMS.API.Controllers
         {
             try
             {
-                if (!await _admsRepository.CheckMatterExists(matterId))
+                if (!await _admsRepository.MatterExistsAsync(matterId))
                 {
                     return NotFound("Matter not found");
                 }
 
-                if (!await _admsRepository.CheckDocumentExistsAsync(documentId))
+                if (!await _admsRepository.DocumentExistsAsync(documentId))
                 {
                     return NotFound("Document not found");
                 }
 
-                IEnumerable<Revision> revisions = await _admsRepository.GetRevisionsAsync(documentId, includeDeleted);
+                IEnumerable<Entities.Revision> revisions = await _admsRepository.GetRevisionsAsync(documentId, includeDeleted);
+                if (revisions == null || !revisions.Any())
+                {
+                    return NotFound("No revisions found");
+                }
+
                 return Ok(_mapper.Map<IEnumerable<RevisionDto>>(revisions));
             }
             catch (Exception exception)
             {
-                if (exception == null)
-                    return BadRequest("An error occured");
-                if (string.IsNullOrEmpty(exception.StackTrace))
-                {
-                    return BadRequest("An error occured");
-                }
-                _logger.LogCritical(exception: exception,
-                                    message: "An error occured while retrieving revisions for document with id: {documentId}",
-                                    args: [exception.StackTrace]);
-                return BadRequest("An error occured");
+                _logger.LogCritical(exception, "An error occurred while retrieving revisions for document with id: {DocumentId} in matter {MatterId}", documentId, matterId);
+                return BadRequest("An error occurred");
             }
         }
 
@@ -332,40 +317,45 @@ namespace ADMS.API.Controllers
         /// </summary>
         /// <param name="matterId">Matter containing document</param>
         /// <param name="documentId">Document containing revision</param>
-        /// <param name="id">Revision Id</param>
-        /// <param name="revision">revision to be updated</param>
+        /// <param name="revisionId">Revision Id</param>
+        /// <param name="revision">Revision to be updated</param>
         /// <returns>IActionResult</returns>
         /// <response code="204">Returns No Content</response>
-        /// <response code="400">An error occured</response>
+        /// <response code="400">An error occurred</response>
         /// <response code="404">Matter, Document or Revision not found</response>
-        [HttpPut("{id}")]
+        [HttpPut("{revisionId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateRevision(
             Guid matterId,
             Guid documentId,
-            Guid id, 
+            Guid revisionId,
             RevisionForUpdateDto revision)
         {
             try
             {
-                if (!await _admsRepository.CheckMatterExists(matterId))
+                if (revision == null)
+                {
+                    return BadRequest("Revision cannot be null");
+                }
+
+                if (!await _admsRepository.MatterExistsAsync(matterId))
                 {
                     return NotFound("Matter not found");
                 }
 
-                if (!await _admsRepository.CheckDocumentExistsAsync(documentId))
+                if (!await _admsRepository.DocumentExistsAsync(documentId))
                 {
                     return NotFound("Document not found");
                 }
 
-                if (!await _admsRepository.CheckRevisionExistsAsync(id))
+                if (!await _admsRepository.RevisionExistsAsync(revisionId))
                 {
                     return NotFound("Revision not found");
                 }
 
-                Revision? revisionEntity = await _admsRepository.GetRevisionByIdAsync(id);
+                Entities.Revision? revisionEntity = await _admsRepository.GetRevisionByIdAsync(revisionId);
                 if (revisionEntity == null)
                 {
                     return NotFound("Revision not found");
@@ -373,22 +363,14 @@ namespace ADMS.API.Controllers
 
                 _mapper.Map(revision, revisionEntity);
 
-                Revision? resultantOp = await _admsRepository.UpdateRevisionsAsync(matterId, documentId, id, _mapper.Map<RevisionDto>(revisionEntity));
+                Entities.Revision? resultantOp = await _admsRepository.UpdateRevisionAsync(matterId, documentId, revisionId, _mapper.Map<RevisionDto>(revisionEntity));
 
                 return await _admsRepository.SaveChangesAsync() ? NoContent() : BadRequest("Could not save updates");
             }
             catch (Exception exception)
             {
-                if (exception == null)
-                    return BadRequest("An error occured");
-                if (string.IsNullOrEmpty(exception.StackTrace))
-                {
-                    return BadRequest("An error occured");
-                }
-                _logger.LogCritical(exception: exception,
-                                    message: "An error occured while updating Revision with revisionId: {id}",
-                                    args: [exception.StackTrace]);
-                return BadRequest("An error occured");
+                _logger.LogCritical(exception, "An error occurred while updating Revision with revisionId: {RevisionId} for document {DocumentId} in matter {MatterId}", revisionId, documentId, matterId);
+                return BadRequest("An error occurred");
             }
         }
     }
