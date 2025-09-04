@@ -47,7 +47,6 @@
 
   <ItemGroup>
     <!-- Organized folder structure -->
-    <Folder Include="Persistence\Context\" />
     <Folder Include="Persistence\Configurations\" />
     <Folder Include="Persistence\Migrations\" />
     <Folder Include="Persistence\Repositories\" />
