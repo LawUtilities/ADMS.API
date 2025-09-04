@@ -4,21 +4,45 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Services\" />
-    <Folder Include="Persistence\Migrations\" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\core\ADMS.Application\ADMS.Application.csproj" />
     <ProjectReference Include="..\..\core\ADMS.Domain\ADMS.Domain.csproj" />
     <ProjectReference Include="..\..\Shared\ADMS.Shared\ADMS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- Infrastructure-specific packages -->
+    <PackageReference Include="Microsoft.EntityFrameworkCore" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+    <PackageReference Include="nClam" />
+    <PackageReference Include="File.TypeChecker" />
+    <PackageReference Include="Mime-Detective" />
+    <PackageReference Include="MimeTypesMap" />
+
+    <!-- Document Processing -->
+    <PackageReference Include="Syncfusion.DocIO.Net.Core" />
+    <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" />
+    <PackageReference Include="Syncfusion.Presentation.Net.Core" />
+    <PackageReference Include="Syncfusion.PresentationRenderer.Net.Core" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" />
+    <PackageReference Include="Syncfusion.XlsIORenderer.Net.Core" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Persistence\Context\" />
+    <Folder Include="Persistence\Configurations\" />
+    <Folder Include="Persistence\Migrations\" />
+    <Folder Include="Persistence\Repositories\" />
+    <Folder Include="Services\Document\" />
+    <Folder Include="Services\Security\" />
+    <Folder Include="Services\External\" />
+    <Folder Include="Extensions\" />
   </ItemGroup>
 
 </Project>

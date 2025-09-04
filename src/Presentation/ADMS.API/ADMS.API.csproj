@@ -4,21 +4,38 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <DocumentationFile>ADMS.API.xml</DocumentationFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+    <!-- Allow missing XML comments in development -->
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Middleware\" />
-    <Folder Include="Filters\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <!-- Clean Architecture Dependencies -->
     <ProjectReference Include="..\..\core\ADMS.Application\ADMS.Application.csproj" />
     <ProjectReference Include="..\..\Infrastructure\ADMS.Infrastructure\ADMS.Infrastructure.csproj" />
     <ProjectReference Include="..\..\Shared\ADMS.Shared\ADMS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- API-specific packages only -->
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Swashbuckle.AspNetCore" />
+    <PackageReference Include="Asp.Versioning.Mvc" />
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" />
+    <PackageReference Include="Serilog.AspNetCore" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Controllers\" />
+    <Folder Include="Middleware\" />
+    <Folder Include="Filters\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Configuration\" />
   </ItemGroup>
 
 </Project>
