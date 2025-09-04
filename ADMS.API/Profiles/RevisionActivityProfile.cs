@@ -1,21 +1,25 @@
-﻿using AutoMapper;
+﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
-namespace ADMS.API.Profiles
+using Mapster;
+
+namespace ADMS.API.Profiles;
+
+/// <summary>
+///     AutoMapper profile for mapping between <see cref="RevisionActivity"/>, <see cref="RevisionActivityDto"/>, and <see cref="RevisionActivityMinimalDto"/>.
+/// </summary>
+public class RevisionActivityProfile
 {
     /// <summary>
-    /// Revision Activity Profile for autopmapper
+    ///     Initializes a new instance of the <see cref="RevisionActivityProfile"/> class and configures entity-to-DTO mappings.
     /// </summary>
-    public class RevisionActivityProfile : Profile
+    public RevisionActivityProfile()
     {
-        /// <summary>
-        /// Revision Activity Profile Constructor
-        /// </summary>
-        public RevisionActivityProfile()
-        {
-            CreateMap<Entities.RevisionActivity, Models.RevisionActivityDto>();
-            CreateMap<Entities.RevisionActivity, Models.RevisionActivityMinimalDto>();
+        // Entity to DTO mappings
+        TypeAdapterConfig<RevisionActivity, RevisionActivityDto>.NewConfig();
+        TypeAdapterConfig<RevisionActivity, RevisionActivityMinimalDto>.NewConfig();
 
-            CreateMap<Models.RevisionActivityDto, Entities.RevisionActivity>();
-        }
+        // DTO to Entity mapping
+        TypeAdapterConfig<RevisionActivityDto, RevisionActivity>.NewConfig();
     }
 }

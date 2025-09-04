@@ -1,73 +1,85 @@
 ﻿using Microsoft.EntityFrameworkCore;
 
-namespace ADMS.API.Helpers;
-
-/// <summary>
-/// Paged List
-/// </summary>
-/// <typeparam name="T">returns list of type T</typeparam>
-public class PagedList<T> : List<T>
+namespace ADMS.API.Helpers
 {
     /// <summary>
-    /// Current page being retrieved
+    /// Represents a paged list of items with pagination metadata.
     /// </summary>
-    public int CurrentPage { get; }
-
-    /// <summary>
-    /// Total number of pages
-    /// </summary>
-    public int TotalPages { get; }
-
-    /// <summary>
-    /// Page Size to retrieve
-    /// </summary>
-    public int PageSize { get; private set; }
-
-    /// <summary>
-    /// Total record count
-    /// </summary>
-    public int TotalCount { get; private set; }
-
-    /// <summary>
-    /// determines if a previous page exists
-    /// </summary>
-    public bool HasPrevious => CurrentPage > 1;
-
-    /// <summary>
-    /// determines if next page exists
-    /// </summary>
-    public bool HasNext => CurrentPage < TotalPages;
-
-    /// <summary>
-    /// Constructor
-    /// </summary>
-    /// <param name="items">list items</param>
-    /// <param name="count">total records</param>
-    /// <param name="pageNumber">page number to retrieve</param>
-    /// <param name="pageSize">Page size to return</param>
-    public PagedList(List<T> items, int count, int pageNumber, int pageSize)
+    /// <typeparam name="T">The type of items in the list.</typeparam>
+    public class PagedList<T> : List<T>
     {
-        TotalCount = count;
-        PageSize = pageSize;
-        CurrentPage = pageNumber;
-        TotalPages = (int)Math.Ceiling(count / (double)pageSize);
-        AddRange(items);
-    }
+        /// <summary>
+        /// Gets the current page number (1-based).
+        /// </summary>
+        public int CurrentPage { get; }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <param name="source"></param>
-    /// <param name="pageNumber"></param>
-    /// <param name="pageSize"></param>
-    /// <returns></returns>
-    public static async Task<PagedList<T>> CreateAsync(
-        IQueryable<T> source, int pageNumber, int pageSize)
-    {
-        var count = source.Count();
-        var items = await source.Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize).ToListAsync();
-        return new PagedList<T>(items, count, pageNumber, pageSize);
+        /// <summary>
+        /// Gets the total number of pages.
+        /// </summary>
+        public int TotalPages { get; }
+
+        /// <summary>
+        /// Gets the size of each page.
+        /// </summary>
+        public int PageSize { get; }
+
+        /// <summary>
+        /// Gets the total number of items.
+        /// </summary>
+        public int TotalCount { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether there is a previous page.
+        /// </summary>
+        public bool HasPrevious => CurrentPage > 1;
+
+        /// <summary>
+        /// Gets a value indicating whether there is a next page.
+        /// </summary>
+        public bool HasNext => CurrentPage < TotalPages;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PagedList{T}"/> class.
+        /// </summary>
+        public PagedList(List<T> items, int count, int pageNumber, int pageSize)
+            : base(items)
+        {
+            (TotalCount, PageSize, CurrentPage, TotalPages) = (count, pageSize, pageNumber, pageSize > 0 ? (int)Math.Ceiling(count / (double)pageSize) : 0);
+        }
+
+        /// <summary>
+        /// Asynchronously creates a paged list from an <see cref="IQueryable{T}"/> source.
+        /// </summary>
+        /// <param name="source">The source queryable.</param>
+        /// <param name="pageNumber">The current page number (1-based).</param>
+        /// <param name="pageSize">The size of each page.</param>
+        /// <returns>A <see cref="PagedList{T}"/> containing the items and pagination metadata.</returns>
+        public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, int pageNumber, int pageSize)
+        {
+            ArgumentNullException.ThrowIfNull(source);
+            if (pageNumber < 1)
+                throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than 0.");
+            if (pageSize < 1)
+                throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than 0.");
+
+            var count = await source.CountAsync();
+            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+            return new PagedList<T>(items, count, pageNumber, pageSize);
+        }
+
+        /// <summary>
+        /// Creates an empty paged list with the specified page number and page size.
+        /// </summary>
+        /// <param name="pageNumber">The current page number (1-based).</param>
+        /// <param name="pageSize">The size of each page.</param>
+        /// <returns>An empty <see cref="PagedList{T}"/>.</returns>
+        public static PagedList<T> CreateEmpty(int pageNumber, int pageSize)
+        {
+            if (pageNumber < 1) throw new ArgumentOutOfRangeException(nameof(pageNumber), "Page number must be greater than 0.");
+            if (pageSize < 1) throw new ArgumentOutOfRangeException(nameof(pageSize), "Page size must be greater than 0.");
+
+            return new PagedList<T>([], 0, pageNumber, pageSize);
+        }
+
     }
 }
-

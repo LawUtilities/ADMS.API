@@ -4,12 +4,12 @@ using System.Reflection;
 namespace ADMS.API.Helpers;
 
 /// <summary>
-/// Object Extension Methods
+///     Object Extension Methods
 /// </summary>
 public static class ObjectExtensions
 {
     /// <summary>
-    /// Shape Data method
+    ///     Shape Data method
     /// </summary>
     /// <typeparam name="TSource">Data Source</typeparam>
     /// <param name="source">source data</param>
@@ -18,12 +18,9 @@ public static class ObjectExtensions
     /// <exception cref="ArgumentNullException"></exception>
     /// <exception cref="Exception"></exception>
     public static ExpandoObject ShapeData<TSource>(this TSource source,
-         string? fields)
+        string? fields)
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
+        if (source == null) throw new ArgumentNullException(nameof(source));
 
         var dataShapedObject = new ExpandoObject();
 
@@ -31,8 +28,8 @@ public static class ObjectExtensions
         {
             // all public properties should be in the ExpandoObject 
             var propertyInfos = typeof(TSource)
-                    .GetProperties(BindingFlags.IgnoreCase |
-                    BindingFlags.Public | BindingFlags.Instance);
+                .GetProperties(BindingFlags.IgnoreCase |
+                               BindingFlags.Public | BindingFlags.Instance);
 
             foreach (var propertyInfo in propertyInfos)
             {
@@ -47,7 +44,7 @@ public static class ObjectExtensions
             return dataShapedObject;
         }
 
-        // the field are separated by ",", so we split it.
+        // the field is separated by ",", so we split it.
         var fieldsAfterSplit = fields.Split(',');
 
         foreach (var field in fieldsAfterSplit)
@@ -62,14 +59,12 @@ public static class ObjectExtensions
             // binding flag overwrites the already-existing binding flags.
             var propertyInfo = typeof(TSource)
                 .GetProperty(propertyName,
-                BindingFlags.IgnoreCase | BindingFlags.Public | 
-                BindingFlags.Instance);
+                    BindingFlags.IgnoreCase | BindingFlags.Public |
+                    BindingFlags.Instance);
 
             if (propertyInfo == null)
-            {
                 throw new Exception($"Property {propertyName} wasn't found " +
-                    $"on {typeof(TSource)}");
-            }
+                                    $"on {typeof(TSource)}");
 
             // get the value of the property on the source object
             var propertyValue = propertyInfo.GetValue(source);

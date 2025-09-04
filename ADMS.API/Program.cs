@@ -1,43 +1,49 @@
 using ADMS.API.DbContexts;
 using ADMS.API.Services;
+using ADMS.API.Services.Common;
 
 using Asp.Versioning;
 
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Mapster;
 
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
+using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
 using Serilog;
 
+using Syncfusion.Licensing;
+
 using System.Reflection;
 
-Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1NMaF5cXmBCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWX1feHZVQ2lcV012WEc=");
+// 1. Read Syncfusion license from environment variable or configuration (do NOT hardcode in source)
+var builder = WebApplication.CreateBuilder(args);
 
+var syncfusionLicense = builder.Configuration["SyncfusionLicenseKey"];
+if (!string.IsNullOrWhiteSpace(syncfusionLicense))
+    SyncfusionLicenseProvider.RegisterLicense(syncfusionLicense);
+
+// 2. Serilog configuration from appsettings.json, with context enrichment
 Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Information()
-    .WriteTo.Console()
-    .WriteTo.File("logs/ADMS.API.txt", rollingInterval: RollingInterval.Day)
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
     .CreateLogger();
-
-WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
 builder.Host.UseSerilog();
 
-// Add services to the container.
-
+// 3. Add services to the container.
 builder.Services.AddControllers(options =>
 {
     options.ReturnHttpNotAcceptable = true;
     options.CacheProfiles.Add("240SecondsCacheProfile",
-                new() { Duration = 240 });
+        new CacheProfile { Duration = 240 });
 })
     .AddNewtonsoftJson(options =>
     {
-        options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
+        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
         options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
     })
     .AddXmlDataContractSerializerFormatters()
@@ -45,104 +51,67 @@ builder.Services.AddControllers(options =>
     {
         setupAction.InvalidModelStateResponseFactory = context =>
         {
-            // create a validation problem details object
-            var problemDetailsFactory = context.HttpContext.RequestServices
-                .GetRequiredService<ProblemDetailsFactory>();
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .Select(e => new
+                {
+                    Field = e.Key,
+                    Errors = e.Value?.Errors.Select(x => x.ErrorMessage)
+                });
 
-            var validationProblemDetails = problemDetailsFactory
-                .CreateValidationProblemDetails(
-                    context.HttpContext,
-                    context.ModelState);
-
-            // add additional info not added by default
-            validationProblemDetails.Detail =
-                "See the errors field for details.";
-            validationProblemDetails.Instance =
-                context.HttpContext.Request.Path;
-
-            // report invalid model state responses as validation issues
-            validationProblemDetails.Type =
-                "https://courselibrary.com/modelvalidationproblem";
-            validationProblemDetails.Status =
-                StatusCodes.Status422UnprocessableEntity;
-            validationProblemDetails.Title =
-                "One or more validation errors occurred.";
-
-            return new UnprocessableEntityObjectResult(
-                validationProblemDetails)
-            {
-                ContentTypes = { "application/problem+json" }
-            };
+            return new BadRequestObjectResult(new { Errors = errors });
         };
     });
 
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
 builder.Services.AddSwaggerGen(setupAction =>
 {
-    string xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    string xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
+    var xmlCommentsFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlCommentsFullPath = Path.Combine(AppContext.BaseDirectory, xmlCommentsFile);
 
     setupAction.IncludeXmlComments(xmlCommentsFullPath);
 });
 
-if (builder.Environment.IsDevelopment())
-{
-    builder.Services.AddDbContextFactory<AdmsContext>(
-    dbContextOptions => dbContextOptions.UseSqlServer(
-        builder
-        .Configuration["ConnectionStrings:ADMS.API.Connection"])
-        .EnableSensitiveDataLogging()
-    
-    );
-}
-else
-{
-    builder.Services.AddDbContextFactory<AdmsContext>(
-    dbContextOptions => dbContextOptions.UseSqlServer(
-        builder
-        .Configuration["ConnectionStrings:ADMS.API.Connection"])
-    );
-}
+builder.Services.AddDbContextFactory<AdmsContext>(dbContextOptions =>
+    dbContextOptions.UseSqlServer(
+        builder.Configuration.GetConnectionString("ADMS.API.Connection"))
+    .EnableSensitiveDataLogging(builder.Environment.IsDevelopment()));
 
-builder.Services.AddTransient<IPropertyMappingService,
-    PropertyMappingService>();
+builder.Services.Configure<EntityValidationOptions>(builder.Configuration.GetSection("EntityValidation"));
+builder.Services.Configure<BatchValidationOptions>(builder.Configuration.GetSection("BatchValidation"));
 
-builder.Services.AddTransient<IPropertyCheckerService,
-    PropertyCheckerService>();
-
+builder.Services.AddSingleton<IPropertyMappingService, PropertyMappingService>();
+builder.Services.AddSingleton<IPropertyCheckerService, PropertyCheckerService>();
+builder.Services.AddScoped<IEntityExistenceValidator, EntityExistenceValidator>();
+builder.Services.AddScoped<IBatchEntityValidator, BatchEntityValidator>();
+builder.Services.AddScoped<IEntityExistenceValidator, EntityExistenceValidator>();
+builder.Services.AddScoped<IValidationService, ValidationService>();
 builder.Services.AddScoped<IAdmsRepository, AdmsRepository>();
+builder.Services.AddScoped<IVirusScanner, ClamAvVirusScanner>();
+builder.Services.AddScoped<IFileStorage, FileSystemStorage>();
 
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
+builder.Services.AddMapster();
 builder.Services.AddResponseCaching();
 
-builder.Services.Configure<ApiBehaviorOptions>(options =>
-{
-    options.SuppressModelStateInvalidFilter = true;
-});
-
-builder.Services.Configure<MvcOptions>(config =>
-{
-    var newtonsoftJsonOutputFormatter = config.OutputFormatters
-          .OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
-
-    newtonsoftJsonOutputFormatter?.SupportedMediaTypes
-        .Add("application/vnd.adms.hateoas+json");
-});
+builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 builder.Services.AddApiVersioning(setupAction =>
 {
     setupAction.AssumeDefaultVersionWhenUnspecified = true;
     setupAction.DefaultApiVersion = new ApiVersion(1, 0);
     setupAction.ReportApiVersions = true;
+})
+.AddMvc()
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
 });
 
-WebApplication app = builder.Build();
+var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 5. Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
@@ -151,25 +120,103 @@ if (app.Environment.IsDevelopment())
 }
 else
 {
+    // Use ProblemDetails for error responses in production
     app.UseExceptionHandler(appBuilder =>
     {
         appBuilder.Run(async context =>
         {
             context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("An unexpected fault happened.  Try again later.");
+            context.Response.ContentType = "application/problem+json";
+            var problem = new
+            {
+                status = 500,
+                title = "An unexpected fault happened.",
+                detail = "Try again later."
+            };
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(problem));
         });
     });
 }
 
-app.UseHttpsRedirection();
-
-app.UseRouting();
-
-app.UseAuthorization();
-
-app.UseEndpoints(endpoints =>
+app.UseExceptionHandler(errorApp =>
 {
-    endpoints.MapControllers();
+    errorApp.Run(async context =>
+    {
+        var exceptionHandlerPathFeature = context.Features.Get<IExceptionHandlerPathFeature>();
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogError(exceptionHandlerPathFeature?.Error, "Unhandled exception");
+
+        context.Response.StatusCode = 500;
+        context.Response.ContentType = "application/problem+json";
+        var problem = new
+        {
+            status = 500,
+            title = "An unexpected error occurred.",
+            detail = "Please try again later."
+        };
+        await context.Response.WriteAsync(JsonConvert.SerializeObject(problem));
+    });
 });
 
-app.Run();
+// 6. Add security headers (expanded)
+AddSecurityHeaders(app);
+
+app.UseHttpsRedirection();
+app.UseRouting();
+app.UseResponseCaching(); // Place before Authorization for best effect
+app.UseAuthorization();
+
+// Minimal API: Health check endpoint
+app.MapGet("/health", () => Results.Ok(new { status = "Healthy", timestamp = DateTime.UtcNow }))
+    .WithName("HealthCheck")
+    .WithTags("System");
+
+// Minimal API: Version info endpoint
+app.MapGet("/version", () =>
+    {
+        var version = typeof(Program).Assembly.GetName().Version?.ToString() ?? "unknown";
+        return Results.Ok(new { version });
+    })
+    .WithName("VersionInfo")
+    .WithTags("System");
+
+// Replace the UseEndpoints call with top-level route registrations
+app.MapControllers();
+
+await app.RunAsync();
+return;
+
+
+// 4. Security headers middleware
+static void AddSecurityHeaders(IApplicationBuilder application)
+{
+    application.Use(async (context, next) =>
+    {
+        var headers = context.Response.Headers;
+
+        // Prevent MIME type sniffing
+        headers.TryAdd("X-Content-Type-Options", "nosniff");
+
+        // Prevent clickjacking
+        headers.TryAdd("X-Frame-Options", "DENY");
+
+        // Content Security Policy (adjust as needed)
+        headers.TryAdd("Content-Security-Policy", "default-src 'self'");
+
+        // Referrer Policy
+        headers.TryAdd("Referrer-Policy", "no-referrer");
+
+        // HSTS (only for HTTPS)
+        if (context.Request.IsHttps)
+            headers.TryAdd("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
+
+        // Permissions Policy (restricts browser features)
+        headers.TryAdd("Permissions-Policy", "geolocation=(), microphone=(), camera=()");
+
+        // Cross-Origin headers
+        headers.TryAdd("Cross-Origin-Opener-Policy", "same-origin");
+        headers.TryAdd("Cross-Origin-Resource-Policy", "same-origin");
+
+        await next();
+    });
+}

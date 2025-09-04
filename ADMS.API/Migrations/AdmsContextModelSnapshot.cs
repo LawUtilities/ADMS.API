@@ -17,7 +17,7 @@ namespace ADMS.API.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.1")
+                .HasAnnotation("ProductVersion", "9.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -27,6 +27,10 @@ namespace ADMS.API.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Checksum")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Extension")
                         .IsRequired()
@@ -38,6 +42,9 @@ namespace ADMS.API.Migrations
                         .HasMaxLength(128)
                         .HasColumnType("nvarchar(128)");
 
+                    b.Property<long>("FileSize")
+                        .HasColumnType("bigint");
+
                     b.Property<bool>("IsCheckedOut")
                         .HasColumnType("bit");
 
@@ -46,6 +53,10 @@ namespace ADMS.API.Migrations
 
                     b.Property<Guid>("MatterId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MimeType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -72,32 +83,32 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("0d8fc022-b294-437e-ad9b-a0e61b833270"),
+                            Id = new Guid("20000000-0000-0000-0000-000000000001"),
                             Activity = "CHECKED IN"
                         },
                         new
                         {
-                            Id = new Guid("86dc18d4-2620-416f-8053-266374fa4418"),
+                            Id = new Guid("20000000-0000-0000-0000-000000000002"),
                             Activity = "CHECKED OUT"
                         },
                         new
                         {
-                            Id = new Guid("833677b2-9915-4dff-a960-850e0399fc47"),
+                            Id = new Guid("20000000-0000-0000-0000-000000000003"),
                             Activity = "CREATED"
                         },
                         new
                         {
-                            Id = new Guid("d32536a8-815c-432f-a470-b2b316b30c43"),
+                            Id = new Guid("20000000-0000-0000-0000-000000000004"),
                             Activity = "DELETED"
                         },
                         new
                         {
-                            Id = new Guid("33ff8724-da35-461f-bb37-bb268a1c8b60"),
+                            Id = new Guid("20000000-0000-0000-0000-000000000005"),
                             Activity = "RESTORED"
                         },
                         new
                         {
-                            Id = new Guid("8d48562f-35a0-4643-83fb-cde9d879b507"),
+                            Id = new Guid("20000000-0000-0000-0000-000000000006"),
                             Activity = "SAVED"
                         });
                 });
@@ -152,48 +163,48 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b7774153-b681-4c26-8316-07d718a6d9cc"),
-                            CreationDate = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(130),
+                            Id = new Guid("60000000-0000-0000-0000-000000000001"),
+                            CreationDate = new DateTime(2024, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Test Matter #1",
                             IsArchived = false,
                             IsDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("332cdc1e-5bd3-43a7-930c-e0cf9d9191be"),
-                            CreationDate = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(163),
+                            Id = new Guid("60000000-0000-0000-0000-000000000002"),
+                            CreationDate = new DateTime(2024, 1, 2, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Test Matter #2",
                             IsArchived = false,
                             IsDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("b4cf639a-2ee4-4e3b-9a5d-ec272bda887e"),
-                            CreationDate = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(166),
+                            Id = new Guid("60000000-0000-0000-0000-000000000003"),
+                            CreationDate = new DateTime(2024, 1, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Test Matter #3",
                             IsArchived = true,
                             IsDeleted = false
                         },
                         new
                         {
-                            Id = new Guid("2d9b2def-f7f1-4faf-8e87-76f34f0008f7"),
-                            CreationDate = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(169),
+                            Id = new Guid("60000000-0000-0000-0000-000000000004"),
+                            CreationDate = new DateTime(2024, 1, 4, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Test Matter #4",
                             IsArchived = false,
                             IsDeleted = true
                         },
                         new
                         {
-                            Id = new Guid("11a088be-a380-4957-a02e-7fb06aa564a3"),
-                            CreationDate = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(172),
+                            Id = new Guid("60000000-0000-0000-0000-000000000005"),
+                            CreationDate = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Test Matter #5",
                             IsArchived = true,
                             IsDeleted = true
                         },
                         new
                         {
-                            Id = new Guid("f089f59f-0460-4737-a903-e9cc7c388b86"),
-                            CreationDate = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(175),
+                            Id = new Guid("60000000-0000-0000-0000-000000000006"),
+                            CreationDate = new DateTime(2024, 1, 6, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Test Matter #6",
                             IsArchived = true,
                             IsDeleted = true
@@ -208,7 +219,8 @@ namespace ADMS.API.Migrations
 
                     b.Property<string>("Activity")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -217,28 +229,33 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("bc9aee9c-950c-4018-aaae-cd23079da63d"),
+                            Id = new Guid("30000000-0000-0000-0000-000000000001"),
                             Activity = "ARCHIVED"
                         },
                         new
                         {
-                            Id = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
+                            Id = new Guid("30000000-0000-0000-0000-000000000002"),
                             Activity = "CREATED"
                         },
                         new
                         {
-                            Id = new Guid("0efbb031-0ccb-4997-acf6-0613e3abf099"),
+                            Id = new Guid("30000000-0000-0000-0000-000000000003"),
                             Activity = "DELETED"
                         },
                         new
                         {
-                            Id = new Guid("2ef7e49f-f374-4e0d-9a5f-d38bf2bf4cd3"),
+                            Id = new Guid("30000000-0000-0000-0000-000000000004"),
                             Activity = "RESTORED"
                         },
                         new
                         {
-                            Id = new Guid("9cc499e4-87cb-4af3-b7ce-b75973287fe9"),
+                            Id = new Guid("30000000-0000-0000-0000-000000000005"),
                             Activity = "UNARCHIVED"
+                        },
+                        new
+                        {
+                            Id = new Guid("30000000-0000-0000-0000-000000000006"),
+                            Activity = "VIEWED"
                         });
                 });
 
@@ -267,87 +284,87 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            MatterId = new Guid("b7774153-b681-4c26-8316-07d718a6d9cc"),
-                            MatterActivityId = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(178)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000001"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 1, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("332cdc1e-5bd3-43a7-930c-e0cf9d9191be"),
-                            MatterActivityId = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(181)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000002"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 2, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("b4cf639a-2ee4-4e3b-9a5d-ec272bda887e"),
-                            MatterActivityId = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(225)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000003"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 3, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("2d9b2def-f7f1-4faf-8e87-76f34f0008f7"),
-                            MatterActivityId = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(228)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000004"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 4, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("11a088be-a380-4957-a02e-7fb06aa564a3"),
-                            MatterActivityId = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(231)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000005"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 5, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("f089f59f-0460-4737-a903-e9cc7c388b86"),
-                            MatterActivityId = new Guid("268c76b7-fbff-4c14-b397-ffe61748a1ca"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(234)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000006"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000002"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 6, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("b4cf639a-2ee4-4e3b-9a5d-ec272bda887e"),
-                            MatterActivityId = new Guid("bc9aee9c-950c-4018-aaae-cd23079da63d"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(236)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000003"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000001"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 7, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("11a088be-a380-4957-a02e-7fb06aa564a3"),
-                            MatterActivityId = new Guid("bc9aee9c-950c-4018-aaae-cd23079da63d"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(239)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000005"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000001"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 8, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("f089f59f-0460-4737-a903-e9cc7c388b86"),
-                            MatterActivityId = new Guid("bc9aee9c-950c-4018-aaae-cd23079da63d"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(241)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000006"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000001"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 9, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("2d9b2def-f7f1-4faf-8e87-76f34f0008f7"),
-                            MatterActivityId = new Guid("0efbb031-0ccb-4997-acf6-0613e3abf099"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(244)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000004"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000003"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 10, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("11a088be-a380-4957-a02e-7fb06aa564a3"),
-                            MatterActivityId = new Guid("0efbb031-0ccb-4997-acf6-0613e3abf099"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(246)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000005"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000003"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 11, 0, 0, DateTimeKind.Utc)
                         },
                         new
                         {
-                            MatterId = new Guid("f089f59f-0460-4737-a903-e9cc7c388b86"),
-                            MatterActivityId = new Guid("0efbb031-0ccb-4997-acf6-0613e3abf099"),
-                            UserId = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
-                            CreatedAt = new DateTime(2024, 2, 3, 10, 6, 58, 267, DateTimeKind.Utc).AddTicks(248)
+                            MatterId = new Guid("60000000-0000-0000-0000-000000000006"),
+                            MatterActivityId = new Guid("30000000-0000-0000-0000-000000000003"),
+                            UserId = new Guid("50000000-0000-0000-0000-000000000001"),
+                            CreatedAt = new DateTime(2024, 1, 10, 0, 12, 0, 0, DateTimeKind.Utc)
                         });
                 });
 
@@ -369,12 +386,12 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("7083bf51-890e-4e87-9a3f-db75945a02bf"),
+                            Id = new Guid("40000000-0000-0000-0000-000000000001"),
                             Activity = "COPIED"
                         },
                         new
                         {
-                            Id = new Guid("da30e84c-331a-426d-af88-f79b74de3f49"),
+                            Id = new Guid("40000000-0000-0000-0000-000000000002"),
                             Activity = "MOVED"
                         });
                 });
@@ -453,7 +470,7 @@ namespace ADMS.API.Migrations
                     b.Property<DateTime>("ModificationDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RevisionId")
+                    b.Property<int>("RevisionNumber")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -481,22 +498,22 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1926553c-ae97-421b-9142-a784f54bdfc6"),
+                            Id = new Guid("10000000-0000-0000-0000-000000000001"),
                             Activity = "CREATED"
                         },
                         new
                         {
-                            Id = new Guid("6e96bfb6-1c6f-473e-a98f-346c7c24ffb2"),
+                            Id = new Guid("10000000-0000-0000-0000-000000000002"),
                             Activity = "DELETED"
                         },
                         new
                         {
-                            Id = new Guid("46e2852f-8fad-4b6a-8ac9-f7b682989a0d"),
+                            Id = new Guid("10000000-0000-0000-0000-000000000003"),
                             Activity = "RESTORED"
                         },
                         new
                         {
-                            Id = new Guid("5e88dd09-1bc8-4f1c-8146-44e0b4244a65"),
+                            Id = new Guid("10000000-0000-0000-0000-000000000004"),
                             Activity = "SAVED"
                         });
                 });
@@ -542,7 +559,7 @@ namespace ADMS.API.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("b628c4f0-bdb8-4b4d-a059-341f16279de8"),
+                            Id = new Guid("50000000-0000-0000-0000-000000000001"),
                             Name = "rbrown"
                         });
                 });

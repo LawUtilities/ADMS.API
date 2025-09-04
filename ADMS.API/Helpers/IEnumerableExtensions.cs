@@ -4,12 +4,12 @@ using System.Reflection;
 namespace ADMS.API.Helpers;
 
 /// <summary>
-/// merable Extension methods
+///     Enumerable Extension methods
 /// </summary>
-public static class IEnumerableExtensions
+public static class EnumerableExtensions
 {
     /// <summary>
-    /// Shape Data method
+    ///     Shape Data method
     /// </summary>
     /// <typeparam name="TSource">Source data type</typeparam>
     /// <param name="source">source value</param>
@@ -18,15 +18,9 @@ public static class IEnumerableExtensions
     /// <exception cref="ArgumentNullException">source is null</exception>
     /// <exception cref="Exception">property name not found</exception>
     public static IEnumerable<ExpandoObject> ShapeData<TSource>(
-            this IEnumerable<TSource> source,
-            string? fields)
+        this IEnumerable<TSource> source,
+        string? fields)
     {
-        if (source == null)
-        {
-            throw new ArgumentNullException(nameof(source));
-        }
-
-        // create a list to hold our ExpandoObjects
         var expandoObjectList = new List<ExpandoObject>();
 
         // create a list with PropertyInfo objects on TSource.  Reflection is
@@ -39,13 +33,14 @@ public static class IEnumerableExtensions
         {
             // all public properties should be in the ExpandoObject
             var propertyInfos = typeof(TSource)
-                    .GetProperties(BindingFlags.IgnoreCase
-                    | BindingFlags.Public | BindingFlags.Instance);
+                .GetProperties(BindingFlags.IgnoreCase
+                               | BindingFlags.Public | BindingFlags.Instance);
 
             propertyInfoList.AddRange(propertyInfos);
         }
         else
-        {       // the field are separated by ",", so we split it.
+        {
+            // the field is separated by ",", so we split it.
             var fieldsAfterSplit = fields.Split(',');
 
             foreach (var field in fieldsAfterSplit)
@@ -60,13 +55,11 @@ public static class IEnumerableExtensions
                 // flag overwrites the already-existing binding flags.
                 var propertyInfo = typeof(TSource)
                     .GetProperty(propertyName, BindingFlags.IgnoreCase |
-                    BindingFlags.Public | BindingFlags.Instance);
+                                               BindingFlags.Public | BindingFlags.Instance);
 
                 if (propertyInfo == null)
-                {
                     throw new Exception($"Property {propertyName} wasn't found on" +
-                        $" {typeof(TSource)}");
-                }
+                                        $" {typeof(TSource)}");
 
                 // add propertyInfo to list 
                 propertyInfoList.Add(propertyInfo);
@@ -74,7 +67,7 @@ public static class IEnumerableExtensions
         }
 
         // run through the source objects
-        foreach (TSource sourceObject in source)
+        foreach (var sourceObject in source)
         {
             // create an ExpandoObject that will hold the 
             // selected properties & values

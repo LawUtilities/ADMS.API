@@ -1,22 +1,22 @@
 ﻿namespace ADMS.API.Helpers;
 
 /// <summary>
-/// Type of URL to create
+///     Type of URL to create
 /// </summary>
 public enum ResourceUriType
 {
     /// <summary>
-    /// Previous item
+    ///     Previous item
     /// </summary>
     PreviousPage,
 
     /// <summary>
-    /// Next item
+    ///     Next item
     /// </summary>
     NextPage,
 
     /// <summary>
-    /// Current item
+    ///     Current item
     /// </summary>
     Current
 }

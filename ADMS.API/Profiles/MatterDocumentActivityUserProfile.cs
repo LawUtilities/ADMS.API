@@ -1,23 +1,27 @@
-﻿using AutoMapper;
+﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
-namespace ADMS.API.Profiles
+using Mapster;
+
+namespace ADMS.API.Profiles;
+
+/// <summary>
+///     AutoMapper profile for mapping between matter document activity user entities and their DTOs.
+/// </summary>
+public class MatterDocumentActivityUserProfile
 {
     /// <summary>
-    /// Matter Document Activity Profile for autopmapper
+    ///     Initializes a new instance of the <see cref="MatterDocumentActivityUserProfile"/> class and configures entity-to-DTO mappings.
     /// </summary>
-    public class MatterDocumentActivityUserProfile : Profile
+    public MatterDocumentActivityUserProfile()
     {
-        /// <summary>
-        /// Matter Document Activity Profile Constructor
-        /// </summary>
-        public MatterDocumentActivityUserProfile()
-        {
-            CreateMap<Entities.MatterDocumentActivityUser, Models.MatterDocumentActivityUserDto>();
-            CreateMap<Entities.MatterDocumentActivityUserFrom, Models.MatterDocumentActivityUserDto>();
-            CreateMap<Entities.MatterDocumentActivityUserTo, Models.MatterDocumentActivityUserDto>();
-            CreateMap<Entities.MatterDocumentActivityUser, Models.MatterDocumentActivityUserMinimalDto>();
+        // Entity to DTO mappings
+        TypeAdapterConfig<MatterDocumentActivityUser, MatterDocumentActivityUserDto>.NewConfig();
+        TypeAdapterConfig<MatterDocumentActivityUserFrom, MatterDocumentActivityUserDto>.NewConfig();
+        TypeAdapterConfig<MatterDocumentActivityUserTo, MatterDocumentActivityUserDto>.NewConfig();
+        TypeAdapterConfig<MatterDocumentActivityUser, MatterDocumentActivityUserMinimalDto>.NewConfig();
 
-            CreateMap<Models.MatterDocumentActivityUserDto , Entities.MatterDocumentActivityUser>();
-        }
+        // DTO to Entity mapping
+        TypeAdapterConfig<MatterDocumentActivityUserDto, MatterDocumentActivityUser>.NewConfig();
     }
 }

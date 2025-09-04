@@ -1,29 +1,36 @@
-﻿using AutoMapper;
+﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
-namespace ADMS.API.Profiles
+using Mapster;
+
+namespace ADMS.API.Profiles;
+
+/// <summary>
+///     AutoMapper profile for mapping between <see cref="Matter"/> entities and their DTOs.
+/// </summary>
+public class MatterProfile
 {
     /// <summary>
-    /// Automapper profile
+    ///     Initializes a new instance of the <see cref="MatterProfile"/> class and configures entity-to-DTO and DTO-to-entity mappings.
     /// </summary>
-    public class MatterProfile : Profile
+    public MatterProfile()
     {
-        /// <summary>
-        /// Matter profile constructor
-        /// </summary>
-        public MatterProfile()
-        {
-            CreateMap<Entities.Matter, Models.MatterDto>();
-            CreateMap<Entities.Matter, Models.MatterMinimalDto>();
-            CreateMap<Entities.Matter, Models.MatterForCreationDto>();
-            CreateMap<Entities.Matter, Models.MatterForUpdateDto>();
-            CreateMap<Entities.Matter, Models.MatterWithDocumentsDto>();
-            CreateMap<Entities.Matter, Models.MatterWithoutDocumentsDto>();
+        // Entity to DTO mappings
+        TypeAdapterConfig<Matter, MatterDto>.NewConfig();
+        TypeAdapterConfig<Matter, MatterMinimalDto>.NewConfig();
+        TypeAdapterConfig<Matter, MatterForCreationDto>.NewConfig();
+        TypeAdapterConfig<Matter, MatterForUpdateDto>.NewConfig();
+        TypeAdapterConfig<Matter, MatterWithDocumentsDto>.NewConfig();
+        TypeAdapterConfig<Matter, MatterWithoutDocumentsDto>.NewConfig();
 
-            CreateMap<Models.MatterDto, Entities.Matter>();
-            CreateMap<Models.MatterForCreationDto, Entities.Matter>();
-            CreateMap<Models.MatterForUpdateDto, Entities.Matter>();
-            CreateMap<Models.MatterWithDocumentsDto, Entities.Matter>();
-            CreateMap<Models.MatterWithoutDocumentsDto, Entities.Matter>();
-        }
+        // DTO to Entity mappings
+        TypeAdapterConfig<MatterDto, Matter>.NewConfig();
+        TypeAdapterConfig<MatterForCreationDto, Matter>.NewConfig();
+        TypeAdapterConfig<MatterForUpdateDto, Matter>.NewConfig();
+        TypeAdapterConfig<MatterWithDocumentsDto, Matter>.NewConfig();
+        TypeAdapterConfig<MatterWithoutDocumentsDto, Matter>.NewConfig();
+
+        // DTO to DTO mappings
+        TypeAdapterConfig<MatterForCreationDto, MatterDto>.NewConfig();
     }
 }

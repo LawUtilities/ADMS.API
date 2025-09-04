@@ -1,10 +1,10 @@
 ﻿namespace ADMS.API.Models;
 
 /// <summary>
-/// Link model
+///     Link model
 /// </summary>
 /// <remarks>
-/// Constructor
+///     Constructor
 /// </remarks>
 /// <param name="href">URL</param>
 /// <param name="rel">relationship</param>
@@ -12,17 +12,17 @@
 public class LinkDto(string? href, string? rel, string method)
 {
     /// <summary>
-    /// URL to return
+    ///     URL to return
     /// </summary>
     public string? Href { get; private set; } = href;
 
     /// <summary>
-    /// Relationship
+    ///     Relationship
     /// </summary>
     public string? Rel { get; private set; } = rel;
 
     /// <summary>
-    /// Method
+    ///     Method
     /// </summary>
     public string Method { get; private set; } = method;
 }

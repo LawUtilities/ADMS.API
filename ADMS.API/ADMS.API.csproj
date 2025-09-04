@@ -1,31 +1,26 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0-windows8.0</TargetFramework>
+    <TargetFramework>net9.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <GenerateDocumentationFile>True</GenerateDocumentationFile>
     <DocumentationFile>ADMS.API.xml</DocumentationFile>
-    <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="ActionConstraints\**" />
-    <Compile Remove="DbContexts\**" />
     <Compile Remove="Entities\**" />
     <Compile Remove="Models\**" />
     <Compile Remove="ResourceParameters\**" />
-    <Content Remove="ActionConstraints\**" />
     <Content Remove="DbContexts\**" />
     <Content Remove="Entities\**" />
     <Content Remove="Models\**" />
     <Content Remove="ResourceParameters\**" />
-    <EmbeddedResource Remove="ActionConstraints\**" />
     <EmbeddedResource Remove="DbContexts\**" />
     <EmbeddedResource Remove="Entities\**" />
     <EmbeddedResource Remove="Models\**" />
     <EmbeddedResource Remove="ResourceParameters\**" />
-    <None Remove="ActionConstraints\**" />
     <None Remove="DbContexts\**" />
     <None Remove="Entities\**" />
     <None Remove="Models\**" />
@@ -33,44 +28,76 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Helpers\IEnumerableExtensions.cs" />
+    <Compile Remove="Helpers\ObjectExtensions.cs" />
+    <Compile Remove="Helpers\ResourceUriType.cs" />
+    <Compile Remove="Services\IModelValidator.cs" />
+    <Compile Remove="Services\ModelValidator.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="ResourceParameters\abstract_PagedResourceParameters.cs" />
+    <Compile Include="ResourceParameters\DocumentAuditsResourceParameters.cs" />
+    <Compile Include="ResourceParameters\DocumentsResourceParameters.cs" />
+    <Compile Include="ResourceParameters\MattersResourceParameters.cs" />
+    <Compile Include="ResourceParameters\RevisionsResourceParameters.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />
-    <PackageReference Include="AutoMapper" Version="14.0.0" />
-    <PackageReference Include="File.TypeChecker" Version="4.1.1" />
-    <PackageReference Include="Handlebars.Net.Helpers.DynamicLinq" Version="2.4.12" />
-    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.2" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.2">
+    <PackageReference Include="Asp.Versioning.Mvc.ApiExplorer" Version="8.1.0" />
+    <PackageReference Include="File.TypeChecker" Version="4.2.0" />
+    <PackageReference Include="FluentAssertions" Version="8.6.0" />
+    <PackageReference Include="Handlebars.Net.Helpers.DynamicLinq" Version="2.5.2" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
+    <PackageReference Include="Mapster.DependencyInjection" Version="1.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.JsonPatch" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="9.0.8" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.8">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.8" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="Mime-Detective" Version="25.8.1" />
+    <PackageReference Include="MimeTypesMap" Version="1.0.9" />
+    <PackageReference Include="Moq" Version="4.20.72" />
+    <PackageReference Include="nClam" Version="9.0.0" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="9.0.0" />
-    <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="7.2.0" />
-    <PackageReference Include="Syncfusion.DocIO.Net.Core" Version="28.2.6" />
-    <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" Version="28.2.6" />
-    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="28.2.6" />
-    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="28.2.6" />
-    <PackageReference Include="Syncfusion.PresentationRenderer.Net.Core" Version="28.2.6" />
-    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="28.2.6" />
-    <PackageReference Include="Syncfusion.XlsIORenderer.Net.Core" Version="28.2.6" />
-    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.0.2" />
+    <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="9.0.3" />
+    <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="9.0.3" />
+    <PackageReference Include="Syncfusion.DocIO.Net.Core" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.Pdf.Net.Core" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.Presentation.Net.Core" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.PresentationRenderer.Net.Core" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.XlsIO.Net.Core" Version="30.2.6" />
+    <PackageReference Include="Syncfusion.XlsIORenderer.Net.Core" Version="30.2.6" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="1.6.7" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="logs\" />
+    <Folder Include="Migrations\" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADMS.API.ActionConstraints\ADMS.API.ActionConstraints.csproj" />
-    <ProjectReference Include="..\ADMS.API.DbContexts\ADMS.API.DbContexts.csproj" />
+    <ProjectReference Include="..\ADMS.API.Common\ADMS.API.Common.csproj" />
     <ProjectReference Include="..\ADMS.API.Entities\ADMS.API.Entities.csproj" />
     <ProjectReference Include="..\ADMS.API.Models\ADMS.API.Models.csproj" />
-    <ProjectReference Include="..\ADMS.API.ResourceParameters\ADMS.API.ResourceParameters.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

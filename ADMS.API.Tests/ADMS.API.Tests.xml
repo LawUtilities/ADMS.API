@@ -1,0 +1,2881 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ADMS.API.Tests</name>
+    </assembly>
+    <members>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentAuditControllerTests">
+            <summary>
+            Unit tests for <see cref="T:ADMS.API.Controllers.DocumentAuditController"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsBadRequest_WhenModelStateIsInvalid">
+            <summary>
+            Tests that a 400 BadRequest is returned when the model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsNotFound_WhenMatterDoesNotExist">
+            <summary>
+            Tests that a 404 NotFound is returned when the matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Tests that a 404 NotFound is returned when the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsBadRequest_WhenOrderByIsInvalid">
+            <summary>
+            Tests that a 400 BadRequest is returned when the order by field is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsNotFound_WhenNoAuditsFound">
+            <summary>
+            Tests that a 404 NotFound is returned when no audit records are found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsOk_WithAuditRecords">
+            <summary>
+            Tests that a 200 OK is returned with audit records when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentActivityAuditsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that a 500 InternalServerError is returned when an exception is thrown.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsBadRequest_WhenModelStateIsInvalid">
+            <summary>
+            Tests that a 400 BadRequest is returned when the model state is invalid for move-from audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsNotFound_WhenMatterDoesNotExist">
+            <summary>
+            Tests that a 404 NotFound is returned when the matter does not exist for move-from audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Tests that a 404 NotFound is returned when the document does not exist for move-from audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsBadRequest_WhenOrderByIsInvalid">
+            <summary>
+            Tests that a 400 BadRequest is returned when the order by field is invalid for move-from audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsNotFound_WhenNoAuditsFound">
+            <summary>
+            Tests that a 404 NotFound is returned when no move-from audit records are found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsOk_WithAuditRecords">
+            <summary>
+            Tests that a 200 OK is returned with move-from audit records when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveFromAuditsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that a 500 InternalServerError is returned when an exception is thrown for move-from audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsBadRequest_WhenModelStateIsInvalid">
+            <summary>
+            Tests that a 400 BadRequest is returned when the model state is invalid for move-to audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsNotFound_WhenMatterDoesNotExist">
+            <summary>
+            Tests that a 404 NotFound is returned when the matter does not exist for move-to audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Tests that a 404 NotFound is returned when the document does not exist for move-to audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsBadRequest_WhenOrderByIsInvalid">
+            <summary>
+            Tests that a 400 BadRequest is returned when the order by field is invalid for move-to audits.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsNotFound_WhenNoAuditsFound">
+            <summary>
+            Tests that a 404 NotFound is returned when no move-to audit records are found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsOk_WithAuditRecords">
+            <summary>
+            Tests that a 200 OK is returned with move-to audit records when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentAuditControllerTests.GetDocumentMoveToAuditsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that a 500 InternalServerError is returned when an exception is thrown for move-to audits.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.CheckinDocumentAsync(System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CheckinDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that CheckinDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CheckinDocumentAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that CheckinDocumentAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CheckinDocumentAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that CheckinDocumentAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CheckinDocumentAsync_ReturnsOk_WhenCheckinSucceeds">
+            <summary>
+            Tests that CheckinDocumentAsync returns Ok when the checkin operation succeeds.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CheckinDocumentAsync_ReturnsBadRequest_WhenCannotCheckin">
+            <summary>
+            Tests that CheckinDocumentAsync returns BadRequest when the document cannot be checked in.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckinDocumentAsyncTests.CheckinDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that CheckinDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.CheckoutDocumentAsync(System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CheckoutDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that CheckoutDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CheckoutDocumentAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that CheckoutDocumentAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CheckoutDocumentAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that CheckoutDocumentAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CheckoutDocumentAsync_ReturnsOk_WhenCheckoutSucceeds">
+            <summary>
+            Tests that CheckoutDocumentAsync returns Ok when the checkout operation succeeds.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CheckoutDocumentAsync_ReturnsBadRequest_WhenCannotCheckout">
+            <summary>
+            Tests that CheckoutDocumentAsync returns BadRequest when the document cannot be checked out.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCheckoutDocumentAsyncTests.CheckoutDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that CheckoutDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.CopyDocumentAsync(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that CopyDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsBadRequest_WhenDocumentNull">
+            <summary>
+            Tests that CopyDocumentAsync returns BadRequest when document is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that CopyDocumentAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that CopyDocumentAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsNotFound_WhenTargetMatterNotFound">
+            <summary>
+            Tests that CopyDocumentAsync returns NotFound when target matter is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsOk_WhenCopySucceeds">
+            <summary>
+            Tests that CopyDocumentAsync returns Ok when the copy operation succeeds.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsInternalServerError_WhenCopyFails">
+            <summary>
+            Tests that CopyDocumentAsync returns InternalServerError when the copy operation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCopyDocumentAsyncTests.CopyDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that CopyDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.CreateDocumentAsync(System.Guid,ADMS.API.Models.DocumentForCreationDto,Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked
+            dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that CreateDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsBadRequest_WhenDocumentNull">
+            <summary>
+            Tests that CreateDocumentAsync returns BadRequest when document is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsBadRequest_WhenFileNull">
+            <summary>
+            Tests that CreateDocumentAsync returns BadRequest when fileUpload is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsBadRequest_WhenFileEmpty">
+            <summary>
+            Tests that CreateDocumentAsync returns BadRequest when fileUpload is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsPayloadTooLarge_WhenFileTooLarge">
+            <summary>
+            Tests that CreateDocumentAsync returns PayloadTooLarge when file exceeds max size.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that CreateDocumentAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsBadRequest_WhenBusinessValidationFails">
+            <summary>
+            Tests that CreateDocumentAsync returns BadRequest when document business validation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsUnsupportedMediaType_WhenFileTypeNotAllowed">
+            <summary>
+            Tests that CreateDocumentAsync returns UnsupportedMediaType when file type is not allowed.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsUnsupportedMediaType_WhenExtensionMismatch">
+            <summary>
+            Tests that CreateDocumentAsync returns UnsupportedMediaType when file extension does not match detected type.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsUnprocessableEntity_WhenVirusDetected">
+            <summary>
+            Tests that CreateDocumentAsync returns UnprocessableEntity when virus is detected.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsCreatedAtRoute_WhenSuccessful">
+            <summary>
+            Tests that CreateDocumentAsync returns CreatedAtRoute when document is created successfully.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsInternalServerError_WhenAddDocumentFails">
+            <summary>
+            Tests that CreateDocumentAsync returns InternalServerError when AddDocumentAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsInternalServerError_WhenSaveChangesFails">
+            <summary>
+            Tests that CreateDocumentAsync returns InternalServerError when SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsInternalServerError_OnFileReadException">
+            <summary>
+            Tests that CreateDocumentAsync returns InternalServerError on file read exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsInternalServerError_OnVirusScanException">
+            <summary>
+            Tests that CreateDocumentAsync returns InternalServerError on virus scan exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerCreateDocumentAsyncTests.CreateDocumentAsync_ReturnsInternalServerError_OnFileSaveException">
+            <summary>
+            Tests that CreateDocumentAsync returns InternalServerError on file save exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.DeleteDocumentAsync(System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that DeleteDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that DeleteDocumentAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that DeleteDocumentAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsNotFound_WhenDocumentNotFoundInRepository">
+            <summary>
+            Tests that DeleteDocumentAsync returns NotFound when document is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsNoContent_WhenSuccessful">
+            <summary>
+            Tests that DeleteDocumentAsync returns NoContent when deletion is successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsInternalServerError_WhenDeleteFails">
+            <summary>
+            Tests that DeleteDocumentAsync returns InternalServerError when deletion fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsInternalServerError_WhenSaveChangesFails">
+            <summary>
+            Tests that DeleteDocumentAsync returns InternalServerError when save changes fails after deletion.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerDeleteDocumentAsyncTests.DeleteDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that DeleteDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.GetAuditAsync(System.Guid,System.Guid,ADMS.API.Helpers.AuditEnums.AuditDirection)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that GetAuditAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that GetAuditAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsBadRequest_WhenDirectionInvalid">
+            <summary>
+            Tests that GetAuditAsync returns BadRequest when direction is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that GetAuditAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsOk_WithAuditRecords">
+            <summary>
+            Tests that GetAuditAsync returns Ok with audit records when input is valid and audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsOk_WithEmptyList_WhenNoAuditsExist">
+            <summary>
+            Tests that GetAuditAsync returns Ok with an empty list when no audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetAuditAsyncTests.GetAuditAsync_ReturnsInternalServerError_OnRepositoryException">
+            <summary>
+            Tests that GetAuditAsync returns InternalServerError when an exception occurs in the repository.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.GetDocumentAsync(System.Guid,System.Guid,System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that GetDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that GetDocumentAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsBadRequest_WhenFieldsInvalid">
+            <summary>
+            Tests that GetDocumentAsync returns BadRequest when fields parameter is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that GetDocumentAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsNotFound_WhenDocumentNotFoundInRepository">
+            <summary>
+            Tests that GetDocumentAsync returns NotFound when document is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsOk_WithDocument">
+            <summary>
+            Tests that GetDocumentAsync returns Ok with mapped document when all parameters are valid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentAsyncTests.GetDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.GetDocumentHistoryAsync(System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsOk_WithHistory">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns Ok with mapped history when document and matter exist and history is present.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsOk_WithEmptyList_WhenNoHistory">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns Ok with an empty list when document has no history.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsNotFound_WhenDocumentNotFoundInRepository">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns NotFound when document is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentHistoryAsyncTests.GetDocumentHistoryAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetDocumentHistoryAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentOptionsTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.GetDocumentOptions(System.Nullable{System.Guid})"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentOptionsTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentOptionsTests.GetDocumentOptions_ReturnsNoContent_AndSetsAllowHeader">
+            <summary>
+            Tests that GetDocumentOptions returns NoContent and sets the Allow header with supported HTTP methods.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentOptionsTests.GetDocumentOptions_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetDocumentOptions returns InternalServerError when an exception is thrown.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.GetDocumentsAsync(System.Guid,ADMS.API.ResourceParameters.DocumentsResourceParameters)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.GetDocumentsAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that GetDocumentsAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.GetDocumentsAsync_ReturnsBadRequest_WhenOrderByInvalid">
+            <summary>
+            Tests that GetDocumentsAsync returns BadRequest when OrderBy is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.GetDocumentsAsync_ReturnsBadRequest_WhenFieldsInvalid">
+            <summary>
+            Tests that GetDocumentsAsync returns BadRequest when Fields parameter is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.GetDocumentsAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetDocumentsAsync returns NotFound when the matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.GetDocumentsAsync_ReturnsOk_WithDocuments">
+            <summary>
+            Tests that GetDocumentsAsync returns Ok with mapped documents when all parameters are valid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerGetDocumentsAsyncTests.GetDocumentsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetDocumentsAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.MoveDocumentAsync(System.Guid,ADMS.API.Models.DocumentWithoutRevisionsDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that MoveDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsBadRequest_WhenDocumentNull">
+            <summary>
+            Tests that MoveDocumentAsync returns BadRequest when document is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that MoveDocumentAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that MoveDocumentAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsNotFound_WhenTargetMatterNotFound">
+            <summary>
+            Tests that MoveDocumentAsync returns NotFound when target matter is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that MoveDocumentAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsOk_WhenMoveSucceeds">
+            <summary>
+            Tests that MoveDocumentAsync returns Ok when the move operation succeeds.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsInternalServerError_WhenMoveFails">
+            <summary>
+            Tests that MoveDocumentAsync returns InternalServerError when the move operation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerMoveDocumentAsyncTests.MoveDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that MoveDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.DocumentController.UpdateDocumentAsync(System.Guid,System.Guid,ADMS.API.Models.DocumentForUpdateDto,Microsoft.AspNetCore.Http.IFormFile,System.Threading.CancellationToken)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.DocumentController"/> class with mocked dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.DocumentController"/> instance with a mocked <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            and <see cref="T:Microsoft.AspNetCore.Http.DefaultHttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsBadRequest_WhenMatterIdEmpty">
+            <summary>
+            Tests that UpdateDocumentAsync returns BadRequest when matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsBadRequest_WhenDocumentIdEmpty">
+            <summary>
+            Tests that UpdateDocumentAsync returns BadRequest when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsNotFound_WhenMatterOrDocumentNotFound">
+            <summary>
+            Tests that UpdateDocumentAsync returns NotFound when matter or document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsPayloadTooLarge_WhenFileTooLarge">
+            <summary>
+            Tests that UpdateDocumentAsync returns PayloadTooLarge when file exceeds max size.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsInternalServerError_WhenFileReadFails">
+            <summary>
+            Tests that UpdateDocumentAsync returns InternalServerError when file read fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsUnprocessableEntity_WhenVirusDetected">
+            <summary>
+            Tests that UpdateDocumentAsync returns UnprocessableEntity when virus is detected.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsInternalServerError_WhenVirusScanThrows">
+            <summary>
+            Tests that UpdateDocumentAsync returns InternalServerError when virus scan throws.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsUnsupportedMediaType_WhenExtensionNotAllowed">
+            <summary>
+            Tests that UpdateDocumentAsync returns UnsupportedMediaType when file extension is not allowed.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsUnsupportedMediaType_WhenFileTypeNotAllowed">
+            <summary>
+            Tests that UpdateDocumentAsync returns UnsupportedMediaType when file type is not allowed.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsUnsupportedMediaType_WhenExtensionMismatch">
+            <summary>
+            Tests that UpdateDocumentAsync returns UnsupportedMediaType when file extension does not match detected type.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that UpdateDocumentAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsBadRequest_WhenBusinessValidationFails">
+            <summary>
+            Tests that UpdateDocumentAsync returns BadRequest when business validation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsNotFound_WhenDocumentNotFoundInRepository">
+            <summary>
+            Tests that UpdateDocumentAsync returns NotFound when document is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsNoContent_WhenSuccessful">
+            <summary>
+            Tests that UpdateDocumentAsync returns NoContent when update is successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsBadRequest_WhenSaveChangesFails">
+            <summary>
+            Tests that UpdateDocumentAsync returns BadRequest when SaveChangesAsync returns false.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.DocumentControllerUpdateDocumentAsyncTests.UpdateDocumentAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that UpdateDocumentAsync returns InternalServerError when an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.FileControllerTests">
+            <summary>
+            Unit tests for <see cref="T:ADMS.API.Controllers.FileController"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadExistingFileAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that UploadExistingFileAsync returns BadRequest when any GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadExistingFileAsync_ReturnsBadRequest_WhenFileIsNullOrEmpty">
+            <summary>
+            Tests that UploadExistingFileAsync returns BadRequest when file is null or empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadExistingFileAsync_ReturnsPayloadTooLarge_WhenFileTooBig">
+            <summary>
+            Tests that UploadExistingFileAsync returns PayloadTooLarge when file is too big.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadExistingFileAsync_ReturnsUnsupportedMediaType_WhenExtensionNotAllowed">
+            <summary>
+            Tests that UploadExistingFileAsync returns UnsupportedMediaType for disallowed extension.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.DownloadFileAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that DownloadFileAsync returns BadRequest when any GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.DownloadFileAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that DownloadFileAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.DownloadPdfAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that DownloadPdfAsync returns BadRequest when any GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.VerifyFileTypeAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that VerifyFileTypeAsync returns BadRequest when any GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.VerifyFileTypeAsync_ReturnsBadRequest_WhenFileIsNullOrEmpty">
+            <summary>
+            Tests that VerifyFileTypeAsync returns BadRequest when file is null or empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadNewFileAsync_ReturnsBadRequest_WhenMatterIdInvalid">
+            <summary>
+            Tests that UploadNewFileAsync returns BadRequest when matterId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadNewFileAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that UploadNewFileAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.FileControllerTests.UploadNewFileAsync_ReturnsBadRequest_WhenFileIsNullOrEmpty">
+            <summary>
+            Tests that UploadNewFileAsync returns BadRequest when file is null or empty.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.MatterControllerTests">
+            <summary>
+            Unit tests for <see cref="T:ADMS.API.Controllers.MatterController"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.CreateMatterAsync_ReturnsBadRequest_WhenDtoIsNull">
+            <summary>
+            Tests that CreateMatterAsync returns BadRequest when the DTO is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.CreateMatterAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that CreateMatterAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.CreateMatterAsync_ReturnsConflict_WhenDuplicateDescription">
+            <summary>
+            Tests that CreateMatterAsync returns Conflict when a matter with the same description exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.CreateMatterAsync_ReturnsCreatedAtRoute_WhenSuccessful">
+            <summary>
+            Tests that CreateMatterAsync returns CreatedAtRoute when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.CreateMatterAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that CreateMatterAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that DeleteMatterAsync returns BadRequest when GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that DeleteMatterAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsNotFound_WhenMatterNullFromRepo">
+            <summary>
+            Tests that DeleteMatterAsync returns NotFound when matter is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsBadRequest_WhenNotAllDocumentsDeleted">
+            <summary>
+            Tests that DeleteMatterAsync returns BadRequest if not all documents are deleted.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsBadRequest_WhenAnyDocumentCheckedOut">
+            <summary>
+            Tests that DeleteMatterAsync returns BadRequest if any document is checked out.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsInternalServerError_WhenDeleteFails">
+            <summary>
+            Tests that DeleteMatterAsync returns InternalServerError if deletion fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsNoContent_WhenSuccessful">
+            <summary>
+            Tests that DeleteMatterAsync returns NoContent when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.DeleteMatterAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that DeleteMatterAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that GetMatterAsync returns BadRequest when GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetMatterAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterAsync_ReturnsNotFound_WhenMatterNullFromRepo">
+            <summary>
+            Tests that GetMatterAsync returns NotFound when matter is null from repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterAsync_ReturnsOk_WithoutDocuments">
+            <summary>
+            Tests that GetMatterAsync returns Ok with correct DTO when includeDocuments is false.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterAsync_ReturnsOk_WithDocuments">
+            <summary>
+            Tests that GetMatterAsync returns Ok with correct DTO when includeDocuments is true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetMatterAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetAuditsAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that GetAuditsAsync returns BadRequest when GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetAuditsAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetAuditsAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetAuditsAsync_ReturnsBadRequest_WhenHistoryTypeInvalid">
+            <summary>
+            Tests that GetAuditsAsync returns BadRequest for invalid historyType.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetAuditsAsync_ReturnsOk_WhenAuditsFound">
+            <summary>
+            Tests that GetAuditsAsync returns Ok when audits are found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetAuditsAsync_ReturnsNotFound_WhenNoAuditsFound">
+            <summary>
+            Tests that GetAuditsAsync returns NotFound when no audits are found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetAuditsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetAuditsAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsBadRequest_WhenDtoIsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns BadRequest when DTO is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that UpdateMatterAsync returns BadRequest when GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that UpdateMatterAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that UpdateMatterAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsInternalServerError_WhenUpdateFails">
+            <summary>
+            Tests that UpdateMatterAsync returns InternalServerError if update fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsNoContent_WhenSuccessful">
+            <summary>
+            Tests that UpdateMatterAsync returns NoContent when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.UpdateMatterAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that UpdateMatterAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterHistoryAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that GetMatterHistoryAsync returns BadRequest when GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterHistoryAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetMatterHistoryAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterHistoryAsync_ReturnsNotFound_WhenMatterWithHistoryNull">
+            <summary>
+            Tests that GetMatterHistoryAsync returns NotFound when matterWithHistory is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterHistoryAsync_ReturnsOk_WhenSuccessful">
+            <summary>
+            Tests that GetMatterHistoryAsync returns Ok when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMatterHistoryAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetMatterHistoryAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.RestoreMatterAsync_ReturnsBadRequest_WhenGuidInvalid">
+            <summary>
+            Tests that RestoreMatterAsync returns BadRequest when GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.RestoreMatterAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that RestoreMatterAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.RestoreMatterAsync_ReturnsBadRequest_WhenRestorationFails">
+            <summary>
+            Tests that RestoreMatterAsync returns BadRequest if restoration fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.RestoreMatterAsync_ReturnsOk_WhenSuccessful">
+            <summary>
+            Tests that RestoreMatterAsync returns Ok when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.RestoreMatterAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that RestoreMatterAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMattersAsync_ReturnsBadRequest_WhenResourceParametersNull">
+            <summary>
+            Tests that GetMattersAsync returns BadRequest when resourceParameters is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMattersAsync_ReturnsBadRequest_WhenPaginationInvalid">
+            <summary>
+            Tests that GetMattersAsync returns BadRequest for invalid pagination.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMattersAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that GetMattersAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMattersAsync_ReturnsOk_WhenSuccessful">
+            <summary>
+            Tests that GetMattersAsync returns Ok with results when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.MatterControllerTests.GetMattersAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetMattersAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.RevisionController.CreateRevisionAsync(System.Guid,System.Guid,ADMS.API.Models.RevisionForCreationDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsBadRequest_WhenDtoIsNull">
+            <summary>
+            Tests that CreateRevisionAsync returns BadRequest when the DTO is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsBadRequest_WhenMatterIdInvalid">
+            <summary>
+            Tests that CreateRevisionAsync returns BadRequest when matterId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsBadRequest_WhenDocumentIdInvalid">
+            <summary>
+            Tests that CreateRevisionAsync returns BadRequest when documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that CreateRevisionAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that CreateRevisionAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that CreateRevisionAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsNotFound_WhenDocumentNotInMatter">
+            <summary>
+            Tests that CreateRevisionAsync returns NotFound when document does not belong to matter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsBadRequest_WhenCreationFails">
+            <summary>
+            Tests that CreateRevisionAsync returns BadRequest if creation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsInternalServerError_WhenSaveFails">
+            <summary>
+            Tests that CreateRevisionAsync returns InternalServerError if SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsCreatedAtRoute_WhenSuccessful">
+            <summary>
+            Tests that CreateRevisionAsync returns CreatedAtRoute when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerCreateRevisionAsyncTests.CreateRevisionAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that CreateRevisionAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.RevisionController.DeleteRevisionAsync(System.Guid,System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsBadRequest_WhenAnyGuidInvalid">
+            <summary>
+            Tests that DeleteRevisionAsync returns BadRequest when any GUID is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that DeleteRevisionAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that DeleteRevisionAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNotFound_WhenRevisionNotFound">
+            <summary>
+            Tests that DeleteRevisionAsync returns NotFound when revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNotFound_WhenRevisionNullFromRepo">
+            <summary>
+            Tests that DeleteRevisionAsync returns NotFound when revision is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNotFound_WhenRevisionNotInDocument">
+            <summary>
+            Tests that DeleteRevisionAsync returns NotFound when revision does not belong to the specified document.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNotFound_WhenDocumentNotInMatter">
+            <summary>
+            Tests that DeleteRevisionAsync returns NotFound when document does not belong to the specified matter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsBadRequest_WhenDeleteFails">
+            <summary>
+            Tests that DeleteRevisionAsync returns BadRequest if deletion fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsNoContent_WhenSuccessful">
+            <summary>
+            Tests that DeleteRevisionAsync returns NoContent when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsInternalServerError_WhenSaveFails">
+            <summary>
+            Tests that DeleteRevisionAsync returns InternalServerError if SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that DeleteRevisionAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.RevisionController.GetRevisionAsync(System.Guid,System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.RevisionController"/> class with mocked
+            dependencies for testing purposes.
+            </summary>
+            <returns>A fully initialized <see cref="T:ADMS.API.Controllers.RevisionController"/> instance with a default <see cref="T:Microsoft.AspNetCore.Mvc.ControllerContext"/>
+            containing an <see cref="T:Microsoft.AspNetCore.Http.HttpContext"/>.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsBadRequest_WhenMatterIdInvalid">
+            <summary>
+            Tests that GetRevisionAsync returns BadRequest when matterId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsBadRequest_WhenDocumentIdInvalid">
+            <summary>
+            Tests that GetRevisionAsync returns BadRequest when documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsBadRequest_WhenRevisionNumberInvalid">
+            <summary>
+            Tests that GetRevisionAsync returns BadRequest when revisionId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetRevisionAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that GetRevisionAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsNotFound_WhenRevisionNotFound">
+            <summary>
+            Tests that GetRevisionAsync returns NotFound when revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsNotFound_WhenRevisionNullFromRepo">
+            <summary>
+            Tests that GetRevisionAsync returns NotFound when revision is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsNotFound_WhenRevisionNotInDocument">
+            <summary>
+            Tests that GetRevisionAsync returns NotFound when revision does not belong to the specified document.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsNotFound_WhenDocumentNotInMatter">
+            <summary>
+            Tests that GetRevisionAsync returns NotFound when document does not belong to the specified matter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsOk_WhenSuccessful">
+            <summary>
+            Tests that GetRevisionAsync returns Ok with the mapped DTO when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAsyncTests.GetRevisionAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetRevisionAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.RevisionController.GetRevisionAuditsAsync(System.Guid,System.Guid,System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsBadRequest_WhenMatterIdInvalid">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns BadRequest when matterId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsBadRequest_WhenDocumentIdInvalid">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns BadRequest when documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsBadRequest_WhenRevisionNumberInvalid">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns BadRequest when revisionId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenRevisionNotFound">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenRevisionNullFromRepo">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when revision is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenRevisionNotInDocument">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when revision does not belong to the specified document.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenDocumentNotInMatter">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when document does not belong to the specified matter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsNotFound_WhenNoAuditHistory">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns NotFound when revision has no audit history.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsOk_WhenSuccessful">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns Ok with mapped audit records when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionAuditsAsyncTests.GetRevisionAuditsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetRevisionAuditsAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.RevisionController.GetRevisionsAsync(System.Guid,System.Guid,ADMS.API.ResourceParameters.RevisionsResourceParameters)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.CreateController">
+            <summary>
+            Creates and initializes a new instance of the <see cref="T:ADMS.API.Controllers.RevisionController"/> class.
+            </summary>
+            <remarks>The created controller is configured with mocked dependencies and a default HTTP
+            context for testing purposes. This method is intended for use in unit tests or scenarios where a fully
+            initialized <see cref="T:ADMS.API.Controllers.RevisionController"/> is required.</remarks>
+            <returns>A fully initialized instance of the <see cref="T:ADMS.API.Controllers.RevisionController"/> class.</returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsBadRequest_WhenMatterIdInvalid">
+            <summary>
+            Tests that GetRevisionsAsync returns BadRequest when matterId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsBadRequest_WhenDocumentIdInvalid">
+            <summary>
+            Tests that GetRevisionsAsync returns BadRequest when documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that GetRevisionsAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that GetRevisionsAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that GetRevisionsAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsBadRequest_WhenOrderByInvalid">
+            <summary>
+            Tests that GetRevisionsAsync returns BadRequest when orderBy is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsNotFound_WhenDocumentNotInMatter">
+            <summary>
+            Tests that GetRevisionsAsync returns NotFound when document does not belong to the specified matter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsInternalServerError_WhenPagedRevisionsNull">
+            <summary>
+            Tests that GetRevisionsAsync returns InternalServerError when paginated revisions retrieval fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsOk_WhenSuccessful">
+            <summary>
+            Tests that GetRevisionsAsync returns Ok with mapped DTOs and pagination metadata when successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that GetRevisionsAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Controllers.RevisionController.UpdateRevisionAsync(System.Guid,System.Guid,System.Guid,ADMS.API.Models.RevisionForUpdateDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsBadRequest_WhenMatterIdInvalid">
+            <summary>
+            Tests that UpdateRevisionAsync returns BadRequest when matterId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsBadRequest_WhenDocumentIdInvalid">
+            <summary>
+            Tests that UpdateRevisionAsync returns BadRequest when documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsBadRequest_WhenRevisionNumberInvalid">
+            <summary>
+            Tests that UpdateRevisionAsync returns BadRequest when revisionId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNotFound_WhenMatterNotFound">
+            <summary>
+            Tests that UpdateRevisionAsync returns NotFound when matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNotFound_WhenDocumentNotFound">
+            <summary>
+            Tests that UpdateRevisionAsync returns NotFound when document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNotFound_WhenRevisionNotFound">
+            <summary>
+            Tests that UpdateRevisionAsync returns NotFound when revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsBadRequest_WhenModelStateInvalid">
+            <summary>
+            Tests that UpdateRevisionAsync returns BadRequest when model state is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNotFound_WhenRevisionNullFromRepo">
+            <summary>
+            Tests that UpdateRevisionAsync returns NotFound when revision is not found in repository.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNotFound_WhenRevisionNotInDocument">
+            <summary>
+            Tests that UpdateRevisionAsync returns NotFound when revision does not belong to the specified document.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNotFound_WhenDocumentNotInMatter">
+            <summary>
+            Tests that UpdateRevisionAsync returns NotFound when document does not belong to the specified matter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsNoContent_WhenSuccessful">
+            <summary>
+            Tests that UpdateRevisionAsync returns NoContent when update and save are successful.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsBadRequest_WhenSaveFails">
+            <summary>
+            Tests that UpdateRevisionAsync returns BadRequest if SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Controllers.RevisionControllerUpdateRevisionAsyncTests.UpdateRevisionAsync_ReturnsInternalServerError_OnException">
+            <summary>
+            Tests that UpdateRevisionAsync returns InternalServerError on exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.AddMatterAsync(ADMS.API.Models.MatterForCreationDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory <see cref="T:ADMS.API.DbContexts.AdmsContext"/> for testing.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_ReturnsBadRequest_WhenMatterIsNull">
+            <summary>
+            Verifies that BadRequest is returned when the input matter is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_ReturnsBadRequest_WhenDescriptionIsNullOrEmpty(System.String)">
+            <summary>
+            Verifies that BadRequest is returned when the matter description is null or empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_ReturnsBadRequest_WhenModelValidationFails">
+            <summary>
+            Verifies that BadRequest is returned when model validation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_ReturnsConflict_WhenMatterWithSameDescriptionExists">
+            <summary>
+            Verifies that Conflict is returned when a matter with the same description already exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_Returns500_WhenUserOrActivityNotFound">
+            <summary>
+            Verifies that a 500 ObjectResult is returned when user or activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_Returns500_WhenSaveChangesFails">
+            <summary>
+            Verifies that a 500 ObjectResult is returned when SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.AddMatterAsync_ReturnsOk_WhenMatterIsCreated">
+            <summary>
+            Verifies that OkObjectResult is returned and the matter is created when all is valid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddMatterAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Creates an instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocked dependencies.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.AddRevisionAsync(System.Guid,ADMS.API.Models.RevisionDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_ReturnsNull_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that AddRevisionAsync returns null and logs a warning if the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_ReturnsNull_WhenRevisionIsNull">
+            <summary>
+            Verifies that AddRevisionAsync returns null and logs a warning if the revision DTO is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_ReturnsNull_WhenRevisionDtoModelValidationFails">
+            <summary>
+            Verifies that AddRevisionAsync returns null and logs a warning if the revision DTO model validation fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_ReturnsNull_WhenCreateRevisionAsyncReturnsNull">
+            <summary>
+            Verifies that AddRevisionAsync returns null and logs a warning if CreateRevisionAsync returns null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_ReturnsNull_WhenUserOrRevisionActivityNotFound">
+            <summary>
+            Verifies that AddRevisionAsync returns null and logs a warning if user or revision activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_CreatesRevisionAndReturnsIt_WhenAllValid">
+            <summary>
+            Verifies that AddRevisionAsync creates a revision, adds an audit log, and saves changes when all is valid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryAddRevisionAsyncTests.AddRevisionAsync_ReturnsNull_AndLogsError_OnException">
+            <summary>
+            Verifies that AddRevisionAsync returns null and logs an error if an exception is thrown.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.DeleteMatterAsync(ADMS.API.Models.MatterDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnFalse_WhenMatterToDeleteIsNull">
+            <summary>
+            Should return false and log a warning when the input MatterDto is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnFalse_WhenMatterDoesNotExist">
+            <summary>
+            Should return false and log a warning when the matter does not exist (validation fails).
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnFalse_WhenMatterNotFoundInDb">
+            <summary>
+            Should return false and log a warning when the matter is not found in the database after validation.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnFalse_WhenUserOrMatterActivityNotFound">
+            <summary>
+            Should return false and log a warning when the user or MatterActivity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnFalse_WhenSaveChangesFails">
+            <summary>
+            Should return false and log a warning when SaveChangesAsync returns false.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnFalse_WhenExceptionThrown">
+            <summary>
+            Should return false and log an error if an exception is thrown during the operation.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteMatterAsyncTests.DeleteMatterAsync_ShouldReturnTrue_WhenSuccessful">
+            <summary>
+            Should return true and log information when the matter is successfully deleted.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.DeleteRevisionAsync(ADMS.API.Models.RevisionDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsFalse_WhenRevisionDtoIsNull">
+            <summary>
+            Verifies that DeleteRevisionAsync returns false and logs a warning if the revision DTO is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsFalse_WhenRevisionNumberIsNull">
+            <summary>
+            Verifies that DeleteRevisionAsync returns false and logs a warning if the revision ID is not set.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsFalse_WhenRevisionDoesNotExist">
+            <summary>
+            Verifies that DeleteRevisionAsync returns false and logs a warning if the revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsFalse_WhenRevisionNotFoundInDatabase">
+            <summary>
+            Verifies that DeleteRevisionAsync returns false and logs a warning if the revision is not found in the database.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsFalse_WhenUserOrRevisionActivityNotFound">
+            <summary>
+            Verifies that DeleteRevisionAsync returns false and logs a warning if the user or revision activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsTrue_WhenRevisionDeletedSuccessfully">
+            <summary>
+            Verifies that DeleteRevisionAsync returns true and logs information if the revision is successfully deleted.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryDeleteRevisionAsyncTests.DeleteRevisionAsync_ReturnsFalse_AndLogsError_OnException">
+            <summary>
+            Verifies that DeleteRevisionAsync returns false and logs an error if an exception is thrown.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetDocumentActivityAuditsAsync(System.Guid,ADMS.API.ResourceParameters.DocumentAuditsResourceParameters)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory database context for testing.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ThrowsArgumentException_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that an ArgumentException is thrown when the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ReturnsPagedList_SortedByCreatedAtDescending_WhenNoOrderBy">
+            <summary>
+            Verifies that a paged list is returned with correct sorting by CreatedAt descending when no OrderBy is specified.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ReturnsPagedList_SortedByActivity_WhenOrderByActivity">
+            <summary>
+            Verifies that a paged list is returned with correct sorting by Activity when OrderBy is "activity".
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ReturnsPagedList_SortedByCreatedAtDescending_WhenOrderByCreatedAt">
+            <summary>
+            Verifies that a paged list is returned with correct sorting by CreatedAt descending when OrderBy is "createdat".
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ReturnsEmptyPagedList_WhenNoAuditsExist">
+            <summary>
+            Verifies that an empty paged list is returned when no audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ReturnsPagedList_WithCorrectPaging">
+            <summary>
+            Verifies that a paged list is returned with correct paging.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.GetDocumentActivityAuditsAsync_ReturnsEmptyPagedList_WhenExceptionOccurs">
+            <summary>
+            Verifies that an empty paged list is returned if an exception occurs in the try block.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityAuditsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Creates an instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocks.
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetDocumentActivityByActivityNameAsync(System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsNull">
+            <summary>
+            Tests that the method returns null and logs a warning when activityName is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsEmpty">
+            <summary>
+            Tests that the method returns null and logs a warning when activityName is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsWhitespace">
+            <summary>
+            Tests that the method returns null and logs a warning when activityName is whitespace.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsNull_WhenActivityNotFound">
+            <summary>
+            Tests that the method returns null and logs a warning when the activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsActivity_WhenFound">
+            <summary>
+            Tests that the method returns the correct activity and logs information when found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsNull_WhenMultipleActivitiesExist">
+            <summary>
+            Tests that the method returns null and logs an error when multiple activities with the same name exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentActivityByActivityNameAsyncTests.GetDocumentActivityByActivityNameAsync_ReturnsNull_OnUnexpectedException">
+            <summary>
+            Tests that the method returns null and logs an error when an unexpected exception occurs.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetDocumentAuditsAsync(System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory database context for testing.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.GetDocumentAuditsAsync_ReturnsBadRequest_WhenDocumentIdIsEmpty">
+            <summary>
+            Verifies that BadRequestObjectResult is returned when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.GetDocumentAuditsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that NotFoundObjectResult is returned when the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.GetDocumentAuditsAsync_Returns500_WhenValidationThrows">
+            <summary>
+            Verifies that ObjectResult with status code 500 is returned when validation throws.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.GetDocumentAuditsAsync_ReturnsOkWithEmptyList_WhenNoAuditsExist">
+            <summary>
+            Verifies that OkObjectResult with empty list is returned when no audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.GetDocumentAuditsAsync_ReturnsOkWithMappedAudits_WhenAuditsExist">
+            <summary>
+            Verifies that OkObjectResult with mapped audits is returned when audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.GetDocumentAuditsAsync_Returns500_WhenExceptionDuringQuery">
+            <summary>
+            Verifies that ObjectResult with status code 500 is returned when an exception occurs during query.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentAuditsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Creates an instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocks.
+            </summary>
+            <param name="context"></param>
+            <returns></returns>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests">
+            <summary>
+            Unit tests for <see cref="!:AdmsRepository.GetDocumentMoveFromAuditsAsync(Guid, DocumentAuditsResourceParameters)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory <see cref="T:ADMS.API.DbContexts.AdmsContext"/> for testing.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsBadRequest_WhenDocumentIdIsEmpty">
+            <summary>
+            Verifies that BadRequest is returned when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsBadRequest_WhenResourceParametersIsNull">
+            <summary>
+            Verifies that BadRequest is returned when resourceParameters is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsBadRequest_WhenPageNumberIsInvalid">
+            <summary>
+            Verifies that BadRequest is returned when PageNumber is less than or equal to 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsBadRequest_WhenPageSizeIsInvalid">
+            <summary>
+            Verifies that BadRequest is returned when PageSize is less than or equal to 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that NotFound is returned when the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_Returns500_WhenValidationThrows">
+            <summary>
+            Verifies that ObjectResult with status 500 is returned when validation throws.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsPagedList_SortedByCreatedAtDescending_WhenNoOrderBy">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned and sorted by CreatedAt descending when no OrderBy is specified.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsPagedList_SortedByActivity_WhenOrderByActivity">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned and sorted by Activity when OrderBy is "activity".
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsPagedList_SortedByCreatedAtDescending_WhenOrderByCreatedAt">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned and sorted by CreatedAt descending when OrderBy is "createdat".
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsEmptyPagedList_WhenNoAuditsExist">
+            <summary>
+            Verifies that OkObjectResult with an empty paged list is returned when no audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsPagedList_WithCorrectPaging">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned with correct paging.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.GetDocumentMoveFromAuditsAsync_ReturnsEmptyPagedList_WhenExceptionOccurs">
+            <summary>
+            Verifies that OkObjectResult with an empty paged list is returned if an exception occurs in the try block.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveFromAuditsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Creates an instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocked dependencies.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests">
+            <summary>
+            Unit tests for <see cref="!:AdmsRepository.GetDocumentMoveToAuditsAsync(Guid, DocumentAuditsResourceParameters)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory <see cref="T:ADMS.API.DbContexts.AdmsContext"/> for testing.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsBadRequest_WhenDocumentIdIsEmpty">
+            <summary>
+            Verifies that BadRequest is returned when documentId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsBadRequest_WhenResourceParametersIsNull">
+            <summary>
+            Verifies that BadRequest is returned when resourceParameters is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsBadRequest_WhenPageNumberIsInvalid">
+            <summary>
+            Verifies that BadRequest is returned when PageNumber is less than or equal to 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsBadRequest_WhenPageSizeIsInvalid">
+            <summary>
+            Verifies that BadRequest is returned when PageSize is less than or equal to 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that NotFound is returned when the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_Returns500_WhenValidationThrows">
+            <summary>
+            Verifies that ObjectResult with status 500 is returned when validation throws.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsPagedList_SortedByCreatedAtDescending_WhenNoOrderBy">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned and sorted by CreatedAt descending when no OrderBy is specified.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsPagedList_SortedByActivity_WhenOrderByActivity">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned and sorted by Activity when OrderBy is "activity".
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsPagedList_SortedByCreatedAtDescending_WhenOrderByCreatedAt">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned and sorted by CreatedAt descending when OrderBy is "createdat".
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsEmptyPagedList_WhenNoAuditsExist">
+            <summary>
+            Verifies that OkObjectResult with an empty paged list is returned when no audits exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsPagedList_WithCorrectPaging">
+            <summary>
+            Verifies that OkObjectResult with a paged list is returned with correct paging.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.GetDocumentMoveToAuditsAsync_ReturnsEmptyPagedList_WhenExceptionOccurs">
+            <summary>
+            Verifies that OkObjectResult with an empty paged list is returned if an exception occurs in the try block.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetDocumentMoveToAuditsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Creates an instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocked dependencies.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetExtendedAuditsAsync(System.Guid,System.Guid,ADMS.API.Helpers.AuditEnums.AuditDirection)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.CreateContext(System.Collections.Generic.IEnumerable{ADMS.API.Entities.MatterDocumentActivityUserFrom},System.Collections.Generic.IEnumerable{ADMS.API.Entities.MatterDocumentActivityUserTo})">
+            <summary>
+            Helper to create an in-memory context with optional seed data.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Returns a new instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocks.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ThrowsArgumentException_WhenBothMatterIdAndDocumentIdAreEmpty">
+            <summary>
+            Test: Throws ArgumentException if both matterId and documentId are empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ThrowsArgumentException_WhenMatterIdDoesNotExist">
+            <summary>
+            Test: Throws ArgumentException if matterId is provided but does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ThrowsArgumentException_WhenDocumentIdDoesNotExist">
+            <summary>
+            Test: Throws ArgumentException if documentId is provided but does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ThrowsArgumentOutOfRangeException_WhenDirectionIsInvalid">
+            <summary>
+            Test: Throws ArgumentOutOfRangeException if direction is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ReturnsQuery_ForFromDirection_WithFilters">
+            <summary>
+            Test: Returns correct query for FROM direction with filters.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ReturnsQuery_ForToDirection_WithFilters">
+            <summary>
+            Test: Returns correct query for TO direction with filters.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetExtendedAuditsAsyncTests.ThrowsInvalidOperationException_WhenUnexpectedExceptionOccurs">
+            <summary>
+            Test: Throws InvalidOperationException if an unexpected error occurs.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests">
+            <summary>
+            Unit tests for AdmsRepository.GetMatterAsync.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.CreateContextWithMatters(System.Collections.Generic.IEnumerable{ADMS.API.Entities.Matter},System.Collections.Generic.IEnumerable{ADMS.API.Entities.MatterActivity})">
+            <summary>
+            Helper to create an in-memory context with seeded matters.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ValidMatter(System.Nullable{System.Guid})">
+            <summary>
+            Returns a valid Matter entity.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsNull_WhenMatterIdIsEmpty">
+            <summary>
+            Test: Returns null if matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsNull_WhenMatterDoesNotExist">
+            <summary>
+            Test: Returns null if matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsMatter_WhenExists_NoDocumentsOrHistory">
+            <summary>
+            Test: Returns the matter if it exists and no documents/history are requested.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsMatter_WithDocuments_WhenIncludeDocumentsIsTrue">
+            <summary>
+            Test: Returns the matter with documents if includeDocuments is true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsMatter_WithHistory_WhenIncludeHistoryIsTrue">
+            <summary>
+            Test: Returns the matter with history if includeHistory is true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsMatter_WhenUserOrActivityNotFoundForAudit">
+            <summary>
+            Test: Returns the matter even if user or activity for audit is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.ReturnsNull_WhenExceptionOccurs">
+            <summary>
+            Test: Returns null if an exception occurs during query.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetMatterAsyncTests.CallsAuditLog_WhenUserAndActivityFound">
+            <summary>
+            Test: Audit log is called when user and activity are found.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests">
+            <summary>
+            Unit tests for AdmsRepository.GetPaginatedMattersAsync.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.CreateContextWithMatters(System.Collections.Generic.IEnumerable{ADMS.API.Entities.Matter})">
+            <summary>
+            Helper to create an in-memory context with seeded matters.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ValidParameters">
+            <summary>
+            Returns a default valid MattersResourceParameters.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsEmptyList_WhenResourceParametersIsNull">
+            <summary>
+            Test: Returns empty paged list if resource parameters are null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsEmptyList_WhenPageNumberIsInvalid">
+            <summary>
+            Test: Returns empty paged list if PageNumber is less than or equal to zero.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsEmptyList_WhenPageSizeIsInvalid">
+            <summary>
+            Test: Returns empty paged list if PageSize is less than or equal to zero.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsFilteredByDescription">
+            <summary>
+            Test: Returns only matters matching the description filter.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsOnlyNotArchivedAndNotDeleted_WhenFlagsAreFalse">
+            <summary>
+            Test: Returns only matters that are not archived or deleted when flags are false.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsAll_WhenIsArchivedAndIsDeletedAreTrue">
+            <summary>
+            Test: Returns all matters when IsArchived and IsDeleted are true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsPagedResults">
+            <summary>
+            Test: Returns paged results according to PageNumber and PageSize.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsSortedResults_WhenOrderByProvided">
+            <summary>
+            Test: Returns sorted results when OrderBy is provided.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsEmptyList_WhenExceptionThrown">
+            <summary>
+            Test: Returns empty paged list if an exception is thrown.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedMattersAsyncTests.ReturnsExpectedMatters_WhenValidRequest">
+            <summary>
+            Test: Returns expected matters for a normal valid request.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetPaginatedRevisionsAsync(System.Guid,ADMS.API.ResourceParameters.RevisionsResourceParameters)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.CreateContext(System.String)">
+            <summary>
+            Creates a new in-memory context for each test.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Returns a new instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with all dependencies mocked.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsBadRequest_WhenDocumentIdIsInvalid">
+            <summary>
+            Verifies that a BadRequest is returned if the documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsBadRequest_WhenResourceParametersIsNull">
+            <summary>
+            Verifies that a BadRequest is returned if resourceParameters is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsBadRequest_WhenPageNumberIsInvalid">
+            <summary>
+            Verifies that a BadRequest is returned if PageNumber is less than or equal to 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsBadRequest_WhenPageSizeIsInvalid">
+            <summary>
+            Verifies that a BadRequest is returned if PageSize is less than or equal to 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that a NotFound is returned if the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsServerError_WhenValidationThrows">
+            <summary>
+            Verifies that a 500 error is returned if an exception occurs during document validation.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsServerError_WhenQueryThrows">
+            <summary>
+            Verifies that a 500 error is returned if an exception occurs during query execution.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsOk_WithPagedRevisions_WhenDocumentExists">
+            <summary>
+            Verifies that OkObjectResult is returned with the correct paginated revisions when the document exists and no errors occur.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetPaginatedRevisionsAsyncTests.GetPaginatedRevisionsAsync_ReturnsOk_WithAllPagedRevisions_WhenIncludeDeletedTrue">
+            <summary>
+            Verifies that OkObjectResult is returned with all paged revisions when IncludeDeleted is true.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetRevisionActivityByActivityNameAsync(System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.CreateContext(System.Collections.Generic.IEnumerable{ADMS.API.Entities.RevisionActivity})">
+            <summary>
+            Helper to create an in-memory context with optional seed data.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Returns a new instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocks.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.ReturnsNull_WhenActivityNameIsNullOrEmpty(System.String)">
+            <summary>
+            Test: Returns null and logs warning if activityName is null or empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.ReturnsNull_WhenActivityNotFound">
+            <summary>
+            Test: Returns null and logs warning if no activity is found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.ReturnsActivity_WhenFound">
+            <summary>
+            Test: Returns the activity and logs info if found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.ReturnsNull_WhenMultipleActivitiesWithSameName">
+            <summary>
+            Test: Returns null and logs error if multiple activities with the same name exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionActivityByActivityNameAsyncTests.ReturnsNull_WhenUnexpectedExceptionOccurs">
+            <summary>
+            Test: Returns null and logs error if an unexpected exception occurs.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetRevisionByIdAsync(System.Guid,System.Boolean)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests.GetRevisionByIdAsync_ReturnsNull_WhenValidationFails">
+            <summary>
+            Verifies that GetRevisionByIdAsync returns null and logs a warning if the revision does not exist (validation fails).
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests.GetRevisionByIdAsync_ReturnsRevision_WhenExists_AndIncludeHistoryFalse">
+            <summary>
+            Verifies that GetRevisionByIdAsync returns the revision when it exists and includeHistory is false.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests.GetRevisionByIdAsync_ReturnsRevisionWithHistory_WhenIncludeHistoryTrue">
+            <summary>
+            Verifies that GetRevisionByIdAsync returns the revision and includes navigation properties when includeHistory is true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests.GetRevisionByIdAsync_ReturnsNull_WhenRevisionNotFoundInDatabase">
+            <summary>
+            Verifies that GetRevisionByIdAsync returns null and logs a warning if the revision is not found in the database.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionByIdAsyncTests.GetRevisionByIdAsync_ReturnsNull_AndLogsError_OnException">
+            <summary>
+            Verifies that GetRevisionByIdAsync returns null and logs an error if an exception is thrown.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetRevisionsAsync(System.Guid,System.Boolean,System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.CreateContext(System.String)">
+            <summary>
+            Creates a new in-memory context for each test.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Returns a new instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with all dependencies mocked.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsBadRequest_WhenDocumentIdIsInvalid">
+            <summary>
+            Verifies that a BadRequest is returned if the documentId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsNotFound_WhenDocumentDoesNotExist">
+            <summary>
+            Verifies that a NotFound is returned if the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsServerError_WhenValidationThrows">
+            <summary>
+            Verifies that a 500 error is returned if an exception occurs during document validation.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsOk_WithRevisions_WhenDocumentExists">
+            <summary>
+            Verifies that OkObjectResult is returned with the correct revisions when the document exists and no errors occur.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsOk_WithAllRevisions_WhenIncludeDeletedTrue">
+            <summary>
+            Verifies that OkObjectResult is returned with all revisions when includeDeleted is true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryGetRevisionsAsyncTests.GetRevisionsAsync_ReturnsServerError_WhenQueryThrows">
+            <summary>
+            Verifies that a 500 error is returned if an exception occurs during query execution.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetMatterActivityByActivityNameAsync(System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsNull">
+            <summary>
+            Tests that the method returns null and logs a warning when activityName is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsEmpty">
+            <summary>
+            Tests that the method returns null and logs a warning when activityName is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsWhitespace">
+            <summary>
+            Tests that the method returns null and logs a warning when activityName is whitespace.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsNull_WhenActivityNotFound">
+            <summary>
+            Tests that the method returns null and logs a warning when the activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsActivity_WhenFound">
+            <summary>
+            Tests that the method returns the correct activity and logs information when found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsNull_WhenMultipleActivitiesExist">
+            <summary>
+            Tests that the method returns null and logs an error when multiple activities with the same name exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterActivityTests.GetMatterActivityByActivityNameAsync_ReturnsNull_OnUnexpectedException">
+            <summary>
+            Tests that the method returns null and logs an error when an unexpected exception occurs.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.MatterExistsAsync(System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory <see cref="T:ADMS.API.DbContexts.AdmsContext"/> for testing.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests.MatterExistsAsync_ReturnsBadRequest_WhenMatterIdIsEmpty">
+            <summary>
+            Verifies that a BadRequestObjectResult is returned when the matterId is Guid.Empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests.MatterExistsAsync_ReturnsOkTrue_WhenMatterExists">
+            <summary>
+            Verifies that OkObjectResult is returned with true when the matter exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests.MatterExistsAsync_ReturnsOkFalse_WhenMatterDoesNotExist">
+            <summary>
+            Verifies that OkObjectResult is returned with false when the matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests.MatterExistsAsync_Returns500_WhenExceptionIsThrown">
+            <summary>
+            Verifies that a 500 ObjectResult is returned when an exception occurs.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterExistsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Helper to create a repository with the provided context and mocked dependencies.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.MatterNameExistsAsync(System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.CreateInMemoryContext">
+            <summary>
+            Creates an in-memory <see cref="T:ADMS.API.DbContexts.AdmsContext"/> for testing.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.MatterNameExistsAsync_ReturnsBadRequest_WhenNameIsNull">
+            <summary>
+            Verifies that a BadRequestObjectResult is returned when the matter name is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.MatterNameExistsAsync_ReturnsBadRequest_WhenNameIsEmpty">
+            <summary>
+            Verifies that a BadRequestObjectResult is returned when the matter name is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.MatterNameExistsAsync_ReturnsOkTrue_WhenNameExists">
+            <summary>
+            Verifies that OkObjectResult is returned with true when the matter name exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.MatterNameExistsAsync_ReturnsOkFalse_WhenNameDoesNotExist">
+            <summary>
+            Verifies that OkObjectResult is returned with false when the matter name does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.MatterNameExistsAsync_Returns500_WhenExceptionIsThrown">
+            <summary>
+            Verifies that a 500 ObjectResult is returned when an exception occurs.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryMatterNameExistsAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Helper to create a repository with the provided context and mocked dependencies.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.RestoreMatterAsync(System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.CreateContext(System.String)">
+            <summary>
+            Creates an in-memory context for testing.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_WhenMatterIdIsEmpty">
+            <summary>
+            Test: Returns false if matterId is empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_WhenMatterDoesNotExist">
+            <summary>
+            Test: Returns false if validation service says matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_WhenMatterNotInDatabase">
+            <summary>
+            Test: Returns false if matter is not found in the database after validation passes.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_WhenUserNotFound">
+            <summary>
+            Test: Returns false if user is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_WhenMatterActivityNotFound">
+            <summary>
+            Test: Returns false if matter activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_WhenSaveChangesFails">
+            <summary>
+            Test: Returns false if SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsTrue_WhenRestorationSucceeds">
+            <summary>
+            Test: Returns true when matter is restored successfully.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRestoreMatterAsyncTests.RestoreMatterAsync_ReturnsFalse_OnException">
+            <summary>
+            Test: Returns false if an exception is thrown during the process.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.GetRevisionActivityByActivityNameAsync(System.String)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests.GetRevisionActivityByActivityNameAsync_ReturnsNull_WhenActivityNameIsNullOrEmpty(System.String)">
+            <summary>
+            Verifies that null is returned and a warning is logged when the activity name is null or empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests.GetRevisionActivityByActivityNameAsync_ReturnsNull_WhenActivityNotFound">
+            <summary>
+            Verifies that null is returned and a warning is logged when the activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests.GetRevisionActivityByActivityNameAsync_ReturnsActivity_WhenFound">
+            <summary>
+            Verifies that the correct RevisionActivity is returned and information is logged when found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests.GetRevisionActivityByActivityNameAsync_ReturnsNull_WhenMultipleActivitiesExist">
+            <summary>
+            Verifies that null is returned and an error is logged when multiple activities with the same name exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionActivityTests.GetRevisionActivityByActivityNameAsync_ReturnsNull_OnUnexpectedException">
+            <summary>
+            Verifies that null is returned and an error is logged when an unexpected exception occurs.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.RevisionExistsAsync(System.Guid)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests.RevisionExistsAsync_ReturnsFalse_WhenRevisionNumberIsInvalid">
+            <summary>
+            Verifies that RevisionExistsAsync returns false and logs a warning if the revisionId is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests.RevisionExistsAsync_ReturnsFalse_WhenRevisionDoesNotExist">
+            <summary>
+            Verifies that RevisionExistsAsync returns false and logs a warning if the revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests.RevisionExistsAsync_ReturnsTrue_WhenRevisionExists">
+            <summary>
+            Verifies that RevisionExistsAsync returns true and logs information if the revision exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryRevisionExistsAsyncTests.RevisionExistsAsync_ReturnsFalse_AndLogsError_OnException">
+            <summary>
+            Verifies that RevisionExistsAsync returns false and logs an error if an exception is thrown.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.SaveChangesAsync"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.CreateMockContext(System.Boolean)">
+            <summary>
+            Helper to create a mock context with a mock ChangeTracker.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Returns a new instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocks.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.ReturnsTrue_WhenNoChangesToSave">
+            <summary>
+            Test: Returns true and logs info if there are no changes to save.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.ReturnsTrue_WhenSaveChangesSucceeds">
+            <summary>
+            Test: Returns true and logs info if SaveChangesAsync returns >= 0.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.ReturnsTrue_WhenSaveChangesReturnsZero">
+            <summary>
+            Test: Returns true if SaveChangesAsync returns 0 (no rows affected but still a valid save).
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.ReturnsFalse_WhenDbUpdateExceptionThrown">
+            <summary>
+            Test: Returns false and logs error if SaveChangesAsync throws DbUpdateException.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositorySaveChangesAsyncTests.ReturnsFalse_WhenUnexpectedExceptionThrown">
+            <summary>
+            Test: Returns false and logs error if SaveChangesAsync throws an unexpected exception.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.UpdateMatterAsync(System.Guid,ADMS.API.Models.MatterForUpdateDto)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_NullDto_ReturnsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns null and logs a warning when the DTO is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_InvalidDtoModel_ReturnsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns null and logs a warning when the DTO model is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_MatterDoesNotExist_ReturnsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns null and logs a warning when the matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_MatterNotFoundInDb_ReturnsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns null and logs a warning when the matter is not found in the database.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_UserOrActivityNotFound_ReturnsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns null and logs a warning when the user or activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_SaveFails_ReturnsNull">
+            <summary>
+            Tests that UpdateMatterAsync returns null and logs a warning when SaveChangesAsync fails.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryTests.UpdateMatterAsync_ValidInput_ReturnsUpdatedMatter">
+            <summary>
+            Tests that UpdateMatterAsync returns the updated matter when all operations succeed.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests">
+            <summary>
+            Unit tests for <see cref="M:ADMS.API.Services.AdmsRepository.UpdateRevisionAsync(System.Guid,System.Guid,System.Guid,ADMS.API.Entities.Revision)"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.CreateContext">
+            <summary>
+            Helper to create an in-memory context.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.CreateRepository(ADMS.API.DbContexts.AdmsContext)">
+            <summary>
+            Returns a new instance of <see cref="T:ADMS.API.Services.AdmsRepository"/> with the provided context and mocks.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenRevisionIsNull">
+            <summary>
+            Test: Returns null and logs if revision is null.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenMatterDoesNotExist">
+            <summary>
+            Test: Returns null and logs if matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenDocumentDoesNotExist">
+            <summary>
+            Test: Returns null and logs if document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenRevisionDoesNotExist">
+            <summary>
+            Test: Returns null and logs if revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenUserNotFound">
+            <summary>
+            Test: Returns null and logs if the user is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenRevisionActivityNotFound">
+            <summary>
+            Test: Returns null and logs if the revision activity is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsUpdatedRevision_WhenAllValidationsPassAndSaveSucceeds">
+            <summary>
+            Test: Returns updated revision when all validations pass and save succeeds.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUpdateRevisionAsyncTests.ReturnsNull_WhenSaveChangesFails">
+            <summary>
+            Test: Returns null and logs if SaveChangesAsync returns false.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests">
+            <summary>
+            Unit tests for AdmsRepository User Actions region.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests"/> class.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests.GetUserByUsernameAsync_ReturnsUser_WhenUserExists">
+            <summary>
+            Tests that GetUserByUsernameAsync returns the user when found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests.GetUserByUsernameAsync_ReturnsNull_WhenUserNotFound">
+            <summary>
+            Tests that GetUserByUsernameAsync returns null and logs a warning when user is not found.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests.GetUserByUsernameAsync_ReturnsNull_WhenUsernameIsNullOrEmpty(System.String)">
+            <summary>
+            Tests that GetUserByUsernameAsync throws ArgumentNullException when username is null or empty.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Repositories.AdmsRepositoryUserActionsTests.GetUserByUsernameAsync_ReturnsNull_WhenMultipleUsersExist">
+            <summary>
+            Tests that GetUserByUsernameAsync throws InvalidOperationException when multiple users with the same username exist.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Services.PropertyMappingServiceTests">
+            <summary>
+            Unit tests for <see cref="T:ADMS.API.Services.PropertyMappingService"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.GetPropertyMapping_ReturnsMapping_ForKnownTypes">
+            <summary>
+            Tests that GetPropertyMapping returns a valid mapping dictionary for a known DTO/entity pair.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.GetPropertyMapping_Throws_ForUnknownTypes">
+            <summary>
+            Tests that GetPropertyMapping throws InvalidOperationException for unknown type pairs.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.ValidMappingExistsFor_ReturnsTrue_ForEmptyOrWhitespaceFields(System.String)">
+            <summary>
+            Tests that ValidMappingExistsFor returns true for empty or whitespace fields.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.ValidMappingExistsFor_ReturnsTrue_ForSingleValidField">
+            <summary>
+            Tests that ValidMappingExistsFor returns true for a single valid field.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.ValidMappingExistsFor_ReturnsTrue_ForMultipleValidFields">
+            <summary>
+            Tests that ValidMappingExistsFor returns true for multiple valid fields.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.ValidMappingExistsFor_ReturnsFalse_IfAnyFieldIsInvalid">
+            <summary>
+            Tests that ValidMappingExistsFor returns false if any field is invalid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.ValidMappingExistsFor_IgnoresSortDirection">
+            <summary>
+            Tests that ValidMappingExistsFor ignores sort direction keywords (asc/desc) and validates property names only.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.ValidMappingExistsFor_Throws_ForUnknownTypes">
+            <summary>
+            Tests that ValidMappingExistsFor throws InvalidOperationException for unknown type pairs.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Services.PropertyMappingServiceTests.FakeDto">
+            <summary>
+            Dummy DTO for negative test cases.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.FakeDto.#ctor(System.String)">
+            <summary>
+            Dummy DTO for negative test cases.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Services.PropertyMappingServiceTests.FakeEntity">
+            <summary>
+            Dummy entity for negative test cases.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.PropertyMappingServiceTests.FakeEntity.#ctor(System.String)">
+            <summary>
+            Dummy entity for negative test cases.
+            </summary>
+        </member>
+        <member name="T:ADMS.API.Tests.Services.ValidationServiceTests">
+            <summary>
+            Unit tests for <see cref="T:ADMS.API.Services.ValidationService"/>.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateGuid_ReturnsNull_ForValidGuid">
+            <summary>
+            Tests that ValidateGuid returns null for a non-empty Guid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateGuid_ReturnsBadRequest_ForEmptyGuid">
+            <summary>
+            Tests that ValidateGuid returns BadRequestObjectResult for an empty Guid.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateStringNotEmpty_ReturnsTrue_ForNonEmptyString">
+            <summary>
+            Tests that ValidateStringNotEmpty returns true for a non-empty string.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateStringNotEmpty_ReturnsFalse_ForNullOrWhitespace(System.String)">
+            <summary>
+            Tests that ValidateStringNotEmpty returns false for a null or whitespace string.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateNotNull_ReturnsNull_ForNonNullObject">
+            <summary>
+            Tests that ValidateNotNull returns null for a non-null object.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateNotNull_ReturnsBadRequest_ForNullObject">
+            <summary>
+            Tests that ValidateNotNull returns BadRequestObjectResult for a null object.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateModelState_ReturnsNull_ForValidModelState">
+            <summary>
+            Tests that ValidateModelState returns null for a valid model state.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateModelState_ReturnsBadRequest_ForInvalidModelState">
+            <summary>
+            Tests that ValidateModelState returns BadRequestObjectResult for an invalid model state.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateMatterExistsAsync_ReturnsNull_IfMatterExists">
+            <summary>
+            Tests that ValidateMatterExistsAsync returns null if the matter exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateMatterExistsAsync_ReturnsNotFound_IfMatterDoesNotExist">
+            <summary>
+            Tests that ValidateMatterExistsAsync returns NotFoundObjectResult if the matter does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentExistsAsync_ReturnsNull_IfDocumentExists">
+            <summary>
+            Tests that ValidateDocumentExistsAsync returns null if the document exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentExistsAsync_ReturnsNotFound_IfDocumentDoesNotExist">
+            <summary>
+            Tests that ValidateDocumentExistsAsync returns NotFoundObjectResult if the document does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateRevisionExistsAsync_ReturnsNull_IfRevisionExists">
+            <summary>
+            Tests that ValidateRevisionExistsAsync returns null if the revision exists.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateRevisionExistsAsync_ReturnsNotFound_IfRevisionDoesNotExist">
+            <summary>
+            Tests that ValidateRevisionExistsAsync returns NotFoundObjectResult if the revision does not exist.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentForCreationAsync_ReturnsValidationErrors_ForInvalidFields">
+            <summary>
+            Tests that ValidateDocumentForCreationAsync returns validation errors for missing or invalid fields.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentForCreationAsync_ReturnsValidationError_ForDuplicateFileName">
+            <summary>
+            Tests that ValidateDocumentForCreationAsync returns a validation error for duplicate file name.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentForCreationAsync_ReturnsNoErrors_ForValidInput">
+            <summary>
+            Tests that ValidateDocumentForCreationAsync returns an empty list for valid input.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentForUpdate_ReturnsValidationErrors_ForInvalidFields">
+            <summary>
+            Tests that ValidateDocumentForUpdate returns validation errors for missing or invalid fields.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentForUpdate_ReturnsValidationError_IfDeletedAndCheckedOut">
+            <summary>
+            Tests that ValidateDocumentForUpdate returns a validation error if both IsDeleted and IsCheckedOut are true.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateDocumentForUpdate_ReturnsNoErrors_ForValidInput">
+            <summary>
+            Tests that ValidateDocumentForUpdate returns no errors for valid input.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateEmail_ReturnsTrue_ForValidEmail">
+            <summary>
+            Tests that ValidateEmail returns true for a valid email.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateEmail_ReturnsFalse_ForInvalidEmail(System.String)">
+            <summary>
+            Tests that ValidateEmail returns false for an invalid email.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateFileExtension_ReturnsTrue_ForValidExtension(System.String)">
+            <summary>
+            Tests that ValidateFileExtension returns true for a valid extension.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateFileExtension_ReturnsFalse_ForInvalidExtension(System.String)">
+            <summary>
+            Tests that ValidateFileExtension returns false for an invalid extension.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateMimeType_ReturnsTrue_ForValidMimeType(System.String)">
+            <summary>
+            Tests that ValidateMimeType returns true for a valid MIME type.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Tests.Services.ValidationServiceTests.ValidateMimeType_ReturnsFalse_ForInvalidMimeType(System.String)">
+            <summary>
+            Tests that ValidateMimeType returns false for an invalid MIME type.
+            </summary>
+        </member>
+    </members>
+</doc>

@@ -1,30 +1,30 @@
 ﻿using ADMS.API.Services;
+
 using System.Linq.Dynamic.Core;
 
 namespace ADMS.API.Helpers;
 
 /// <summary>
-/// Iqueryable Extension methods
+/// Provides extension methods for IQueryable to support dynamic sorting using property mapping.
 /// </summary>
-public static class IQueryableExtensions
+public static class QueryableExtensions
 {
     /// <summary>
-    /// Apply Sort method
+    /// Applies dynamic sorting to the source IQueryable based on the provided orderBy string and property mapping dictionary.
     /// </summary>
-    /// <typeparam name="T">Data Type</typeparam>
-    /// <param name="source">Source</param>
-    /// <param name="orderBy">Order By field</param>
-    /// <param name="mappingDictionary">Mappibnd Dictionary</param>
-    /// <returns>IQueryable of type T</returns>
-    /// <exception cref="ArgumentException">Property name missing</exception>
-    /// <exception cref="ArgumentNullException">source, mappibngDictionary or propertyMappingValue null</exception>
+    /// <typeparam name="T">The type of the IQueryable elements.</typeparam>
+    /// <param name="source">The source IQueryable to apply sorting to.</param>
+    /// <param name="orderBy">A comma-separated string specifying the sort order (e.g., "Name desc, Age").</param>
+    /// <param name="mappingDictionary">A dictionary mapping source property names to destination property mappings.</param>
+    /// <returns>The sorted IQueryable.</returns>
+    /// <exception cref="ArgumentNullException">Thrown if source or mappingDictionary is null.</exception>
+    /// <exception cref="ArgumentException">Thrown if a property in orderBy is not found in the mapping dictionary.</exception>
     public static IQueryable<T> ApplySort<T>(
-        this IQueryable<T> source, 
+        this IQueryable<T> source,
         string orderBy,
         Dictionary<string, PropertyMappingValue> mappingDictionary)
     {
         ArgumentNullException.ThrowIfNull(source);
-
         ArgumentNullException.ThrowIfNull(mappingDictionary);
 
         if (string.IsNullOrWhiteSpace(orderBy))
@@ -32,64 +32,51 @@ public static class IQueryableExtensions
             return source;
         }
 
-        var orderByString = string.Empty;
+        // Split the orderBy string into individual clauses
+        var orderByClauses = orderBy.Split(',', StringSplitOptions.RemoveEmptyEntries);
 
-        // the orderBy string is separated by ",", so we split it.
-        var orderByAfterSplit = orderBy.Split(',');
-
-        // apply each orderby clause  
-        foreach (var orderByClause in orderByAfterSplit)
+        // Build the orderBy string using LINQ
+        var orderByString = string.Join(", ", orderByClauses.Select(clause =>
         {
-            // trim the orderBy clause, as it might contain leading
-            // or trailing spaces. Can't trim the var in foreach,
-            // so use another var.
-            var trimmedOrderByClause = orderByClause.Trim();
+            var trimmedClause = clause.Trim();
 
-            // if the sort option ends with with " desc", we order
-            // descending, ortherwise ascending
-            var orderDescending = trimmedOrderByClause.EndsWith(" desc");
+            // Determine sort direction
+            var isDescending = trimmedClause.EndsWith(" desc", StringComparison.OrdinalIgnoreCase);
+            var propertyName = ExtractPropertyName(trimmedClause);
 
-            // remove " asc" or " desc" from the orderBy clause, so we 
-            // get the property name to look for in the mapping dictionary
-            int indexOfFirstSpace = trimmedOrderByClause.IndexOf(' ');
-            var propertyName = indexOfFirstSpace == -1 ?
-                trimmedOrderByClause : trimmedOrderByClause
-                .Remove(indexOfFirstSpace);
-
-            // find the matching property
-            if (!mappingDictionary.TryGetValue(propertyName, out PropertyMappingValue? value))
+            // Validate property name
+            if (!mappingDictionary.TryGetValue(propertyName, out var propertyMappingValue))
             {
-                throw new ArgumentException($"Key mapping for {propertyName} is missing");
+                var availableKeys = string.Join(", ", mappingDictionary.Keys);
+                throw new ArgumentException($"Key mapping for property '{propertyName}' is missing. Available keys: {availableKeys}");
             }
 
-            // get the PropertyMappingValue
-            var propertyMappingValue = value;
-
-            if (propertyMappingValue != null)
+            // Adjust sort direction if necessary
+            if (propertyMappingValue.Revert)
             {
-                // revert sort order if necessary
-                if (propertyMappingValue.Revert)
-                {
-                    orderDescending = !orderDescending;
-                }
-
-                // Run through the property names 
-                foreach (var destinationProperty in
-                    propertyMappingValue.DestinationProperties)
-                {
-                    orderByString = orderByString +
-                        (string.IsNullOrWhiteSpace(orderByString) ? string.Empty : ", ")
-                        + destinationProperty
-                        + (orderDescending ? " descending" : " ascending");
-                }
+                isDescending = !isDescending;
             }
-            else
-            {
-                throw new ArgumentException(nameof(propertyMappingValue));
-            }
-        }
 
+            // Build the orderBy string for the current clause
+            return string.Join(", ", propertyMappingValue.DestinationProperties.Select(destinationProperty =>
+                $"{destinationProperty} {(isDescending ? "descending" : "ascending")}"
+            ));
+        }));
+
+        // Apply the sorting
         return source.OrderBy(orderByString);
     }
-}
 
+    /// <summary>
+    /// Extracts the property name from an orderBy clause.
+    /// </summary>
+    /// <param name="orderByClause">The orderBy clause (e.g., "Name desc").</param>
+    /// <returns>The extracted property name (e.g., "Name").</returns>
+    private static string ExtractPropertyName(string orderByClause)
+    {
+        var indexOfSpace = orderByClause.IndexOf(' ');
+        return indexOfSpace == -1
+            ? orderByClause
+            : orderByClause[..indexOfSpace];
+    }
+}

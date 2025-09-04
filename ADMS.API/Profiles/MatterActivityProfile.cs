@@ -1,21 +1,25 @@
-﻿using AutoMapper;
+﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
-namespace ADMS.API.Profiles
+using Mapster;
+
+namespace ADMS.API.Profiles;
+
+/// <summary>
+///     AutoMapper profile for mapping between <see cref="MatterActivity"/>, <see cref="MatterActivityDto"/>, and <see cref="MatterActivityMinimalDto"/>.
+/// </summary>
+public class MatterActivityProfile
 {
     /// <summary>
-    /// Matter Activity Profile for autopmapper
+    ///     Initializes a new instance of the <see cref="MatterActivityProfile"/> class and configures entity-to-DTO mappings.
     /// </summary>
-    public class MatterActivityProfile : Profile
+    public MatterActivityProfile()
     {
-        /// <summary>
-        /// Matter Activity Profile Constructor
-        /// </summary>
-        public MatterActivityProfile()
-        {
-            CreateMap<Entities.MatterActivity, Models.MatterActivityDto>();
-            CreateMap<Entities.MatterActivity, Models.MatterActivityMinimalDto>();
+        // Entity to DTO mappings
+        TypeAdapterConfig<MatterActivity, MatterActivityDto>.NewConfig();
+        TypeAdapterConfig<MatterActivity, MatterActivityMinimalDto>.NewConfig();
 
-            CreateMap<Models.MatterActivityDto, Entities.MatterActivity>();
-        }
+        // DTO to Entity mapping
+        TypeAdapterConfig<MatterActivityDto, MatterActivity>.NewConfig();
     }
 }

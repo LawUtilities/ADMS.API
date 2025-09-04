@@ -6,1074 +6,2342 @@
     <members>
         <member name="T:ADMS.API.Models.DocumentActivityDto">
             <summary>
-            Document Activity List
+            Data Transfer Object representing a document activity, including its type and associated users.
             </summary>
             <remarks>
-            Document Activity Constructor
+            Used to transfer document activity data between layers.
             </remarks>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityDto.Id">
             <summary>
-            Document Activity primary key
+            Gets or sets the unique identifier for the document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityDto.Activity">
             <summary>
-            Document Activity
+            Gets or sets the activity type (e.g., CREATED, DELETED, etc.).
+            Must be a non-empty string, max 32 characters, and a valid activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityDto.DocumentActivityUsers">
             <summary>
-            Matter document activities
+            Gets or sets the collection of users associated with this document activity.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the current instance for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityDto.ValidateModel(ADMS.API.Models.DocumentActivityDto)">
+            <summary>
+            Helper method to validate a DocumentActivityDto instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.DocumentActivityMinimalDto">
             <summary>
-            Document Activity List
+            Represents minimal information about a document activity (e.g., CREATED, DELETED, etc.).
             </summary>
-            <remarks>
-            Document Activity Constructor
-            </remarks>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityMinimalDto.Activity">
             <summary>
-            Document Activity
+            Gets or sets the document activity name (e.g., CREATED, DELETED, etc.).
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the current <see cref="T:ADMS.API.Models.DocumentActivityMinimalDto"/> instance for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>
+            A collection of <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult"/> objects that describe any validation failures.
+            </returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityMinimalDto.ValidateModel(ADMS.API.Models.DocumentActivityMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.DocumentActivityMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The <see cref="T:ADMS.API.Models.DocumentActivityMinimalDto"/> instance to validate.</param>
+            <returns>
+            A list of <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult"/> objects that describe any validation failures.
+            </returns>
         </member>
         <member name="T:ADMS.API.Models.DocumentActivityUserDto">
             <summary>
-            Document Activity User join
+            Data Transfer Object representing the association between a document, an activity, and a user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentId">
             <summary>
-            Document Id
+            Gets or sets the unique identifier of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.Document">
             <summary>
-            Document
+            Gets or sets the document details (without revisions).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentActivityId">
             <summary>
-            Activity Id
+            Gets or sets the unique identifier of the document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.DocumentActivity">
             <summary>
-            DocumentActivity
+            Gets or sets the document activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier of the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.User">
             <summary>
-            User
+            Gets or sets the user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date and time of the association.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserDto.LocalCreatedAtDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the current instance for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserDto.ValidateDocument(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the Document property.
+            </summary>
+            <param name="validationContext">The validation context.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserDto.ValidateDocumentActivity(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the DocumentActivity property.
+            </summary>
+            <param name="validationContext">The validation context.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserDto.ValidateUser(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the User property.
+            </summary>
+            <param name="validationContext">The validation context.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserDto.ValidateModel(ADMS.API.Models.DocumentActivityUserDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.DocumentActivityUserDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.DocumentActivityUserMinimalDto">
             <summary>
-            Document Activity User join
+            Minimal Data Transfer Object representing a user's activity on a document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.DocumentId">
             <summary>
-            Document Id
+            Gets or sets the unique identifier of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.DocumentActivity">
             <summary>
-            DocumentActivity
+            Gets or sets the minimal document activity information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.User">
             <summary>
-            User
+            Gets or sets the minimal user information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentActivityUserMinimalDto.LocalCreatedAtDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
         </member>
-        <member name="T:ADMS.API.Models.DocumentAuditDto">
+        <member name="M:ADMS.API.Models.DocumentActivityUserMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
-            Document Audit Dto
+            Validates the current instance for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserMinimalDto.ValidateDocumentActivity(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the DocumentActivity property.
+            </summary>
+            <param name="validationContext">The validation context.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserMinimalDto.ValidateUser(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the User property.
+            </summary>
+            <param name="validationContext">The validation context.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentActivityUserMinimalDto.ValidateModel(ADMS.API.Models.DocumentActivityUserMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.DocumentActivityUserMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
+        </member>
+        <member name="T:ADMS.API.Models.DocumentAuditMinimalDto">
+            <summary>
+            Minimal Data Transfer Object for document audit, including document and related activity audits.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.DocumentAuditDto.DocumentActivityUserAudit">
+        <member name="P:ADMS.API.Models.DocumentAuditMinimalDto.Document">
             <summary>
-            List of document activity by users
+            Gets or sets the minimal document information with activity.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.DocumentAuditDto.MatterDocumentActivityUserFromAudit">
+        <member name="P:ADMS.API.Models.DocumentAuditMinimalDto.DocumentActivityUserAudit">
             <summary>
-            List matter document from activity by users
+            Gets or sets the list of document activity by users.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.DocumentAuditDto.MatterDocumentActivityUserToAudit">
+        <member name="P:ADMS.API.Models.DocumentAuditMinimalDto.MatterDocumentActivityUserFromAudit">
             <summary>
-            List of matter document to activity by users
+            Gets or sets the list of "from" matter document activity by users.
             </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentAuditMinimalDto.MatterDocumentActivityUserToAudit">
+            <summary>
+            Gets or sets the list of "to" matter document activity by users.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentAuditMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentAuditMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentAuditMinimalDto.ValidateDocument(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentAuditMinimalDto.Document"/> property.
+            </summary>
+            <param name="validationContext">The validation context.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentAuditMinimalDto.ValidateAuditCollection``1(System.Collections.Generic.IEnumerable{``0},System.String)">
+            <summary>
+            Validates a collection of audit items.
+            </summary>
+            <typeparam name="T">The type of the audit item.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.DocumentDto">
             <summary>
-            Document DTO
+            Data Transfer Object representing a document, including its revisions and activity associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.Id">
             <summary>
-            Id of the document
+            Gets or sets the unique identifier of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.FileName">
             <summary>
-            Filename of the document
+            Gets or sets the filename of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.Extension">
             <summary>
-            extension of the file
+            Gets or sets the extension of the file.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating if the document is checked out.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.IsDeleted">
             <summary>
-            is the file deleted
+            Gets or sets a value indicating if the file is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.Revisions">
             <summary>
-            revisions assigned to the document
+            Gets or sets the revisions assigned to the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.DocumentActivityUsers">
             <summary>
-            document activities user
+            Gets or sets the document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the "from" matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the "to" matter document activity users.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ValidateCollection``1(System.Collections.Generic.IEnumerable{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.MimeTypeRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[\\w\\.\\-]+\\/[\\w\\.\\-\\+]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [-.\w] atomically at least once.<br/>
+            ○ Match '/'.<br/>
+            ○ Match a character in the set [+-.\w] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentDto.ChecksumRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:ADMS.API.Models.DocumentForCreationDto">
             <summary>
-            Document DTO used to create new documents
+            Data Transfer Object used to create new documents.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForCreationDto.FileName">
             <summary>
-            Filename of the document to be created
+            Gets or sets the filename of the document to be created (without extension).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForCreationDto.Extension">
             <summary>
-            Extension for the file in question
+            Gets or sets the extension for the file in question (without dot).
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForCreationDto.Description">
+            <summary>
+            Gets or sets the optional description of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForCreationDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating if the document is checked out (should be false on creation).
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentForCreationDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForCreationDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForCreationDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForCreationDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForCreationDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForCreationDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForCreationDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.ExtensionAlphanumericRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[a-zA-Z0-9]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Za-z] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForCreationDto.Checksum64HexRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:ADMS.API.Models.DocumentForUpdateDto">
             <summary>
-            Document For Update Dto
+            Data Transfer Object for updating an existing document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForUpdateDto.FileName">
             <summary>
-            filename for the document
+            Gets or sets the file name for the document (without extension).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForUpdateDto.Extension">
             <summary>
-            file extension for the document
+            Gets or sets the file extension for the document (without dot).
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForUpdateDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating if the document is checked out.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentForUpdateDto.IsDeleted">
             <summary>
-            indicates if the document is deleted
+            Gets or sets a value indicating if the document is deleted.
             </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentForUpdateDto.Description">
+            <summary>
+            Gets or sets the optional description of the document.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentForUpdateDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForUpdateDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForUpdateDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForUpdateDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForUpdateDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForUpdateDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentForUpdateDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.MimeTypeRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[\\w\\.\\-]+\\/[\\w\\.\\-\\+]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [-.\w] atomically at least once.<br/>
+            ○ Match '/'.<br/>
+            ○ Match a character in the set [+-.\w] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentForUpdateDto.ChecksumRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:ADMS.API.Models.DocumentFullDto">
             <summary>
-            Document DTO
+            Data Transfer Object representing a document with full details, including revisions and activity associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.Id">
             <summary>
-            Id of the document
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.FileName">
             <summary>
-            Filename of the document
+            Gets or sets the file name of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.Extension">
             <summary>
-            extension of the file
+            Gets or sets the file extension of the document.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating whether the document is checked out.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.IsDeleted">
             <summary>
-            is the file deleted
+            Gets or sets a value indicating whether the document is deleted.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentFullDto.Description">
+            <summary>
+            Gets or sets the description of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.Revisions">
             <summary>
-            revisions assigned to the document
+            Gets or sets the collection of revisions for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.DocumentActivityUsers">
             <summary>
-            document activities user
+            Gets or sets the collection of document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of "from" matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentFullDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the collection of "to" matter document activity users.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentFullDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentFullDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentFullDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentFullDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateCollection``1(System.Collections.Generic.IEnumerable{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentFullDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentFullDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentFullDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.MimeTypeRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[\\w\\.\\-]+\\/[\\w\\.\\-\\+]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [-.\w] atomically at least once.<br/>
+            ○ Match '/'.<br/>
+            ○ Match a character in the set [+-.\w] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentFullDto.ChecksumRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:ADMS.API.Models.DocumentMinimalDto">
             <summary>
-            Document DTO
+            Minimal Data Transfer Object representing a document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentMinimalDto.Id">
             <summary>
-            Id of the document
+            Gets or sets the unique identifier of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentMinimalDto.FileName">
             <summary>
-            Filename of the document
+            Gets or sets the file name of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentMinimalDto.Extension">
             <summary>
-            extension of the file
+            Gets or sets the file extension of the document.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentMinimalDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentMinimalDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating whether the document is checked out.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentMinimalDto.IsDeleted">
             <summary>
-            is the file deleted
+            Gets or sets a value indicating whether the document is deleted.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentMinimalDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentMinimalDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentMinimalDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentMinimalDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentMinimalDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.MimeTypeRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[\\w\\.\\-]+\\/[\\w\\.\\-\\+]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [-.\w] atomically at least once.<br/>
+            ○ Match '/'.<br/>
+            ○ Match a character in the set [+-.\w] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentMinimalDto.ChecksumRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:ADMS.API.Models.DocumentWithoutRevisionsDto">
             <summary>
-            Document DTO without Revisions included
+            Data Transfer Object representing a document without its revision history.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Id">
             <summary>
-            ID for the document
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.FileName">
             <summary>
-            filename for the document
+            Gets or sets the file name of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Extension">
             <summary>
-            file extension for the document
+            Gets or sets the file extension of the document.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating whether the document is checked out.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.IsDeleted">
             <summary>
-            indicates if the document is deleted
+            Gets or sets a value indicating whether the document is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.DocumentActivityUsers">
             <summary>
-            document activities user
+            Gets or sets the collection of document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of "from" matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the collection of "to" matter document activity users.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.DocumentWithoutRevisionsDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithoutRevisionsDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ValidateCollection``1(System.Collections.Generic.IEnumerable{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithoutRevisionsDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithoutRevisionsDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithoutRevisionsDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.MimeTypeRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[\\w\\.\\-]+\\/[\\w\\.\\-\\+]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [-.\w] atomically at least once.<br/>
+            ○ Match '/'.<br/>
+            ○ Match a character in the set [+-.\w] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithoutRevisionsDto.ChecksumRegex">
+            <remarks>
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
+            </remarks>
         </member>
         <member name="T:ADMS.API.Models.DocumentWithRevisionsDto">
             <summary>
-            Document DTO
+            DTO representing a document with its associated revisions and activity/user associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Id">
             <summary>
-            Id of the document
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.FileName">
             <summary>
-            Filename of the document
+            Gets or sets the file name of the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Extension">
             <summary>
-            extension of the file
+            Gets or sets the file extension of the document.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.FileSize">
+            <summary>
+            Gets or sets the size of the file in bytes.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MimeType">
+            <summary>
+            Gets or sets the MIME type of the file (e.g., "application/pdf").
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Checksum">
+            <summary>
+            Gets or sets the checksum (e.g., SHA256 hash) of the file for integrity verification.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.IsCheckedOut">
             <summary>
-            indicates if the document is checkedout
+            Gets or sets a value indicating whether the document is checked out.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.IsDeleted">
             <summary>
-            indicates if the document is deleted
+            Gets or sets a value indicating whether the document is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.Revisions">
             <summary>
-            revisions assigned to the document
+            Gets or sets the collection of revisions for this document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.DocumentActivityUsers">
             <summary>
-            document activities user
+            Gets or sets the collection of document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of "from" matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.DocumentWithRevisionsDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the collection of "to" matter document activity users.
             </summary>
         </member>
-        <member name="T:ADMS.API.Models.LinkDto">
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
             <summary>
-            Link model
+            Validates the <see cref="T:ADMS.API.Models.DocumentWithRevisionsDto"/> for data integrity and business rules.
             </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ValidateFileName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithRevisionsDto.FileName"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ValidateExtension">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithRevisionsDto.Extension"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ValidateCollection``1(System.Collections.Generic.ICollection{``0},System.String,System.Boolean)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <param name="requireAtLeastOne">If true, require at least one item in the collection.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ValidateFileSize">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithRevisionsDto.FileSize"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ValidateMimeType">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithRevisionsDto.MimeType"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ValidateChecksum">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.DocumentWithRevisionsDto.Checksum"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.MimeTypeRegex">
             <remarks>
-            Constructor
+            Pattern:<br/>
+            <code>^[\\w\\.\\-]+\\/[\\w\\.\\-\\+]+$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [-.\w] atomically at least once.<br/>
+            ○ Match '/'.<br/>
+            ○ Match a character in the set [+-.\w] atomically at least once.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
             </remarks>
-            <param name="href">URL</param>
-            <param name="rel">relationship</param>
-            <param name="method">method</param>
         </member>
-        <member name="M:ADMS.API.Models.LinkDto.#ctor(System.String,System.String,System.String)">
-            <summary>
-            Link model
-            </summary>
+        <member name="M:ADMS.API.Models.DocumentWithRevisionsDto.ChecksumRegex">
             <remarks>
-            Constructor
+            Pattern:<br/>
+            <code>^[A-Fa-f0-9]{64}$</code><br/>
+            Explanation:<br/>
+            <code>
+            ○ Match if at the beginning of the string.<br/>
+            ○ Match a character in the set [0-9A-Fa-f] exactly 64 times.<br/>
+            ○ Match if at the end of the string or if before an ending newline.<br/>
+            </code>
             </remarks>
-            <param name="href">URL</param>
-            <param name="rel">relationship</param>
-            <param name="method">method</param>
-        </member>
-        <member name="P:ADMS.API.Models.LinkDto.Href">
-            <summary>
-            URL to return
-            </summary>
-        </member>
-        <member name="P:ADMS.API.Models.LinkDto.Rel">
-            <summary>
-            Relationship
-            </summary>
-        </member>
-        <member name="P:ADMS.API.Models.LinkDto.Method">
-            <summary>
-            Method
-            </summary>
         </member>
         <member name="T:ADMS.API.Models.MatterActivityDto">
             <summary>
-            Matter activity
+            Represents a matter activity, including its users and validation logic.
             </summary>
             <remarks>
-            MatterActivity Constructor
+            Use this DTO to represent an activity within a matter, including associated users.
             </remarks>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityDto.Id">
             <summary>
-            Matter Activity Primary Key
+            Gets or sets the unique identifier for the matter activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityDto.Activity">
             <summary>
-            name of the activity being undertaken
+            Gets or sets the name of the activity being undertaken.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityDto.MatterActivityUsers">
             <summary>
-            Matter activity user
+            Gets or sets the collection of user associations for this activity.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterActivityDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityDto.ValidateActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityDto.Activity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityDto.ValidateMatterActivityUsers">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityDto.MatterActivityUsers"/> collection.
+            </summary>
+            <returns>A collection of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterActivityMinimalDto">
             <summary>
-            Matter activity
+            Minimal DTO for a matter activity, including validation logic.
             </summary>
-            <remarks>
-            MatterActivity Constructor
-            </remarks>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityMinimalDto.Id">
             <summary>
-            Matter Activity Primary Key
+            Gets or sets the unique identifier for the matter activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityMinimalDto.Activity">
             <summary>
-            name of the activity being undertaken
+            Gets or sets the name of the activity being undertaken.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterActivityMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityMinimalDto.ValidateActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityMinimalDto.Activity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterActivityUserDto">
             <summary>
-            shared type entity for many to many tables
+            Represents the association between a matter, an activity, and a user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterId">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.Matter">
             <summary>
-            Document
+            Gets or sets the matter details (without documents).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterActivityId">
             <summary>
-            Matter Activity Id
+            Gets or sets the unique identifier for the matter activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.MatterActivity">
             <summary>
-            MatterActivity
+            Gets or sets the matter activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier for the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.User">
             <summary>
-            User
+            Gets or sets the user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the association.
             </summary>
-            [Key]
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserDto.LocalCreatedAtDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterActivityUserDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.ValidateMatter">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserDto.Matter"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.ValidateMatterActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserDto.MatterActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserDto.ValidateModel(ADMS.API.Models.MatterActivityUserDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterActivityUserDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterActivityUserMinimalDto">
             <summary>
-            shared type entity for many to many tables
+            Minimal DTO representing the association between a matter, an activity, and a user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterId">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.Matter">
             <summary>
-            Document
+            Gets or sets the minimal matter information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterActivityId">
             <summary>
-            Matter Activity Id
+            Gets or sets the unique identifier for the matter activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterActivity">
             <summary>
-            MatterActivity
+            Gets or sets the minimal matter activity information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier for the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.User">
             <summary>
-            User
+            Gets or sets the minimal user information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the association.
             </summary>
-            [Key]
         </member>
         <member name="P:ADMS.API.Models.MatterActivityUserMinimalDto.LocalCreatedAtDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterActivityUserMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.ValidateMatter">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserMinimalDto.Matter"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.ValidateMatterActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserMinimalDto.MatterActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserMinimalDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterActivityUserMinimalDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterActivityUserMinimalDto.ValidateModel(ADMS.API.Models.MatterActivityUserMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterActivityUserMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDocumentActivityDto">
             <summary>
-            Matter document activities
+            Represents a matter document activity, including its users and validation logic.
             </summary>
             <remarks>
-            matter document activity constructor
+            Use this DTO to represent a document activity within a matter, including associated users.
             </remarks>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityDto.Id">
             <summary>
-            Matter Document Activity Primary key
+            Gets or sets the unique identifier for the matter document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityDto.Activity">
             <summary>
-            Activity description
+            Gets or sets the activity description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of "from" user associations for this activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the collection of "to" user associations for this activity.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDocumentActivityDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityDto.ValidateActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityDto.Activity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityDto.ValidateCollection``1(System.Collections.Generic.ICollection{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityDto.ValidateModel(ADMS.API.Models.MatterDocumentActivityDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDocumentActivityDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDocumentActivityMinimalDto">
             <summary>
-            Matter document activities
+            Minimal DTO for a matter document activity, including validation logic.
             </summary>
-            <remarks>
-            matter document activity constructor
-            </remarks>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityMinimalDto.Id">
             <summary>
-            Matter Document Activity Primary key
+            Gets or sets the unique identifier for the matter document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityMinimalDto.Activity">
             <summary>
-            Activity description
+            Gets or sets the activity description.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDocumentActivityMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityMinimalDto.ValidateActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityMinimalDto.Activity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityMinimalDto.ValidateModel(ADMS.API.Models.MatterDocumentActivityMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDocumentActivityMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDocumentActivityUserDto">
             <summary>
-            MatterDocumentActivityUser table
+            Represents the association between a matter, document, activity, and user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterId">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.Matter">
             <summary>
-            Matter document copied / moved from
+            Gets or sets the matter details (without documents).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.DocumentId">
             <summary>
-            What documentId was this action taken from
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.Document">
             <summary>
-            Matter document copied / moved from
+            Gets or sets the document details (without revisions).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterDocumentActivityId">
             <summary>
-            Document Activity Id
+            Gets or sets the unique identifier for the matter document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterDocumentActivity">
             <summary>
-            MatterDocumentActivity
+            Gets or sets the matter document activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier for the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.User">
             <summary>
-            User
+            Gets or sets the user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the association.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserDto.LocalCreatedAtDateString">
             <summary>
-            local created at timestring
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDocumentActivityUserDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateMatter">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserDto.Matter"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateDocument">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserDto.Document"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateMatterDocumentActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserDto.MatterDocumentActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserDto.ValidateModel(ADMS.API.Models.MatterDocumentActivityUserDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDocumentActivityUserDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDocumentActivityUserFromDto">
             <summary>
-            MatterDocumentActivityUserFrom linkage table
+            Linkage DTO representing a "from" association between a matter, document, activity, and user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterId">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Matter">
             <summary>
-            Matter document copied / moved from
+            Gets or sets the matter details (without documents).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.DocumentId">
             <summary>
-            What documentId was this action taken from
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Document">
             <summary>
-            Matter document copied / moved from
+            Gets or sets the document details (without revisions).
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivityId">
             <summary>
-            Document Activity Id
+            Gets or sets the unique identifier for the matter document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivity">
             <summary>
-            MatterDocumentActivity
+            Gets or sets the matter document activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier for the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.User">
             <summary>
-            User
+            Gets or sets the user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the association.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.LocalCreatedAtDateString">
             <summary>
-            local created at timestring
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDocumentActivityUserFromDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateMatter">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Matter"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateDocument">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.Document"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateMatterDocumentActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.MatterDocumentActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserFromDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserFromDto.ValidateModel(ADMS.API.Models.MatterDocumentActivityUserFromDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDocumentActivityUserFromDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDocumentActivityUserMinimalDto">
             <summary>
-            MatterDocumentActivityUser table
+            Minimal DTO representing a user’s activity on a matter document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterId">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.Matter">
             <summary>
-            Matter
+            Gets or sets the minimal matter information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.DocumentId">
             <summary>
-            What documentId was this action taken from
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterDocumentActivityId">
             <summary>
-            Document Activity Id
+            Gets or sets the unique identifier for the matter document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterDocumentActivity">
             <summary>
-            MatterDocumentActivity
+            Gets or sets the minimal matter document activity information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier for the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.User">
             <summary>
-            User
+            Gets or sets the minimal user information.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.LocalCreatedAtDateString">
             <summary>
-            local created at timestring
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDocumentActivityUserMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.ValidateMatter">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.Matter"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.ValidateMatterDocumentActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.MatterDocumentActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserMinimalDto.ValidateModel(ADMS.API.Models.MatterDocumentActivityUserMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDocumentActivityUserMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDocumentActivityUserToDto">
             <summary>
-            MatterDocumentActivityUserTo linkage table
+            Linkage DTO representing a "to" association between a matter, document, activity, and user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterId">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Matter">
             <summary>
-            Matter document copied / moved from
+            Gets or sets the matter details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.DocumentId">
             <summary>
-            What documentId was this action taken from
+            Gets or sets the unique identifier for the document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Document">
             <summary>
-            Matter document copied / moved from
+            Gets or sets the document details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivityId">
             <summary>
-            Document Activity Id
+            Gets or sets the unique identifier for the matter document activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivity">
             <summary>
-            MatterDocumentActivity
+            Gets or sets the matter document activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier for the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.User">
             <summary>
-            User
+            Gets or sets the user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date of the association.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDocumentActivityUserToDto.LocalCreatedAtDateString">
             <summary>
-            local created at timestring
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDocumentActivityUserToDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateMatter">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Matter"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateDocument">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserToDto.Document"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateMatterDocumentActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserToDto.MatterDocumentActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserToDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateIdConsistency">
+            <summary>
+            Validates consistency between IDs and navigation properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDocumentActivityUserToDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDocumentActivityUserToDto.ValidateModel(ADMS.API.Models.MatterDocumentActivityUserToDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDocumentActivityUserToDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterDto">
             <summary>
-            Matter Dto
+            DTO representing a matter, including its documents and related activities, with validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.Id">
             <summary>
-            Matter primary key
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.Description">
             <summary>
-            Matter description
+            Gets or sets the matter description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.IsArchived">
             <summary>
-            Identifies if the matter is archived
+            Gets or sets a value indicating whether the matter is archived.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.IsDeleted">
             <summary>
-            Identifies if the Matter has been deleted
+            Gets or sets a value indicating whether the matter is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.CreationDate">
             <summary>
-            Creation date of the matter
+            Gets or sets the UTC creation date of the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.Documents">
             <summary>
-            Documents linked to the matter
+            Gets or sets the collection of documents linked to the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.MatterActivityUsers">
             <summary>
-            Matter activity user
+            Gets or sets the collection of matter activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of 'from' matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the collection of 'to' matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterDto.LocalCreationDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDto.ValidateCollection``1(System.Collections.Generic.ICollection{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterDto.ValidateModel(ADMS.API.Models.MatterDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterForCreationDto">
             <summary>
-            Matter for creation Dto
+            DTO for creating a new matter, including validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterForCreationDto.Description">
             <summary>
-            Matter Description
+            Gets or sets the matter description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterForCreationDto.IsArchived">
             <summary>
-            Identifies if the matter is archived
+            Gets or sets a value indicating whether the matter is archived.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterForCreationDto.CreationDate">
             <summary>
-            Creation date of the matter
+            Gets or sets the UTC creation date of the matter.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForCreationDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterForCreationDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForCreationDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterForCreationDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForCreationDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterForCreationDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForCreationDto.ValidateModel(ADMS.API.Models.MatterForCreationDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterForCreationDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterForUpdateDto">
             <summary>
-            Matter For Update Dto
+            DTO for updating a matter, including validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterForUpdateDto.Description">
             <summary>
-            Matter Description
+            Gets or sets the matter description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterForUpdateDto.IsArchived">
             <summary>
-            Identifies if the matter is archived
+            Gets or sets a value indicating whether the matter is archived.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterForUpdateDto.CreationDate">
             <summary>
-            Creation date of the matter
+            Gets or sets the UTC creation date of the matter.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForUpdateDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterForUpdateDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForUpdateDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterForUpdateDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForUpdateDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterForUpdateDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterForUpdateDto.ValidateModel(ADMS.API.Models.MatterForUpdateDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterForUpdateDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterMinimalDto">
             <summary>
-            Matter Dto
+            Minimal DTO for a matter, including validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterMinimalDto.Id">
             <summary>
-            Matter primary key
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterMinimalDto.Description">
             <summary>
-            Matter description
+            Gets or sets the matter description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterMinimalDto.IsArchived">
             <summary>
-            Identifies if the matter is archived
+            Gets or sets a value indicating whether the matter is archived.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterMinimalDto.IsDeleted">
             <summary>
-            Identifies if the Matter has been deleted
+            Gets or sets a value indicating whether the matter is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterMinimalDto.CreationDate">
             <summary>
-            Creation date of the matter
+            Gets or sets the UTC creation date of the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterMinimalDto.LocalCreationDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterMinimalDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterMinimalDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterMinimalDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterMinimalDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterMinimalDto.ValidateModel(ADMS.API.Models.MatterMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
+        </member>
+        <member name="T:ADMS.API.Models.MatterQuery">
+            <summary>
+            Represents a query object for filtering matters, including description and status flags.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterQuery.Description">
+            <summary>
+            Gets or sets the description or search text to filter matters.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterQuery.IncludeArchived">
+            <summary>
+            Gets or sets a value indicating whether to include archived matters in the results.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.MatterQuery.IncludeDeleted">
+            <summary>
+            Gets or sets a value indicating whether to include deleted matters in the results.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterQuery.Validate">
+            <summary>
+            Validates the query parameters for logical consistency.
+            Throws <see cref="T:System.ArgumentException"/> if invalid.
             </summary>
         </member>
         <member name="T:ADMS.API.Models.MatterWithDocumentsDto">
             <summary>
-            Matter including documents Dto
+            DTO representing a matter including its documents and related activities, with validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Id">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Description">
             <summary>
-            Matter Description
+            Gets or sets the matter description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.IsArchived">
             <summary>
-            Identifies if the matter is archived
+            Gets or sets a value indicating whether the matter is archived.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.IsDeleted">
             <summary>
-            indicates if the matter is deleted
+            Gets or sets a value indicating whether the matter is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.CreationDate">
             <summary>
-            Creation date of the matter
+            Gets or sets the UTC creation date of the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.Documents">
             <summary>
-            Documents linked to the matter
+            Gets or sets the collection of documents linked to the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterActivityUsers">
             <summary>
-            Matter document activities
+            Gets or sets the collection of matter activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of 'from' matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Gets or sets the collection of 'to' matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithDocumentsDto.LocalCreationDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithDocumentsDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterWithDocumentsDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithDocumentsDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterWithDocumentsDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithDocumentsDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterWithDocumentsDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithDocumentsDto.ValidateCollection``1(System.Collections.Generic.ICollection{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithDocumentsDto.ValidateModel(ADMS.API.Models.MatterWithDocumentsDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterWithDocumentsDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.MatterWithoutDocumentsDto">
             <summary>
-            Matter Dto
+            DTO representing a matter without its documents, including validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.Id">
             <summary>
-            Matter Id
+            Gets or sets the unique identifier for the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.Description">
             <summary>
-            Matter Description
+            Gets or sets the matter description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.IsArchived">
             <summary>
-            Identifies if the matter is archived
+            Gets or sets a value indicating whether the matter is archived.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.IsDeleted">
             <summary>
-            indicates if the matter is deleted
+            Gets or sets a value indicating whether the matter is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.CreationDate">
             <summary>
-            Creation date of the matter
+            Gets or sets the UTC creation date of the matter.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterActivityUsers">
             <summary>
-            Matter document activities
+            Gets or sets the collection of matter activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of 'from' matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserFrom
+            Gets or sets the collection of 'to' matter document activity users.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.MatterWithoutDocumentsDto.LocalCreationDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithoutDocumentsDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.MatterWithoutDocumentsDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithoutDocumentsDto.ValidateDescription">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterWithoutDocumentsDto.Description"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithoutDocumentsDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.MatterWithoutDocumentsDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithoutDocumentsDto.ValidateCollection``1(System.Collections.Generic.ICollection{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.MatterWithoutDocumentsDto.ValidateModel(ADMS.API.Models.MatterWithoutDocumentsDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.MatterWithoutDocumentsDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionActivityDto">
             <summary>
-            Revision Activity
+            Represents a revision activity, including its users and validation logic.
             </summary>
             <remarks>
             Revision Activity constructor
@@ -1081,311 +2349,814 @@
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityDto.Id">
             <summary>
-            Revision Activity primary key
+            Gets or sets the unique identifier for the revision activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityDto.Activity">
             <summary>
-            Activity description
+            Gets or sets the activity description.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityDto.RevisionActivityUsers">
             <summary>
-            Revision Activity User
+            Gets or sets the collection of users associated with this revision activity.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionActivityDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityDto.ValidateActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityDto.Activity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityDto.ValidateRevisionActivityUsers">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityDto.RevisionActivityUsers"/> collection.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityDto.ValidateModel(ADMS.API.Models.RevisionActivityDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionActivityDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionActivityMinimalDto">
             <summary>
-            Revision Activity
+            Minimal DTO for a revision activity, including validation logic.
             </summary>
-            <remarks>
-            Revision Activity constructor
-            </remarks>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityMinimalDto.Id">
             <summary>
-            Revision Activity primary key
+            Gets or sets the unique identifier for the revision activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityMinimalDto.Activity">
             <summary>
-            Activity description
+            Gets or sets the activity description.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionActivityMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityMinimalDto.ValidateActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityMinimalDto.Activity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityMinimalDto.ValidateModel(ADMS.API.Models.RevisionActivityMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionActivityMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionActivityUserDto">
             <summary>
-            Revision Activity User
+            Represents the association between a user and a revision activity.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionId">
+        <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionNumber">
             <summary>
-            Revision Id
+            Gets or sets the unique identifier of the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.Revision">
             <summary>
-            Revision
+            Gets or sets the revision details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivityId">
             <summary>
-            Activity Id
+            Gets or sets the unique identifier of the revision activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivity">
             <summary>
-            RevisionActivity
+            Gets or sets the revision activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier of the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.User">
             <summary>
-            User
+            Gets or sets the user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date and time of the association.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserDto.LocalCreatedAtDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date and time in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionActivityUserDto"/> for data integrity and consistency.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateRevision">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserDto.Revision"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateRevisionActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserDto.RevisionActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateIdConsistency">
+            <summary>
+            Validates consistency between IDs and navigation properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserDto.ValidateModel(ADMS.API.Models.RevisionActivityUserDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionActivityUserDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionActivityUserMinimalDto">
             <summary>
-            Revision Activity User
+            Minimal DTO representing the association between a user and a revision activity.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionId">
+        <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionNumber">
             <summary>
-            Revision Id
+            Gets or sets the unique identifier of the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.Revision">
             <summary>
-            Revision
+            Gets or sets the minimal revision details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionActivityId">
             <summary>
-            Activity Id
+            Gets or sets the unique identifier of the revision activity.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionActivity">
             <summary>
-            RevisionActivity
+            Gets or sets the minimal revision activity details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.UserId">
             <summary>
-            User Id
+            Gets or sets the unique identifier of the user.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.User">
             <summary>
-            User
+            Gets or sets the minimal user details.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.CreatedAt">
             <summary>
-            entry created at
+            Gets or sets the UTC creation date and time of the association.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionActivityUserMinimalDto.LocalCreatedAtDateString">
             <summary>
-            Local timezone Creation Date
+            Gets the creation date and time in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionActivityUserMinimalDto"/> for data integrity and consistency.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateGuids">
+            <summary>
+            Validates the GUID properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateRevision">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserMinimalDto.Revision"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateRevisionActivity">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserMinimalDto.RevisionActivity"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateUser">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserMinimalDto.User"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateIdConsistency">
+            <summary>
+            Validates consistency between IDs and navigation properties.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateCreatedAt">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionActivityUserMinimalDto.CreatedAt"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionActivityUserMinimalDto.ValidateModel(ADMS.API.Models.RevisionActivityUserMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionActivityUserMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionDto">
             <summary>
-            Revision DTO
+            Data Transfer Object representing a document revision, including metadata and audit associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.Id">
             <summary>
-            Revision primary key
+            Gets or sets the unique identifier for the revision (primary key).
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.RevisionDto.RevisionId">
+        <member name="P:ADMS.API.Models.RevisionDto.RevisionNumber">
             <summary>
-            Revision number for the specified document
+            Gets or sets the revision number for the specified document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.CreationDate">
             <summary>
-            Creation date for the revision
+            Gets or sets the UTC creation date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.ModificationDate">
             <summary>
-            Revision modification date
+            Gets or sets the UTC modification date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.IsDeleted">
             <summary>
-            indicates if the revision is deleted
+            Gets or sets a value indicating whether the revision is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.RevisionActivityUsers">
             <summary>
-            Revision Activity User
+            Gets or sets the collection of audit/activity associations for this revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.LocalCreationDateString">
             <summary>
-            Local Creation Date string
+            Gets the creation date in local time, formatted as a string.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionDto.LocalModificationDateString">
             <summary>
-            Local Modification Date string
+            Gets the modification date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateId">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionDto.Id"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateRevisionNumber">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionDto.RevisionNumber"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateModificationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionDto.ModificationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateModificationAfterCreation">
+            <summary>
+            Validates that <see cref="P:ADMS.API.Models.RevisionDto.ModificationDate"/> is not before <see cref="P:ADMS.API.Models.RevisionDto.CreationDate"/>.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateCollection``1(System.Collections.Generic.ICollection{``0},System.String)">
+            <summary>
+            Validates a collection of <see cref="T:System.ComponentModel.DataAnnotations.IValidatableObject"/> items.
+            </summary>
+            <typeparam name="T">The type of the collection items.</typeparam>
+            <param name="collection">The collection to validate.</param>
+            <param name="propertyName">The property name for error reporting.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionDto.ValidateModel(ADMS.API.Models.RevisionDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionDto"/> instance.
+            </summary>
+            <param name="dto">The <see cref="T:ADMS.API.Models.RevisionDto"/> instance to validate.</param>
+            <returns>A list of <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult"/> objects that describe any validation failures.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionForCreationDto">
             <summary>
-            Revision Dto for creation of new revision
+            Data Transfer Object used for creating a new revision for a document.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.RevisionForCreationDto.RevisionId">
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.#ctor(System.Boolean)">
             <summary>
-            Revision number for the specified document
+            Data Transfer Object used for creating a new revision for a document.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.RevisionNumber">
+            <summary>
+            Gets or sets the revision number for the specified document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionForCreationDto.CreationDate">
             <summary>
-            Creation date for the revision
+            Gets or sets the UTC creation date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionForCreationDto.ModificationDate">
             <summary>
-            Revision modification date
+            Gets or sets the UTC modification date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionForCreationDto.IsDeleted">
             <summary>
-            indicates if the revision is deleted
+            Gets or sets a value indicating whether the revision is deleted.
             </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.LocalCreationDateString">
+            <summary>
+            Gets the creation date in local time, formatted as a string.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForCreationDto.LocalModificationDateString">
+            <summary>
+            Gets the modification date in local time, formatted as a string.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionForCreationDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.ValidateRevisionNumber">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionForCreationDto.RevisionNumber"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionForCreationDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.ValidateModificationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionForCreationDto.ModificationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.ValidateModificationAfterCreation">
+            <summary>
+            Validates that <see cref="P:ADMS.API.Models.RevisionForCreationDto.ModificationDate"/> is not before <see cref="P:ADMS.API.Models.RevisionForCreationDto.CreationDate"/>.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForCreationDto.ValidateModel(ADMS.API.Models.RevisionForCreationDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionForCreationDto"/> instance.
+            </summary>
+            <param name="dto">The <see cref="T:ADMS.API.Models.RevisionForCreationDto"/> instance to validate.</param>
+            <returns>A list of <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult"/> objects that describe any validation failures.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionForUpdateDto">
             <summary>
-            Revision Dto for update of new revision
+            Data Transfer Object used for updating an existing revision of a document.
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.RevisionForUpdateDto.RevisionId">
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.RevisionNumber">
             <summary>
-            Revision number for the specified document
+            Gets or sets the revision number for the specified document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionForUpdateDto.CreationDate">
             <summary>
-            Creation date for the revision
+            Gets or sets the UTC creation date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionForUpdateDto.ModificationDate">
             <summary>
-            Revision modification date
+            Gets or sets the UTC modification date for the revision.
             </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.LocalCreationDateString">
+            <summary>
+            Gets the creation date in local time, formatted as a string.
+            </summary>
+        </member>
+        <member name="P:ADMS.API.Models.RevisionForUpdateDto.LocalModificationDateString">
+            <summary>
+            Gets the modification date in local time, formatted as a string.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForUpdateDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionForUpdateDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForUpdateDto.ValidateRevisionNumber">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionForUpdateDto.RevisionNumber"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForUpdateDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionForUpdateDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForUpdateDto.ValidateModificationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionForUpdateDto.ModificationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForUpdateDto.ValidateModificationAfterCreation">
+            <summary>
+            Validates that <see cref="P:ADMS.API.Models.RevisionForUpdateDto.ModificationDate"/> is not before <see cref="P:ADMS.API.Models.RevisionForUpdateDto.CreationDate"/>.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionForUpdateDto.ValidateModel(ADMS.API.Models.RevisionForUpdateDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionForUpdateDto"/> instance.
+            </summary>
+            <param name="dto">The <see cref="T:ADMS.API.Models.RevisionForUpdateDto"/> instance to validate.</param>
+            <returns>A list of <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult"/> objects that describe any validation failures.</returns>
         </member>
         <member name="T:ADMS.API.Models.RevisionMinimalDto">
             <summary>
-            Revision DTO
+            Minimal Data Transfer Object representing a document revision, including key metadata.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionMinimalDto.Id">
             <summary>
-            Revision primary key
+            Gets or sets the unique identifier for the revision (primary key).
             </summary>
         </member>
-        <member name="P:ADMS.API.Models.RevisionMinimalDto.RevisionId">
+        <member name="P:ADMS.API.Models.RevisionMinimalDto.RevisionNumber">
             <summary>
-            Revision number for the specified document
+            Gets or sets the revision number for the specified document.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionMinimalDto.CreationDate">
             <summary>
-            Creation date for the revision
+            Gets or sets the UTC creation date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionMinimalDto.ModificationDate">
             <summary>
-            Revision modification date
+            Gets or sets the UTC modification date for the revision.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionMinimalDto.IsDeleted">
             <summary>
-            indicates if the revision is deleted
+            Gets or sets a value indicating whether the revision is deleted.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionMinimalDto.LocalCreationDateString">
             <summary>
-            Local Creation Date string
+            Gets the creation date in local time, formatted as a string.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.RevisionMinimalDto.LocalModificationDateString">
             <summary>
-            Local Modification Date string
+            Gets the modification date in local time, formatted as a string.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.RevisionMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.ValidateId">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionMinimalDto.Id"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.ValidateRevisionNumber">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionMinimalDto.RevisionNumber"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.ValidateCreationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionMinimalDto.CreationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.ValidateModificationDate">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.RevisionMinimalDto.ModificationDate"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.ValidateModificationAfterCreation">
+            <summary>
+            Validates that <see cref="P:ADMS.API.Models.RevisionMinimalDto.ModificationDate"/> is not before <see cref="P:ADMS.API.Models.RevisionMinimalDto.CreationDate"/>.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.RevisionMinimalDto.ValidateModel(ADMS.API.Models.RevisionMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.RevisionMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The <see cref="T:ADMS.API.Models.RevisionMinimalDto"/> instance to validate.</param>
+            <returns>A list of <see cref="T:System.ComponentModel.DataAnnotations.ValidationResult"/> objects that describe any validation failures.</returns>
         </member>
         <member name="T:ADMS.API.Models.UserDto">
             <summary>
-            User information
+            User information, including associations to activities and documents, with validation logic.
+            </summary>
+        </member>
+        <member name="M:ADMS.API.Models.UserDto.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ADMS.API.Models.UserDto"/> class with the specified name.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.Id">
             <summary>
-            user primary key
+            Gets or sets the user primary key.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.Name">
             <summary>
-            user name
+            Gets or sets the username.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.MatterActivityUsers">
             <summary>
-            Matter activity user
+            Collection of matter activity user associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.DocumentActivityUsers">
             <summary>
-            Document Activity User
+            Collection of document activity user associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.RevisionActivityUsers">
             <summary>
-            Revision Activity User
+            Collection of revision activity user associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.MatterDocumentActivityUsersFrom">
             <summary>
-            MatterDocumentActivityUserFrom
+            Collection of "from" matter document activity user associations.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserDto.MatterDocumentActivityUsersTo">
             <summary>
-            MatterDocumentActivityUserTo
+            Collection of "to" matter document activity user associations.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.UserDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.UserDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.UserDto.ValidateName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.UserDto.Name"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.UserDto.ValidateModel(ADMS.API.Models.UserDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.UserDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
         </member>
         <member name="T:ADMS.API.Models.UserMinimalDto">
             <summary>
-            Minimal User information
+            Minimal User information (immutable, init-only), with validation logic.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserMinimalDto.Id">
             <summary>
-            user primary key
+            Gets or sets the user primary key.
             </summary>
         </member>
         <member name="P:ADMS.API.Models.UserMinimalDto.Name">
             <summary>
-            user name
+            Gets or sets the username.
             </summary>
+        </member>
+        <member name="M:ADMS.API.Models.UserMinimalDto.Validate(System.ComponentModel.DataAnnotations.ValidationContext)">
+            <summary>
+            Validates the <see cref="T:ADMS.API.Models.UserMinimalDto"/> for data integrity and business rules.
+            </summary>
+            <param name="validationContext">The context information about the validation operation.</param>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.UserMinimalDto.ValidateId">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.UserMinimalDto.Id"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.UserMinimalDto.ValidateName">
+            <summary>
+            Validates the <see cref="P:ADMS.API.Models.UserMinimalDto.Name"/> property.
+            </summary>
+            <returns>A collection of validation results.</returns>
+        </member>
+        <member name="M:ADMS.API.Models.UserMinimalDto.ValidateModel(ADMS.API.Models.UserMinimalDto)">
+            <summary>
+            Helper method to validate a <see cref="T:ADMS.API.Models.UserMinimalDto"/> instance.
+            </summary>
+            <param name="dto">The instance to validate.</param>
+            <returns>A list of validation results.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MimeTypeRegex_0">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the MimeTypeRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.MimeTypeRegex_0.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.ChecksumRegex_1">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the ChecksumRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.ChecksumRegex_1.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ChecksumRegex_1.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.ChecksumRegex_1.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ChecksumRegex_1.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.ChecksumRegex_1.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ChecksumRegex_1.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ChecksumRegex_1.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ChecksumRegex_1.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2">
+            <summary>Custom <see cref="T:System.Text.RegularExpressions.Regex"/>-derived type for the ExtensionAlphanumericRegex method.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.Instance">
+            <summary>Cached, thread-safe singleton instance.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.#ctor">
+            <summary>Initializes the instance.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.RunnerFactory">
+            <summary>Provides a factory for creating <see cref="T:System.Text.RegularExpressions.RegexRunner"/> instances to be used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.RunnerFactory.CreateInstance">
+            <summary>Creates an instance of a <see cref="T:System.Text.RegularExpressions.RegexRunner"/> used by methods on <see cref="T:System.Text.RegularExpressions.Regex"/>.</summary>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.RunnerFactory.Runner">
+            <summary>Provides the runner that contains the custom logic implementing the specified regular expression.</summary>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.RunnerFactory.Runner.Scan(System.ReadOnlySpan{System.Char})">
+            <summary>Scan the <paramref name="inputSpan"/> starting from base.runtextstart for the next match.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.RunnerFactory.Runner.TryFindNextPossibleStartingPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Search <paramref name="inputSpan"/> starting from base.runtextpos for the next location a match could possibly start.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if a possible match was found; false if no more matches are possible.</returns>
+        </member>
+        <member name="M:System.Text.RegularExpressions.Generated.ExtensionAlphanumericRegex_2.RunnerFactory.Runner.TryMatchAtCurrentPosition(System.ReadOnlySpan{System.Char})">
+            <summary>Determine whether <paramref name="inputSpan"/> at base.runtextpos is a match for the regular expression.</summary>
+            <param name="inputSpan">The text being scanned by the regular expression.</param>
+            <returns>true if the regular expression matches at the current position; otherwise, false.</returns>
+        </member>
+        <member name="T:System.Text.RegularExpressions.Generated.Utilities">
+            <summary>Helper methods used by generated <see cref="T:System.Text.RegularExpressions.Regex"/>-derived implementations.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout">
+            <summary>Default timeout value set in <see cref="T:System.AppContext"/>, or <see cref="F:System.Text.RegularExpressions.Regex.InfiniteMatchTimeout"/> if none was set.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_hasTimeout">
+            <summary>Whether <see cref="F:System.Text.RegularExpressions.Generated.Utilities.s_defaultTimeout"/> is non-infinite.</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiHexDigits">
+            <summary>Supports searching for characters in or not in "0123456789ABCDEFabcdef".</summary>
+        </member>
+        <member name="F:System.Text.RegularExpressions.Generated.Utilities.s_asciiLettersAndDigits">
+            <summary>Supports searching for characters in or not in "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".</summary>
         </member>
     </members>
 </doc>

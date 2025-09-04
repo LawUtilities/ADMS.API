@@ -2,426 +2,319 @@
 using ADMS.API.Helpers;
 using ADMS.API.Models;
 using ADMS.API.ResourceParameters;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ADMS.API.Services
 {
     /// <summary>
-    /// ADMS Repository identifying actions used.
+    ///     ADMS Repository identifying actions used.
     /// </summary>
     public interface IAdmsRepository
     {
-
-        #region Documents
-
-        /// <summary>
-        /// Adds document to selected matter
-        /// </summary>
-        /// <param name="matterId">matter Id to add to</param>
-        /// <param name="document">document to be added</param>
-        /// <returns></returns>
-        Task<Document?> AddDocumentAsync(
-            Guid matterId,
-            DocumentForCreationDto document);
-
-        /*
-        /// <summary>
-        /// Add Document
-        /// </summary>
-        /// <param name="document">Document to be added</param>
-        void AddDocument(Document document);
-        */
+        #region HELPERS
 
         /// <summary>
-        /// see if a specified document exists
+        ///   Retrieves a list of extended audits for a specified matter and document.
         /// </summary>
-        /// <param name="documentId">Document ID to be checked</param>
-        /// <returns>True if the document exists, false otherwise</returns>
-        Task<bool> DocumentExistsAsync(
-            Guid documentId);
+        /// <param name="matterId">Matter to be retrieved</param>
+        /// <param name="documentId">Document to be retrieved</param>
+        /// <param name="direction">FROM or TO</param>
+        /// <returns>A queryable collection of audit records.</returns>
+        Task<IQueryable<MatterDocumentActivityUserMinimalDto>> GetExtendedAuditsAsync(Guid matterId, Guid documentId,
+            AuditEnums.AuditDirection direction);
 
-        /// <summary>
-        /// Checkin document
-        /// </summary>
-        /// <param name="documentId">document to be checked out</param>
-        /// <returns>true if checked in, false otherwise</returns>
-        Task<bool> CheckinDocumentAsync(
-            Guid documentId);
-
-        /// <summary>
-        /// Checkout document for editing
-        /// </summary>
-        /// <param name="documentId">document to be checked out</param>
-        /// <returns>true if checked out, false otherwise</returns>
-        Task<bool> CheckoutDocumentAsync(
-            Guid documentId);
-
-        /// <summary>
-        /// Deletes a document
-        /// </summary>
-        /// <param name="document">document to be deleted</param>
-        Task<bool> DeleteDocumentAsync(
-            DocumentDto document);
-
-        /// <summary>
-        /// Gets a list of Documents for a specified matter.
-        /// </summary>
-        /// <param name="matterId">matter containing document(s)</param>
-        /// <param name="includeDeleted">include deleted documents</param>
-        /// <returns>A list of documents</returns>
-        Task<IEnumerable<Document>> GetDocumentsAsync(
-            Guid matterId,
-            bool includeDeleted = false);
-
-        /// <summary>
-        /// Gets a list of Documents for a specified matter via a search.
-        /// </summary>
-        /// <param name="matterId">matter containing document(s)</param>
-        /// <param name="documentsResourceParameters">parameters of document list to be retrieved</param>
-        /// <returns>A list of documents</returns>
-        Task<PagedList<Document>> GetDocumentsAsync(
-            Guid matterId, 
-            DocumentsResourceParameters documentsResourceParameters);
-
-        /// <summary>
-        /// Gets a filtered set of Documents
-        /// </summary>
-        /// <param name="matterId">matter containing document(s)</param>
-        /// <param name="documentsResourceParameters">search parameters to locate</param>
-        /// <param name="includeDeleted">include deleted documents</param>
-        /// <returns>Document and pagination information.</returns>
-        Task<(IEnumerable<Document>, PaginationMetadata)> GetPagedDocumentsAsync(
-                    Guid matterId,
-                    DocumentsResourceParameters documentsResourceParameters,
-                    bool includeDeleted);
-
-        /// <summary>
-        /// Gets a single document details
-        /// </summary>
-        /// <param name="documentId">Document Id</param>
-        /// <param name="includeRevisions">Should the document return with revision information</param>
-        /// <returns>Document and associated revisions</returns>
-        Task<Document?> GetDocumentAsync(
-            Guid documentId, 
-            bool includeRevisions);
-
-        /// <summary>
-        /// Get specific document
-        /// </summary>
-        /// <param name="documentId">document to be retrieved</param>
-        /// <returns>document retrieved</returns>
-        Task<Document?> GetDocumentAsync(
-            Guid documentId);
-
-        /// <summary>
-        /// Gets a list of documents by entered filename
-        /// </summary>
-        /// <param name="matterId">matter containing document(s)</param>
-        /// <param name="fileName">File name of the document being searched.</param>
-        /// <returns>Document</returns>
-        Task<IEnumerable<Document>> GetDocumentsByFileNameAsync(
-            Guid matterId, 
-            string fileName);
-
-        /// <summary>
-        /// retrieve document history by id
-        /// </summary>
-        /// <param name="documentId">document to retrieve history from</param>
-        /// <returns>Document history to be retrieved</returns>
-        Task<IEnumerable<DocumentActivityUser>> GetDocumentWithHistoryByIdAsync(
-            Guid documentId);
-
-        /// <summary>
-        /// Copy document from one matter to another
-        /// </summary>
-        /// <param name="document">document to copy</param>
-        /// <param name="matterId">matter to copy document to</param>
-        /// <returns>true if copied, false otherwise</returns>
-        Task<bool> CopyDocumentAsync(
-            Guid matterId,
-            DocumentWithoutRevisionsDto document);
-
-        /// <summary>
-        /// Move document from one matter to another
-        /// </summary>
-        /// <param name="document">document to be moved</param>
-        /// <param name="matterId">matter to be moved to</param>
-        /// <returns>true if moved, false if not</returns>
-        Task<bool> MoveDocumentAsync(
-            Guid matterId,
-            DocumentWithoutRevisionsDto document);
-
-        /// <summary>
-        /// Updates a document with new details
-        /// </summary>
-        /// <param name="document"></param>
-        /// <returns></returns>
-        Task<Document?> UpdateDocumentAsync(
-            Document document);
-
-        #endregion Documents
-
-        #region DocumentActivity
-
-        /// <summary>
-        /// Gets a DocumentActivity by activity
-        /// </summary>
-        /// <param name="activityName">activity to be retrieved</param>
-        /// <returns>DocumentActivity</returns>
-        Task<DocumentActivity> GetDocumentActivityByActivityNameAsync(
-            string activityName);
-
-        /// <summary>
-        /// Add document audit record
-        /// </summary>
-        /// <param name="audit">audit record to add</param>
-        Task AddDocumentAuditAsync(
-            DocumentActivityUser audit);
-
-        /// <summary>
-        /// Get document audit record
-        /// </summary>
-        /// <param name="documentId">Document record to retrieve audits for</param>
-        Task<IEnumerable<DocumentActivityUserMinimalDto>> GetDocumentAuditsAsync(
-            Guid documentId);
-
-        #endregion DocumentActivity
-
-        #region Matters
-
-        /// <summary>
-        /// Adds a matter to the repository
-        /// </summary>
-        /// <param name="matter">Matter to be added</param>
-        /// <returns>Matter that has been created</returns>
-        Task<Matter?> AddMatterAsync(
-            MatterDto matter);
-
-        /// <summary>
-        /// Checks if matter exists
-        /// </summary>
-        /// <param name="matterId">Matter to check</param>
-        /// <returns>true if exists, false otherwise</returns>
-        Task<bool> MatterExistsAsync(
-            Guid matterId);
-
-        /// <summary>
-        /// Checks if matter name exists
-        /// </summary>
-        /// <param name="matterName">name of matter to identify</param>
-        /// <returns>true if exists, false otherwise</returns>
-        Task<bool> MatterNameExistsAsync(
-            string matterName);
-
-        /// <summary>
-        /// Delete matter
-        /// </summary>
-        /// <param name="matter">matter to be deleted</param>
-        /// <returns>true if matter deleted, false otherwise</returns>
-        Task<bool> DeleteMatterAsync(
-            MatterDto matter);
-
-        /// <summary>
-        /// Gets list of matters not including documents
-        /// </summary>
-        /// <param name="description">matter description</param>
-        /// <param name="includeArchived">include archived matters</param>
-        /// <param name="includeDeleted">include deleted matters</param>
-        /// <returns>list of matters</returns>
-        Task<IEnumerable<Matter>> GetMattersAsync(
-            string description, 
-            bool includeArchived = false, 
-            bool includeDeleted = false);
-
-        /// <summary>
-        /// Gets a matter by Id
-        /// </summary>
-        /// <param name="matterId">matter to return</param>
-        /// <param name="includeDocuments">include documents with returned matter</param>
-        /// <returns>Matter</returns>
-        Task<Matter?> GetMatterAsync(
-            Guid matterId, 
-            bool includeDocuments);
-
-        /// <summary>
-        /// Restore Matter by id
-        /// </summary>
-        /// <param name="matterId">matter id to restore</param>
-        /// <returns>True if matter restored, false otherwise</returns>
-        Task<bool> RestoreMatterAsync(
-            Guid matterId);
-
-        /// <summary>
-        /// retrieve matter history by id
-        /// </summary>
-        /// <param name="matterId">matter to retrieve history from</param>
-        /// <returns>Matter with history to be retrieved</returns>
-        Task<Matter> GetMatterWithHistoryByIdAsync(
-            Guid matterId);
-
-        /// <summary>
-        /// retrieves an extended audit history
-        /// </summary>
-        /// <param name="matterId">matter to retrieve data for</param>
-        /// <param name="documentId">document to retrieve data for</param>
-        /// <param name="direction">operation:  From / To</param>
-        /// <returns></returns>
-        Task<IEnumerable<MatterDocumentActivityUserMinimalDto>> GetExtendedAuditsAsync(
-            Guid matterId,
-            Guid documentId,
-            string direction);
-
-        /*
-        /// <summary>
-        /// Get matter document activity user from list
-        /// </summary>
-        /// <param name="matterId">matter to retrieve data for</param>
-        /// <param name="documentId">document to retrieve data for</param>
-        /// <returns>collection of matter document activity user histories</returns>
-        Task<IEnumerable<MatterDocumentActivityUserFrom>> GetMDAUFromHistoryAsync(
-            Guid matterId,
-            Guid documentId);
-
-        /// <summary>
-        /// Get matter document activity user to list
-        /// </summary>
-        /// <param name="matterId">matter to retrieve data for</param>
-        /// <param name="documentId">document to retrieve data for</param>
-        /// <returns>collection of matter document activity user histories</returns>
-        Task<IEnumerable<MatterDocumentActivityUserTo>> GetMDAUToHistoryAsync(
-            Guid matterId,
-            Guid documentId);
-        */
-        /// <summary>
-        /// Identifies if matter history exists
-        /// </summary>
-        /// <param name="matterId">Matter to check</param>
-        /// <returns>true if Matter History exists, false otherwise</returns>
-        Task<bool> DoesMatterHistoryExistAsync(
-            Guid matterId);
-
-        #endregion Matters
+        #endregion HELPERS
 
         #region MatterActivity
 
         /// <summary>
-        /// Gets a MatterActivity by activity
+        ///     Retrieves a MatterActivity by its name.
         /// </summary>
-        /// <param name="activityName">activity to be retrieved</param>
-        /// <returns>MatterActivity</returns>
-        Task<MatterActivity?> GetMatterActivityByActivityNameAsync(
-            string activityName);
+        /// <param name="activityName">The name of the activity to retrieve.</param>
+        /// <returns>The requested MatterActivity, or null if not found.</returns>
+        Task<MatterActivity?> GetMatterActivityByActivityNameAsync(string activityName);
 
         #endregion MatterActivity
-
-        #region Revisions
-
-        /// <summary>
-        /// Ad revision to selected document
-        /// </summary>
-        /// <param name="documentId">Document to add the revision to</param>
-        /// <param name="revision">revision to add</param>
-        /// <returns>IActionResult</returns>
-        Task<Revision?> AddRevisionAsync(
-            Guid documentId, 
-            RevisionDto revision);
-
-        /// <summary>
-        /// Checks to see if a specified revision exists
-        /// </summary>
-        /// <param name="revisionId">Revision ID to be checked</param>
-        /// <returns>True if the document exists, false otherwise</returns>
-        Task<bool> RevisionExistsAsync(
-            Guid revisionId);
-
-        /// <summary>
-        /// Deletes a revision from a document
-        /// </summary>
-        /// <param name="revision">The revision to be deleted</param>
-        Task<bool> DeleteRevisionAsync(
-            RevisionDto revision);
-
-        /// <summary>
-        /// retrieve revision by id
-        /// </summary>
-        /// <param name="revisionId">revision to be deleted</param>
-        /// <returns>Revision to be retrieved</returns>
-        Task<Revision?> GetRevisionByIdAsync(
-            Guid revisionId);
-
-        /// <summary>
-        /// retrieve revision history by revision id
-        /// </summary>
-        /// <param name="revisionId">revision to be deleted</param>
-        /// <returns>Revision to be retrieved</returns>
-        Task<IEnumerable<RevisionActivityUser>> GetRevisionWithHistoryByIdAsync(
-            Guid revisionId);
-
-        /// <summary>
-        /// Get list of revisions
-        /// </summary>
-        /// <param name="documentId">Document Id to retrieve revisions for</param>
-        /// <param name="includeDeleted">include deleted revisions</param>
-        /// <returns>list of revisions</returns>
-        Task<IEnumerable<Revision>> GetRevisionsAsync(
-            Guid documentId, 
-            bool includeDeleted = false);
-
-        /// <summary>
-        /// update revision
-        /// </summary>
-        /// <param name="matterId">Matter containing revision</param>
-        /// <param name="documentId">Document being updated</param>
-        /// <param name="revisionId">Revision to be updated</param>
-        /// <param name="revision">Revision details to update</param>
-        /// <returns>list of revisions</returns>
-        Task<Revision?> UpdateRevisionAsync(
-            Guid matterId, 
-            Guid documentId, 
-            Guid revisionId, 
-            RevisionDto revision);
-
-        #endregion Revisions
-
-        #region Revision Activities
-
-        /// <summary>
-        /// Gets a revision activity by activity name
-        /// </summary>
-        /// <param name="activityName">activity name being sourced</param>
-        /// <returns>RevisionActivity</returns>
-        Task<RevisionActivity?> GetRevisionActivityByActivityNameAsync(
-            string activityName);
-
-        /// <summary>
-        /// Identifies if a revision activity exists by activity description
-        /// </summary>
-        /// <param name="activityName">activity being checked</param>
-        /// <returns>true if activity exists, false otherwise</returns>
-        Task<bool> RevisionActivityExistsAsync(
-            string activityName);
-
-        #endregion Revision Activities
 
         #region User Actions
 
         /// <summary>
-        /// Get a user by enterted username
+        ///     Retrieves a user by their username.
         /// </summary>
-        /// <param name="username">username being requested</param>
-        /// <returns>User</returns>
-        Task<User?> GetUserByUsernameAsync(
-            string username);
+        /// <param name="username">The username of the user to retrieve.</param>
+        /// <returns>The requested user, or null if not found.</returns>
+        Task<User?> GetUserByUsernameAsync(string username);
 
         #endregion User Actions
 
         #region General Actions
 
         /// <summary>
-        /// persists data to database
+        ///     Persists changes to the database.
         /// </summary>
-        /// <returns>true if successfull, false otherwise</returns>
+        /// <returns>True if the changes were successfully saved, false otherwise.</returns>
         Task<bool> SaveChangesAsync();
 
         #endregion General Actions
+
+        #region Documents
+
+        /// <summary>
+        ///     Adds a document to the specified matter.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter to add the document to.</param>
+        /// <param name="document">The document to add.</param>
+        /// <returns>The created document, or null if the operation fails.</returns>
+        Task<Document?> AddDocumentAsync(Guid matterId, DocumentForCreationDto? document);
+
+        /// <summary>
+        ///     Checks if a document exists.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to check.</param>
+        /// <returns>True if the document exists, false otherwise.</returns>
+        Task<bool> DocumentExistsAsync(Guid documentId);
+
+        /// <summary>
+        /// Checks if a document with the specified file name already exists.
+        /// </summary>
+        /// <param name="matterId">Matter ID containing the document.</param>
+        /// <param name="fileName">The file name to check.</param>
+        /// <returns>True if the file name exists, false otherwise.</returns>
+        Task<bool> FileNameExists(Guid matterId, string fileName);
+
+        /// <summary>
+        ///     Retrieves a document by its ID, optionally including revisions and history.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to retrieve.</param>
+        /// <param name="includeRevisions">Whether to include revisions in the result.</param>
+        /// <param name="includeHistory">Whether to include history in the result.</param>
+        /// <returns>The requested document, or null if not found.</returns>
+        Task<Document?> GetDocumentAsync(Guid documentId, bool includeRevisions, bool includeHistory);
+
+        /// <summary>
+        ///     Retrieves a paginated list of documents for a specified matter.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter containing the documents.</param>
+        /// <param name="parameters">The parameters for pagination and filtering.</param>
+        /// <returns>A paginated list of documents.</returns>
+        Task<Helpers.PagedList<Document>> GetPaginatedDocumentsAsync(Guid matterId, DocumentsResourceParameters parameters);
+
+        /// <summary>
+        ///     Deletes a document.
+        /// </summary>
+        /// <param name="document">The document to delete.</param>
+        /// <returns>True if the document was successfully deleted, false otherwise.</returns>
+        Task<bool> DeleteDocumentAsync(DocumentDto document);
+
+        /// <summary>
+        /// Sets the checked-out state of a document.
+        /// </summary>
+        /// <param name="documentId">Document Id to be marked as checked out or checked in.</param>
+        /// <param name="isCheckedOut">True to check out, false to check in.</param>
+        /// <returns>True if the operation was successful, false otherwise.</returns>
+        Task<bool> SetDocumentCheckStateAsync(Guid documentId, bool isCheckedOut);
+
+        /// <summary>
+        ///     Updates a document with new details using a DTO.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to update.</param>
+        /// <param name="documentForUpdate">The DTO containing updated document data.</param>
+        /// <returns>The updated document, or null if the operation fails.</returns>
+        Task<Document?> UpdateDocumentAsync(Guid documentId, DocumentForUpdateDto documentForUpdate);
+
+        /// <summary>
+        ///     Performs an operation (Move or Copy) on a document.
+        /// </summary>
+        /// <param name="sourceMatterId">The ID of the source matter containing the document.</param>
+        /// <param name="targetMatterId">The ID of the target matter to move or copy the document to.</param>
+        /// <param name="document">The document to move or copy.</param>
+        /// <param name="operationType">The type of operation to perform ("Move" or "Copy").</param>
+        /// <returns>True if the operation was successful, false otherwise.</returns>
+        Task<bool> PerformDocumentOperationAsync(
+            Guid sourceMatterId,
+            Guid targetMatterId,
+            DocumentWithoutRevisionsDto? document,
+            string operationType);
+
+        #endregion Documents
+
+        #region DocumentActivity
+
+        /// <summary>
+        ///     Retrieves a DocumentActivity by its name.
+        /// </summary>
+        /// <param name="activityName">The name of the activity to retrieve.</param>
+        /// <returns>The requested DocumentActivity, or null if not found.</returns>
+        Task<DocumentActivity?> GetDocumentActivityByActivityNameAsync(string activityName);
+
+        /// <summary>
+        /// Retrieves document audit records for a specified document, returning appropriate error responses.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to retrieve audits for.</param>
+        /// <returns>
+        /// <para><see cref="OkObjectResult"/> with a list of document audit records if successful.</para>
+        /// <para><see cref="BadRequestObjectResult"/> if the documentId is invalid.</para>
+        /// <para><see cref="NotFoundObjectResult"/> if the document does not exist.</para>
+        /// <para><see cref="ObjectResult"/> with status code 500 if an unexpected error occurs.</para>
+        /// </returns>
+        Task<ActionResult<IEnumerable<DocumentActivityUserMinimalDto>>> GetDocumentAuditsAsync(Guid documentId);
+
+        /// <summary>
+        /// Retrieves a paginated list of document activity audit records (create, save, delete, restore, etc.) for a specified document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to retrieve audits for.</param>
+        /// <param name="resourceParameters">Pagination and sorting information.</param>
+        /// <returns>Paged list of document activity audit records.</returns>
+        Task<ActionResult<Helpers.PagedList<DocumentActivityUserMinimalDto>>> GetDocumentActivityAuditsAsync(
+        Guid documentId, DocumentAuditsResourceParameters resourceParameters);
+
+        /// <summary>
+        /// Retrieves a paginated list of "move/copy FROM" audit records for a specified document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to retrieve move/copy FROM audits for.</param>
+        /// <param name="resourceParameters">Pagination and sorting information.</param>
+        /// <returns>Paged list of move/copy FROM audit records.</returns>
+        Task<Helpers.PagedList<MatterDocumentActivityUserMinimalDto>> GetPaginatedDocumentMoveFromAuditsAsync(
+        Guid documentId, DocumentAuditsResourceParameters resourceParameters);
+
+        /// <summary>
+        /// Retrieves a paginated list of "move/copy TO" audit records for a specified document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to retrieve move/copy TO audits for.</param>
+        /// <param name="resourceParameters">Pagination and sorting information.</param>
+        /// <returns>Paged list of move/copy TO audit records.</returns>
+        Task<Helpers.PagedList<MatterDocumentActivityUserMinimalDto>> GetPaginatedDocumentMoveToAuditsAsync(
+        Guid documentId, DocumentAuditsResourceParameters resourceParameters);
+
+        #endregion DocumentActivity
+
+        #region Matters
+
+        /// <summary>
+        ///     Adds a matter to the repository.
+        /// </summary>
+        /// <param name="matter">The matter to add.</param>
+        /// <returns>The created matter, or null if the operation fails.</returns>
+        Task<ActionResult<Matter>> AddMatterAsync(MatterForCreationDto matter);
+
+        /// <summary>
+        ///     Checks if a matter exists.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter to check.</param>
+        /// <returns>True if the matter exists, false otherwise.</returns>
+        Task<ActionResult<bool>> MatterExistsAsync(Guid matterId);
+
+        /// <summary>
+        ///    Checks if a matter name already exists.
+        /// </summary>
+        /// <param name="matterName">Matter name to check.</param>
+        /// <returns>True if name exists, false otherwise</returns>
+        Task<ActionResult<bool>> MatterNameExistsAsync(string matterName);
+
+        /// <summary>
+        ///    Deletes the specified matter.
+        /// </summary>
+        /// <param name="matterToDelete">Matter to be deleted</param>
+        /// <returns>true if deleted, false otherwise</returns>
+        Task<bool> DeleteMatterAsync(MatterDto matterToDelete);
+
+        /// <summary>
+        ///     Retrieves a paginated list of matters based on the specified resource parameters.
+        /// </summary>
+        /// <param name="resourceParameters">The parameters for pagination, filtering, and sorting.</param>
+        /// <returns>A paginated list of matters.</returns>
+        Task<Helpers.PagedList<Matter>> GetPaginatedMattersAsync(MattersResourceParameters? resourceParameters);
+
+        /// <summary>
+        ///     Retrieves a matter by its ID, optionally including documents and history.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter to retrieve.</param>
+        /// <param name="includeDocuments">Whether to include documents in the result.</param>
+        /// <param name="includeHistory">Whether to include history in the result.</param>
+        /// <returns>The requested matter, or null if not found.</returns>
+        Task<Matter?> GetMatterAsync(Guid matterId, bool includeDocuments, bool includeHistory = false);
+
+        /// <summary>
+        ///     Restores a deleted matter.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter to restore.</param>
+        /// <returns>True if the matter was successfully restored, false otherwise.</returns>
+        Task<bool> RestoreMatterAsync(Guid matterId);
+
+        /// <summary>
+        /// Updates a specified matter with new data and logs the update as an audit activity.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter to update.</param>
+        /// <param name="matterToUpdate">The updated matter data.</param>
+        /// <returns>The updated matter, or null if the operation fails.</returns>
+        Task<Matter?> UpdateMatterAsync(Guid matterId, MatterForUpdateDto? matterToUpdate);
+
+        #endregion Matters
+
+        #region Revisions
+
+        /// <summary>
+        ///     Adds a revision to the specified document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to add the revision to.</param>
+        /// <param name="revision">The revision to add.</param>
+        /// <returns>The created revision, or null if the operation fails.</returns>
+        Task<Revision?> AddRevisionAsync(Guid documentId, RevisionDto revision);
+
+        /// <summary>
+        ///     Checks if a revision exists.
+        /// </summary>
+        /// <param name="revisionId">The ID of the revision to check.</param>
+        /// <returns>True if the revision exists, false otherwise.</returns>
+        Task<bool> RevisionExistsAsync(Guid revisionId);
+
+        /// <summary>
+        ///     Deletes a revision from a document.
+        /// </summary>
+        /// <param name="revision">The revision to be deleted.</param>
+        /// <returns>True if the revision was successfully deleted, false otherwise.</returns>
+        Task<bool> DeleteRevisionAsync(RevisionDto revision);
+
+        /// <summary>
+        ///     Retrieves a revision by its ID.
+        /// </summary>
+        /// <param name="revisionId">The ID of the revision to retrieve.</param>
+        /// <param name="includeHistory">Include revision history in retrieved data.</param>
+        /// <returns>The requested revision, or null if not found.</returns>
+        Task<Revision?> GetRevisionByIdAsync(Guid revisionId, bool includeHistory = false);
+
+        /// <summary>
+        ///     Retrieves a list of revisions for a specified document.
+        /// </summary>
+        /// <param name="documentId">The ID of the document to retrieve revisions for.</param>
+        /// <param name="includeDeleted">Whether to include deleted revisions.</param>
+        /// <param name="orderBy">Optional order by clause.</param>
+        /// <returns>A list of revisions.</returns>
+        Task<ActionResult<IQueryable<Revision>>> GetRevisionsAsync(
+            Guid documentId,
+            bool includeDeleted,
+            string? orderBy = null);
+
+        /// <summary>
+        ///    Retrieves a paginated list of revisions for a specified document.
+        /// </summary>
+        /// <param name="documentId">Document ID containing the Revisions.</param>
+        /// <param name="resourceParameters">Parameters to be sent to perform pagination / sorting, etc.</param>
+        /// <returns>Paged list of revisions</returns>
+        Task<ActionResult<Helpers.PagedList<Revision>>> GetPaginatedRevisionsAsync(
+            Guid documentId,
+            RevisionsResourceParameters resourceParameters);
+
+        /// <summary>
+        ///     Updates a revision with new details.
+        /// </summary>
+        /// <param name="matterId">The ID of the matter containing the revision.</param>
+        /// <param name="documentId">The ID of the document containing the revision.</param>
+        /// <param name="revisionId">The ID of the revision to update.</param>
+        /// <param name="revision">The revision details to update.</param>
+        /// <returns>The updated revision, or null if the operation fails.</returns>
+        Task<Revision?> UpdateRevisionAsync(Guid matterId, Guid documentId, Guid revisionId, Revision revision);
+
+        #endregion Revisions
     }
 }

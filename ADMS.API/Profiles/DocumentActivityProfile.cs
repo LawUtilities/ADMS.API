@@ -1,21 +1,25 @@
-﻿using AutoMapper;
+﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
-namespace ADMS.API.Profiles
+using Mapster;
+
+namespace ADMS.API.Profiles;
+
+/// <summary>
+///     AutoMapper profile for mapping between <see cref="DocumentActivity"/>, <see cref="DocumentActivityDto"/>, and <see cref="DocumentActivityMinimalDto"/>.
+/// </summary>
+public class DocumentActivityProfile
 {
     /// <summary>
-    /// Document Activity Profile for autopmapper
+    ///     Initializes a new instance of the <see cref="DocumentActivityProfile"/> class and configures entity-to-DTO mappings.
     /// </summary>
-    public class DocumentActivityProfile : Profile
+    public DocumentActivityProfile()
     {
-        /// <summary>
-        /// Document Activity Profile Constructor
-        /// </summary>
-        public DocumentActivityProfile()
-        {
-            CreateMap<Entities.DocumentActivity, Models.DocumentActivityDto>();
-            CreateMap<Entities.DocumentActivity, Models.DocumentActivityMinimalDto>();
+        // Entity to DTO mappings
+        TypeAdapterConfig<DocumentActivity, DocumentActivityDto>.NewConfig();
+        TypeAdapterConfig<DocumentActivity, DocumentActivityMinimalDto>.NewConfig();
 
-            CreateMap<Models.DocumentActivityDto, Entities.DocumentActivity>();
-        }
+        // DTO to Entity mapping
+        TypeAdapterConfig<DocumentActivityDto, DocumentActivity>.NewConfig();
     }
 }

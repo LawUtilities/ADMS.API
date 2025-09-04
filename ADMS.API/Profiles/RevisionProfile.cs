@@ -1,31 +1,36 @@
-﻿using AutoMapper;
+﻿using ADMS.API.Entities;
+using ADMS.API.Models;
 
-namespace ADMS.API.Profiles
+using Mapster;
+
+namespace ADMS.API.Profiles;
+
+/// <summary>
+///     AutoMapper profile for mapping between <see cref="Revision"/> entities and their DTOs.
+/// </summary>
+public class RevisionProfile
 {
     /// <summary>
-    /// Revision Profile fpr autopmapper
+    ///     Initializes a new instance of the <see cref="RevisionProfile"/> class and configures entity-to-DTO mappings.
     /// </summary>
-    public class RevisionProfile : Profile
+    public RevisionProfile()
     {
-        /// <summary>
-        /// Revision Profile Constructor
-        /// </summary>
-        public RevisionProfile()
-        {
-            CreateMap<Entities.Revision, Models.RevisionDto>();
-            CreateMap<Entities.Revision, Models.RevisionMinimalDto>();
-            CreateMap<Entities.Revision, Models.RevisionForCreationDto>();
-            CreateMap<Entities.Revision, Models.RevisionForUpdateDto>();
+        // Entity to DTO mappings
+        TypeAdapterConfig<Revision, RevisionDto>.NewConfig();
+        TypeAdapterConfig<Revision, RevisionMinimalDto>.NewConfig();
+        TypeAdapterConfig<Revision, RevisionForCreationDto>.NewConfig();
+        TypeAdapterConfig<Revision, RevisionForUpdateDto>.NewConfig();
 
-            CreateMap<Models.RevisionDto, Entities.Revision>();
-            CreateMap<Models.RevisionForCreationDto, Entities.Revision>();
-            CreateMap<Models.RevisionForUpdateDto, Entities.Revision>();
+        // DTO to Entity mappings
+        TypeAdapterConfig<RevisionDto, Revision>.NewConfig();
+        TypeAdapterConfig<RevisionForCreationDto, Revision>.NewConfig();
+        TypeAdapterConfig<RevisionForUpdateDto, Revision>.NewConfig();
 
-            CreateMap<Models.RevisionDto, Models.RevisionMinimalDto>();
-            CreateMap<Models.RevisionDto, Models.RevisionForCreationDto>();
-            CreateMap<Models.RevisionDto, Models.RevisionForUpdateDto>();
-            CreateMap<Models.RevisionForCreationDto, Models.RevisionDto>();
-            CreateMap<Models.RevisionForUpdateDto, Models.RevisionDto>();
-        }
+        // DTO to DTO mappings (for convenience and model binding scenarios)
+        TypeAdapterConfig<RevisionDto, RevisionMinimalDto>.NewConfig();
+        TypeAdapterConfig<RevisionDto, RevisionForCreationDto>.NewConfig();
+        TypeAdapterConfig<RevisionDto, RevisionForUpdateDto>.NewConfig();
+        TypeAdapterConfig<RevisionForCreationDto, RevisionDto>.NewConfig();
+        TypeAdapterConfig<RevisionForUpdateDto, RevisionDto>.NewConfig();
     }
 }
