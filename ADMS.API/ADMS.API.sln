@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.6.33723.286
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADMS.API", "ADMS.API.csproj", "{0443EEDB-DD50-49ED-9AB5-4906AD043945}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADMS.API.OLD", "ADMS.API.OLD.csproj", "{0443EEDB-DD50-49ED-9AB5-4906AD043945}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ADMS.API.Entities", "..\ADMS.API.Entities\ADMS.API.Entities.csproj", "{1D39D583-57D6-47F8-9FF3-2905CBCA7DFA}"
 EndProject

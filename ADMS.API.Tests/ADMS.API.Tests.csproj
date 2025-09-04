@@ -35,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADMS.API\ADMS.API.csproj" />
+    <ProjectReference Include="..\ADMS.API\ADMS.API.OLD.csproj" />
   </ItemGroup>
 
 </Project>
