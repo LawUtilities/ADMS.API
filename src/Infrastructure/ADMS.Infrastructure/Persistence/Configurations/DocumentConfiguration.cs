@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore.Metadata;
+﻿using ADMS.Domain.Entities;
+using ADMS.Domain.ValueObjects;
+
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ADMS.Infrastructure.Persistence.Configurations;
@@ -23,7 +27,7 @@ public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.Property(d => d.FileName)
             .HasConversion(
                 fileName => fileName.Value,
-                value => FileName.Create(value).Value) // Assumes validation passed
+                value => FileName.FromTrustedSource(value)) // Use trusted source for DB reads
             .HasMaxLength(128)
             .IsRequired();
 
@@ -42,7 +46,7 @@ public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.Property(d => d.Checksum)
             .HasConversion(
                 checksum => checksum.Value,
-                value => FileChecksum.Create(value).Value)
+                value => FileChecksum.FromTrustedSource(value)) // Use trusted source for DB reads
             .HasMaxLength(64)
             .IsRequired();
 
@@ -86,11 +90,26 @@ public sealed class DocumentConfiguration : IEntityTypeConfiguration<Document>
         builder.HasIndex(d => new { d.IsDeleted, d.MatterId })
             .HasDatabaseName("IX_Documents_IsDeleted_MatterId");
 
+        builder.HasIndex(d => d.CreationDate)
+            .HasDatabaseName("IX_Documents_CreationDate");
+
+        builder.HasIndex(d => new { d.MatterId, d.CreationDate })
+            .HasDatabaseName("IX_Documents_MatterId_CreationDate");
+
         // Ignore computed properties
         builder.Ignore(d => d.FullFileName);
         builder.Ignore(d => d.FormattedFileSize);
         builder.Ignore(d => d.HasRevisions);
         builder.Ignore(d => d.RevisionCount);
         builder.Ignore(d => d.DomainEvents);
+        builder.Ignore(d => d.LatestRevisionNumber);
+        builder.Ignore(d => d.HasActivityHistory);
+        builder.Ignore(d => d.TotalActivityCount);
+        builder.Ignore(d => d.CanBeDeleted);
+        builder.Ignore(d => d.CanBeCheckedOut);
+        builder.Ignore(d => d.CanBeCheckedIn);
+        builder.Ignore(d => d.IsPdf);
+        builder.Ignore(d => d.IsImage);
+        builder.Ignore(d => d.IsOfficeDocument);
     }
 }
