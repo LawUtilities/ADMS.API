@@ -3,7 +3,7 @@
 /// <summary>
 /// Base class for domain entities with strong-typed identifiers and domain events.
 /// </summary>
-public abstract class Entity<TId> : IEquatable<Entity<TId>>
+public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAggregateRoot
     where TId : class
 {
     private readonly List<IDomainEvent> _domainEvents = new();
