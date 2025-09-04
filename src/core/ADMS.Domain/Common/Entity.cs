@@ -1,5 +1,8 @@
 ﻿namespace ADMS.Domain.Common;
 
+/// <summary>
+/// Base class for domain entities with strong-typed identifiers and domain events.
+/// </summary>
 public abstract class Entity<TId> : IEquatable<Entity<TId>>
     where TId : class
 {

@@ -1,5 +1,8 @@
 ﻿namespace ADMS.Domain.Common;
 
+/// <summary>
+/// Exception that represents a violation of domain rules.
+/// </summary>
 public sealed class DomainException : Exception
 {
     public DomainError Error { get; }
