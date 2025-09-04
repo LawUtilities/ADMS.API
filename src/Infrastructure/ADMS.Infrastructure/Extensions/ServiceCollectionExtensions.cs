@@ -1,9 +1,9 @@
 ﻿using ADMS.Domain.Common;
 using ADMS.Domain.Events;
 using ADMS.Domain.Services;
-using ADMS.Infrastructure.EventHandlers;
 using ADMS.Infrastructure.EventHandlers.Composite;
 using ADMS.Infrastructure.EventHandlers.Document;
+using ADMS.Infrastructure.EventHandlers.Matter;
 using ADMS.Infrastructure.Events;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +28,7 @@ public static class ServiceCollectionExtensions
         // Register domain events infrastructure
         services.AddDomainEvents();
 
-        // Register domain event handlers
+        // Register all domain event handlers
         services.AddDomainEventHandlers();
 
         return services;
@@ -58,11 +58,32 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
     {
-        // Individual audit handlers
+        // Document audit handlers
+        services.AddDocumentEventHandlers();
+
+        // Matter audit handlers
+        services.AddMatterEventHandlers();
+
+        // Future: Add other entity handlers
+        // services.AddRevisionEventHandlers();
+        // services.AddUserEventHandlers();
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers document-specific event handlers.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddDocumentEventHandlers(this IServiceCollection services)
+    {
+        // Individual document audit handlers
         services.AddDomainEventHandler<DocumentCreatedDomainEvent, DocumentCreatedAuditHandler>();
         services.AddDomainEventHandler<DocumentCheckedOutDomainEvent, DocumentCheckedOutAuditHandler>();
         services.AddDomainEventHandler<DocumentCheckedInDomainEvent, DocumentCheckedInAuditHandler>();
         services.AddDomainEventHandler<DocumentDeletedDomainEvent, DocumentDeletedAuditHandler>();
+        services.AddDomainEventHandler<DocumentRestoredDomainEvent, DocumentRestoredAuditHandler>();
 
         // Composite audit trail manager (can handle multiple event types)
         services.AddScoped<DocumentAuditTrailManager>();
@@ -74,6 +95,26 @@ public static class ServiceCollectionExtensions
             provider.GetRequiredService<DocumentAuditTrailManager>());
         services.AddScoped<IDomainEventHandler<DocumentDeletedDomainEvent>>(provider =>
             provider.GetRequiredService<DocumentAuditTrailManager>());
+
+        return services;
+    }
+
+    /// <summary>
+    /// Registers matter-specific event handlers.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <returns>The service collection for chaining.</returns>
+    public static IServiceCollection AddMatterEventHandlers(this IServiceCollection services)
+    {
+        // Individual matter audit handlers
+        services.AddDomainEventHandler<MatterCreatedDomainEvent, MatterCreatedAuditHandler>();
+        services.AddDomainEventHandler<MatterArchivedDomainEvent, MatterArchivedAuditHandler>();
+        services.AddDomainEventHandler<MatterDeletedDomainEvent, MatterDeletedAuditHandler>();
+
+        // Future matter event handlers
+        // services.AddDomainEventHandler<MatterRestoredDomainEvent, MatterRestoredAuditHandler>();
+        // services.AddDomainEventHandler<MatterUnarchivedDomainEvent, MatterUnarchivedAuditHandler>();
+        // services.AddDomainEventHandler<MatterUpdatedDomainEvent, MatterUpdatedAuditHandler>();
 
         return services;
     }
@@ -129,22 +170,21 @@ public static class ExampleUsage
 {
     public static void ConfigureServices(IServiceCollection services)
     {
-        // Simple registration
+        // Simple registration - registers everything
         services.AddADMSDomain();
 
         // Or more granular control
         services.AddDomainServices()
                 .AddDomainEvents()
-                .ConfigureDomainEventHandlers()
-                    .AddHandler<DocumentCreatedDomainEvent, DocumentCreatedAuditHandler>()
-                    .AddHandler<DocumentDeletedDomainEvent, DocumentDeletedAuditHandler>()
-                    .Services;
+                .AddDocumentEventHandlers()
+                .AddMatterEventHandlers();
 
-        // Register the DbContext with domain events support
-        // services.AddDbContext<AdmsDbContext>((provider, options) =>
-        // {
-        //     options.UseSqlServer(connectionString);
-        //     // The domain event dispatcher will be injected automatically
-        // });
+        // Or fluent configuration for specific handlers
+        services.ConfigureDomainEventHandlers()
+                .AddHandler<DocumentCreatedDomainEvent, DocumentCreatedAuditHandler>()
+                .AddHandler<MatterCreatedDomainEvent, MatterCreatedAuditHandler>()
+                .AddHandler<MatterArchivedDomainEvent, MatterArchivedAuditHandler>()
+                .AddHandler<MatterDeletedDomainEvent, MatterDeletedAuditHandler>()
+                .Services;
     }
 }
