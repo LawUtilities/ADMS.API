@@ -15,16 +15,18 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Infrastructure-specific packages -->
+    <!-- Core Infrastructure -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" />
+
+    <!-- Security & Validation -->
     <PackageReference Include="nClam" />
     <PackageReference Include="File.TypeChecker" />
     <PackageReference Include="Mime-Detective" />
     <PackageReference Include="MimeTypesMap" />
 
-    <!-- Document Processing -->
+    <!-- Document Processing (Syncfusion Suite) -->
     <PackageReference Include="Syncfusion.DocIO.Net.Core" />
     <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" />
     <PackageReference Include="Syncfusion.Pdf.Net.Core" />
@@ -32,17 +34,33 @@
     <PackageReference Include="Syncfusion.PresentationRenderer.Net.Core" />
     <PackageReference Include="Syncfusion.XlsIO.Net.Core" />
     <PackageReference Include="Syncfusion.XlsIORenderer.Net.Core" />
+
+    <!-- Additional Useful Infrastructure Packages -->
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+    <PackageReference Include="Microsoft.Extensions.Http" />
+    <!-- For HttpClient factory -->
+    <PackageReference Include="System.Security.Cryptography.Algorithms" />
+    <!-- For checksum calculations -->
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Organized folder structure -->
     <Folder Include="Persistence\Context\" />
     <Folder Include="Persistence\Configurations\" />
     <Folder Include="Persistence\Migrations\" />
     <Folder Include="Persistence\Repositories\" />
+    <Folder Include="Persistence\Interceptors\" />
+    <!-- EF Core interceptors -->
     <Folder Include="Services\Document\" />
     <Folder Include="Services\Security\" />
+    <Folder Include="Services\Storage\" />
     <Folder Include="Services\External\" />
+    <Folder Include="Services\Caching\" />
     <Folder Include="Extensions\" />
+    <Folder Include="Options\" />
+    <!-- Configuration option classes -->
   </ItemGroup>
 
 </Project>
