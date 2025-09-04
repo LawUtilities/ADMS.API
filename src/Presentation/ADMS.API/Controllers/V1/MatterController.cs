@@ -1,4 +1,4 @@
-﻿using ADMS.API.Entities;
+﻿using ADMS.Domain.Entities;
 using ADMS.API.Extensions;
 using ADMS.API.Helpers;
 using ADMS.API.Models;

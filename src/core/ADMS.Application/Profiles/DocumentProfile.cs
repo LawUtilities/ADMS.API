@@ -1,5 +1,5 @@
 ﻿using ADMS.API.Common;
-using ADMS.API.Entities;
+using ADMS.Domain.Entities;
 using ADMS.API.Models;
 
 using Mapster;
