@@ -1,7 +1,7 @@
 ﻿using ADMS.Domain.Entities;
 using ADMS.API.Extensions;
 using ADMS.API.Helpers;
-using ADMS.API.Models;
+using ADMS.Application.DTOs;
 using ADMS.API.ResourceParameters;
 using ADMS.API.Services;
 

@@ -1,6 +1,6 @@
 ﻿using ADMS.Domain.Entities;
 using ADMS.API.Helpers;
-using ADMS.API.Models;
+using ADMS.Application.DTOs;
 using ADMS.API.ResourceParameters;
 using Microsoft.AspNetCore.Mvc;
 

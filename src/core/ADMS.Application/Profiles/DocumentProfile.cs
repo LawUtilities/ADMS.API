@@ -1,6 +1,6 @@
 ﻿using ADMS.API.Common;
 using ADMS.Domain.Entities;
-using ADMS.API.Models;
+using ADMS.Application.DTOs;
 
 using Mapster;
 

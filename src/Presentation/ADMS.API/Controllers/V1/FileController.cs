@@ -1,7 +1,7 @@
 ﻿using ADMS.API.Common;
 using ADMS.Domain.Entities;
 using ADMS.API.Extensions;
-using ADMS.API.Models;
+using ADMS.Application.DTOs;
 using ADMS.API.Services;
 
 using Asp.Versioning;
