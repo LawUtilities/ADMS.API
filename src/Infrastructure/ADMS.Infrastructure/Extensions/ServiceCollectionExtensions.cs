@@ -4,6 +4,7 @@ using ADMS.Domain.Services;
 using ADMS.Infrastructure.EventHandlers.Composite;
 using ADMS.Infrastructure.EventHandlers.Document;
 using ADMS.Infrastructure.EventHandlers.Matter;
+using ADMS.Infrastructure.EventHandlers.Revision;
 using ADMS.Infrastructure.Events;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -185,6 +186,7 @@ public static class ExampleUsage
                 .AddHandler<MatterCreatedDomainEvent, MatterCreatedAuditHandler>()
                 .AddHandler<MatterArchivedDomainEvent, MatterArchivedAuditHandler>()
                 .AddHandler<MatterDeletedDomainEvent, MatterDeletedAuditHandler>()
+                .AddHandler<RevisionCreatedDomainEvent, RevisionCreatedAuditHandler>()
                 .Services;
     }
 }
