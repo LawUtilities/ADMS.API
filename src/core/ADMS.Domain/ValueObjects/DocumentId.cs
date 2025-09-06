@@ -1,180 +1,247 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+using ADMS.Domain.Common;
 
 namespace ADMS.Domain.ValueObjects;
 
 /// <summary>
-/// Represents a unique identifier for a document in the ADMS legal document management system.
+/// Represents a strongly-typed document identifier value object.
 /// </summary>
 /// <remarks>
-/// This value object encapsulates a GUID-based identifier for documents, ensuring type safety
-/// and preventing accidental mixing of different entity identifiers. The DocumentId is immutable
-/// and provides validation to ensure the identifier is never empty or invalid.
+/// DocumentId provides type safety for document identifiers, preventing accidental mixing
+/// of different entity IDs and adding domain-specific validation and behavior.
 /// 
-/// As a value object, DocumentId instances are compared by value rather than reference,
-/// and two DocumentId instances with the same GUID value are considered equal.
+/// <para><strong>Value Object Characteristics:</strong></para>
+/// <list type="bullet">
+/// <item><strong>Immutable:</strong> Once created, the value cannot be changed</item>
+/// <item><strong>Type Safe:</strong> Prevents mixing of different entity identifiers</item>
+/// <item><strong>Validated:</strong> Ensures only valid GUIDs are used</item>
+/// <item><strong>Comparable:</strong> Supports equality and comparison operations</item>
+/// </list>
 /// 
-/// This strongly-typed identifier helps prevent common programming errors such as passing
-/// a MatterId where a DocumentId was expected, improving code reliability and maintainability.
+/// <para><strong>Benefits:</strong></para>
+/// <list type="bullet">
+/// <item>Compile-time type safety prevents ID mixing errors</item>
+/// <item>Clear domain intent in method signatures</item>
+/// <item>Centralized validation logic</item>
+/// <item>Enhanced debugging and code readability</item>
+/// </list>
 /// </remarks>
-public sealed record DocumentId
+[ComplexType]
+public sealed record DocumentId : IComparable<DocumentId>
 {
     /// <summary>
-    /// Gets the underlying GUID value of this document identifier.
+    /// Gets the underlying GUID value.
     /// </summary>
-    /// <value>
-    /// A <see cref="Guid"/> that uniquely identifies a document in the system.
-    /// </value>
-    /// <remarks>
-    /// This property provides access to the underlying GUID value while maintaining
-    /// encapsulation. The value is guaranteed to never be <see cref="Guid.Empty"/>
-    /// due to validation performed during construction.
-    /// </remarks>
     public Guid Value { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DocumentId"/> record with the specified GUID value.
+    /// Initializes a new instance of the DocumentId with the specified GUID value.
     /// </summary>
-    /// <param name="value">The GUID value for this document identifier.</param>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <remarks>
-    /// This constructor is private to enforce the use of factory methods for creating instances.
-    /// This ensures consistent validation and provides a controlled way to create DocumentId instances.
-    /// </remarks>
+    /// <param name="value">The GUID value for the document identifier.</param>
+    /// <exception cref="ArgumentException">Thrown when the GUID is empty.</exception>
     private DocumentId(Guid value)
     {
         if (value == Guid.Empty)
             throw new ArgumentException("Document ID cannot be empty", nameof(value));
+
         Value = value;
     }
 
     /// <summary>
-    /// Creates a new <see cref="DocumentId"/> with a randomly generated GUID.
+    /// Creates a new DocumentId from the specified GUID value.
     /// </summary>
-    /// <returns>
-    /// A new <see cref="DocumentId"/> instance with a unique identifier.
-    /// </returns>
-    /// <remarks>
-    /// This method is the primary way to create new document identifiers when
-    /// creating new documents. It uses <see cref="Guid.NewGuid()"/> to ensure
-    /// the identifier is unique across all systems and time.
-    /// 
-    /// Example usage:
+    /// <param name="value">The GUID value to create the DocumentId from.</param>
+    /// <returns>A new DocumentId instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the GUID is empty.</exception>
+    /// <example>
     /// <code>
-    /// var documentId = DocumentId.New();
+    /// var documentId = DocumentId.From(Guid.NewGuid());
+    /// var existingId = DocumentId.From(Guid.Parse("12345678-1234-5678-9012-123456789012"));
     /// </code>
-    /// </remarks>
-    public static DocumentId New() => new(Guid.NewGuid());
-
-    /// <summary>
-    /// Creates a <see cref="DocumentId"/> from an existing GUID value.
-    /// </summary>
-    /// <param name="value">The GUID value to convert to a DocumentId.</param>
-    /// <returns>
-    /// A new <see cref="DocumentId"/> instance wrapping the provided GUID.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <remarks>
-    /// Use this method when you have an existing GUID (e.g., from a database query
-    /// or external system) that you need to convert to a strongly-typed DocumentId.
-    /// 
-    /// Example usage:
-    /// <code>
-    /// var guid = Guid.Parse("12345678-1234-1234-1234-123456789ABC");
-    /// var documentId = DocumentId.From(guid);
-    /// </code>
-    /// </remarks>
+    /// </example>
     public static DocumentId From(Guid value) => new(value);
 
     /// <summary>
-    /// Creates a <see cref="DocumentId"/> from a string representation of a GUID.
+    /// Creates a new DocumentId with a new GUID value.
     /// </summary>
-    /// <param name="value">The string representation of the GUID.</param>
-    /// <returns>
-    /// A new <see cref="DocumentId"/> instance if parsing is successful.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is not a valid GUID format or represents <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="value"/> is null.
-    /// </exception>
-    /// <remarks>
-    /// This method accepts standard GUID string formats such as:
-    /// - "12345678-1234-1234-1234-123456789ABC" (with hyphens)
-    /// - "12345678123412341234123456789ABC" (without hyphens)
-    /// - "{12345678-1234-1234-1234-123456789ABC}" (with braces)
-    /// 
-    /// Example usage:
+    /// <returns>A new DocumentId instance with a unique identifier.</returns>
+    /// <example>
     /// <code>
-    /// var documentId = DocumentId.From("12345678-1234-1234-1234-123456789ABC");
+    /// var newDocumentId = DocumentId.New();
     /// </code>
-    /// </remarks>
-    public static DocumentId From(string value)
+    /// </example>
+    public static DocumentId New() => new(Guid.NewGuid());
+
+    /// <summary>
+    /// Attempts to parse a string into a DocumentId.
+    /// </summary>
+    /// <param name="value">The string value to parse.</param>
+    /// <returns>A Result containing either the parsed DocumentId or an error.</returns>
+    /// <example>
+    /// <code>
+    /// var result = DocumentId.TryParse("12345678-1234-5678-9012-123456789012");
+    /// if (result.IsSuccess)
+    /// {
+    ///     var documentId = result.Value;
+    ///     // Use the document ID
+    /// }
+    /// </code>
+    /// </example>
+    public static Result<DocumentId> TryParse(string? value)
     {
-        if (value == null)
-            throw new ArgumentNullException(nameof(value));
+        if (string.IsNullOrWhiteSpace(value))
+            return Result.Failure<DocumentId>(DomainError.Create(
+                "DOCUMENT_ID_NULL_OR_EMPTY",
+                "Document ID cannot be null or empty"));
 
         if (!Guid.TryParse(value, out var guid))
-            throw new ArgumentException($"Invalid GUID format: {value}", nameof(value));
+            return Result.Failure<DocumentId>(DomainError.Create(
+                "DOCUMENT_ID_INVALID_FORMAT",
+                $"'{value}' is not a valid document ID format"));
 
-        return new DocumentId(guid);
+        if (guid == Guid.Empty)
+            return Result.Failure<DocumentId>(DomainError.Create(
+                "DOCUMENT_ID_EMPTY",
+                "Document ID cannot be empty"));
+
+        return Result.Success(new DocumentId(guid));
     }
 
     /// <summary>
-    /// Implicitly converts a <see cref="DocumentId"/> to its underlying <see cref="Guid"/> value.
+    /// Validates whether the specified GUID can be used as a DocumentId.
     /// </summary>
-    /// <param name="id">The DocumentId to convert.</param>
-    /// <returns>The underlying GUID value.</returns>
-    /// <remarks>
-    /// This implicit conversion allows DocumentId instances to be used seamlessly
-    /// where GUID values are expected, such as in Entity Framework queries or
-    /// when interfacing with APIs that expect GUID parameters.
-    /// 
-    /// Example usage:
+    /// <param name="value">The GUID to validate.</param>
+    /// <returns>True if the GUID is valid for use as a DocumentId; otherwise, false.</returns>
+    /// <example>
     /// <code>
-    /// DocumentId documentId = DocumentId.New();
-    /// Guid guid = documentId; // Implicit conversion
+    /// var isValid = DocumentId.IsValid(someGuid);
+    /// if (isValid)
+    /// {
+    ///     var documentId = DocumentId.From(someGuid);
+    /// }
     /// </code>
-    /// </remarks>
-    public static implicit operator Guid(DocumentId id) => id?.Value ?? Guid.Empty;
+    /// </example>
+    public static bool IsValid(Guid value) => value != Guid.Empty;
 
     /// <summary>
-    /// Implicitly converts a <see cref="Guid"/> to a <see cref="DocumentId"/>.
+    /// Validates whether the specified string can be parsed as a DocumentId.
     /// </summary>
-    /// <param name="value">The GUID value to convert.</param>
-    /// <returns>A new DocumentId wrapping the GUID value.</returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <remarks>
-    /// This implicit conversion allows GUID values to be automatically converted
-    /// to DocumentId instances when needed, providing convenience while maintaining
-    /// type safety.
-    /// 
-    /// Example usage:
+    /// <param name="value">The string to validate.</param>
+    /// <returns>True if the string is a valid DocumentId; otherwise, false.</returns>
+    /// <example>
     /// <code>
-    /// Guid guid = Guid.NewGuid();
-    /// DocumentId documentId = guid; // Implicit conversion
+    /// var isValid = DocumentId.IsValid("12345678-1234-5678-9012-123456789012");
     /// </code>
-    /// </remarks>
-    public static implicit operator DocumentId(Guid value) => From(value);
+    /// </example>
+    public static bool IsValid(string? value) => TryParse(value).IsSuccess;
+
+    #region Equality and Comparison
 
     /// <summary>
-    /// Returns a string representation of this document identifier.
+    /// Compares this DocumentId with another DocumentId.
     /// </summary>
-    /// <returns>
-    /// A string representation of the underlying GUID value.
-    /// </returns>
-    /// <remarks>
-    /// The returned string uses the standard GUID format with hyphens:
-    /// "12345678-1234-1234-1234-123456789ABC"
-    /// 
-    /// This method is useful for logging, debugging, and displaying the identifier
-    /// in user interfaces.
-    /// </remarks>
+    /// <param name="other">The other DocumentId to compare with.</param>
+    /// <returns>A value indicating the relative order of the DocumentIds.</returns>
+    public int CompareTo(DocumentId? other) => other is null ? 1 : Value.CompareTo(other.Value);
+
+    /// <summary>
+    /// Determines whether this DocumentId is equal to another DocumentId.
+    /// </summary>
+    /// <param name="other">The other DocumentId to compare with.</param>
+    /// <returns>True if the DocumentIds are equal; otherwise, false.</returns>
+    public bool Equals(DocumentId? other) => other is not null && Value.Equals(other.Value);
+
+    /// <summary>
+    /// Returns the hash code for this DocumentId.
+    /// </summary>
+    /// <returns>A hash code for this DocumentId.</returns>
+    public override int GetHashCode() => Value.GetHashCode();
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Implicitly converts a DocumentId to a Guid.
+    /// </summary>
+    /// <param name="documentId">The DocumentId to convert.</param>
+    /// <returns>The underlying Guid value.</returns>
+    public static implicit operator Guid(DocumentId documentId) => documentId.Value;
+
+    /// <summary>
+    /// Explicitly converts a Guid to a DocumentId.
+    /// </summary>
+    /// <param name="value">The Guid value to convert.</param>
+    /// <returns>A new DocumentId instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the GUID is empty.</exception>
+    public static explicit operator DocumentId(Guid value) => From(value);
+
+    /// <summary>
+    /// Determines whether one DocumentId is less than another.
+    /// </summary>
+    /// <param name="left">The first DocumentId to compare.</param>
+    /// <param name="right">The second DocumentId to compare.</param>
+    /// <returns>True if the first DocumentId is less than the second; otherwise, false.</returns>
+    public static bool operator <(DocumentId? left, DocumentId? right) =>
+        left is null ? right is not null : left.CompareTo(right) < 0;
+
+    /// <summary>
+    /// Determines whether one DocumentId is less than or equal to another.
+    /// </summary>
+    /// <param name="left">The first DocumentId to compare.</param>
+    /// <param name="right">The second DocumentId to compare.</param>
+    /// <returns>True if the first DocumentId is less than or equal to the second; otherwise, false.</returns>
+    public static bool operator <=(DocumentId? left, DocumentId? right) =>
+        left is null || left.CompareTo(right) <= 0;
+
+    /// <summary>
+    /// Determines whether one DocumentId is greater than another.
+    /// </summary>
+    /// <param name="left">The first DocumentId to compare.</param>
+    /// <param name="right">The second DocumentId to compare.</param>
+    /// <returns>True if the first DocumentId is greater than the second; otherwise, false.</returns>
+    public static bool operator >(DocumentId? left, DocumentId? right) =>
+        left is not null && left.CompareTo(right) > 0;
+
+    /// <summary>
+    /// Determines whether one DocumentId is greater than or equal to another.
+    /// </summary>
+    /// <param name="left">The first DocumentId to compare.</param>
+    /// <param name="right">The second DocumentId to compare.</param>
+    /// <returns>True if the first DocumentId is greater than or equal to the second; otherwise, false.</returns>
+    public static bool operator >=(DocumentId? left, DocumentId? right) =>
+        left is null ? right is null : left.CompareTo(right) >= 0;
+
+    #endregion
+
+    #region String Representation
+
+    /// <summary>
+    /// Returns a string representation of the DocumentId.
+    /// </summary>
+    /// <returns>The string representation of the underlying GUID.</returns>
+    /// <example>
+    /// <code>
+    /// var documentId = DocumentId.New();
+    /// var idString = documentId.ToString(); // e.g., "12345678-1234-5678-9012-123456789012"
+    /// </code>
+    /// </example>
     public override string ToString() => Value.ToString();
+
+    /// <summary>
+    /// Returns a string representation of the DocumentId using the specified format.
+    /// </summary>
+    /// <param name="format">The format string to use.</param>
+    /// <returns>The formatted string representation of the underlying GUID.</returns>
+    /// <example>
+    /// <code>
+    /// var documentId = DocumentId.New();
+    /// var shortId = documentId.ToString("N"); // No hyphens
+    /// var bracketed = documentId.ToString("B"); // With braces
+    /// </code>
+    /// </example>
+    public string ToString(string? format) => Value.ToString(format);
+
+    #endregion
 }

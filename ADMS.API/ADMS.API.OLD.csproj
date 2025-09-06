@@ -95,9 +95,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADMS.API.Common\ADMS.API.Common.csproj" />
-    <ProjectReference Include="..\ADMS.API.Entities\ADMS.API.Entities.csproj" />
-    <ProjectReference Include="..\ADMS.API.Models\ADMS.API.Models.csproj" />
+    <ProjectReference Include="..\ADMS.API.Common\ADMS.API.Common.OLD.csproj" />
+    <ProjectReference Include="..\ADMS.API.Entities\ADMS.API.Entities.OLD.csproj" />
+    <ProjectReference Include="..\ADMS.API.Models\ADMS.API.Models.OLD.csproj" />
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">

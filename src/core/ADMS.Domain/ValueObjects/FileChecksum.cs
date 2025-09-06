@@ -1,348 +1,452 @@
-﻿using System;
-using System.IO;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Security.Cryptography;
+using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 using ADMS.Domain.Common;
 
 namespace ADMS.Domain.ValueObjects;
 
 /// <summary>
-/// Represents a validated SHA-256 file checksum for document integrity verification in the ADMS system.
+/// Represents a strongly-typed file checksum value object for document integrity verification.
 /// </summary>
 /// <remarks>
-/// This value object ensures that all checksums are valid SHA-256 hashes in the correct hexadecimal format,
-/// supporting legal document integrity verification and compliance requirements. The checksum provides
-/// cryptographic assurance that document content has not been altered or corrupted.
+/// FileChecksum provides secure file integrity verification using SHA-256 hashing, essential
+/// for legal document management where document authenticity and tampering detection are critical.
 /// 
-/// SHA-256 is chosen for its balance of security and performance, providing 256-bit hash values that
-/// are extremely resistant to collision attacks while being computationally efficient for document
-/// management operations.
+/// <para><strong>Security Features:</strong></para>
+/// <list type="bullet">
+/// <item><strong>SHA-256 Hashing:</strong> Industry-standard cryptographic hash function</item>
+/// <item><strong>Integrity Verification:</strong> Detects any changes to document content</item>
+/// <item><strong>Tampering Detection:</strong> Identifies unauthorized modifications</item>
+/// <item><strong>Format Validation:</strong> Ensures checksums are properly formatted</item>
+/// </list>
 /// 
-/// As a value object, FileChecksum instances are immutable and compared by value, ensuring consistent
-/// integrity verification throughout the document lifecycle.
+/// <para><strong>Legal Compliance:</strong></para>
+/// <list type="bullet">
+/// <item>Supports evidence authenticity requirements</item>
+/// <item>Enables document chain of custody verification</item>
+/// <item>Provides cryptographic proof of document integrity</item>
+/// <item>Meets professional responsibility standards</item>
+/// </list>
 /// </remarks>
-public sealed record FileChecksum
+[ComplexType]
+public sealed record FileChecksum : IComparable<FileChecksum>
 {
-    /// <summary>
-    /// Regular expression pattern for validating SHA-256 hash format.
-    /// </summary>
-    /// <remarks>
-    /// This pattern matches exactly 64 hexadecimal characters (lowercase a-f and digits 0-9),
-    /// which corresponds to the standard SHA-256 hash output format.
-    /// The pattern is compiled for improved performance in repeated validations.
-    /// </remarks>
-    private static readonly Regex Sha256Regex = new(@"^[a-f0-9]{64}$", RegexOptions.Compiled | RegexOptions.CultureInvariant);
+    #region Constants
 
     /// <summary>
-    /// The expected length of a SHA-256 hash in hexadecimal characters.
+    /// The expected length of a SHA-256 checksum in hexadecimal format (64 characters).
     /// </summary>
-    private const int Sha256HexLength = 64;
+    public const int Sha256HexLength = 64;
 
     /// <summary>
-    /// Gets the SHA-256 checksum value as a lowercase hexadecimal string.
+    /// Regular expression for validating hexadecimal checksum format.
     /// </summary>
-    /// <value>
-    /// A 64-character lowercase hexadecimal string representing the SHA-256 hash.
-    /// </value>
-    /// <remarks>
-    /// The checksum value is guaranteed to be a valid SHA-256 hash in lowercase
-    /// hexadecimal format due to validation performed during construction.
-    /// This standardized format ensures consistent comparison and storage operations.
-    /// </remarks>
+    private static readonly Regex HexRegex = new(
+        "^[0-9A-Fa-f]+$",
+        RegexOptions.Compiled);
+
+    #endregion
+
+    /// <summary>
+    /// Gets the validated checksum value in uppercase hexadecimal format.
+    /// </summary>
     public string Value { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FileChecksum"/> record with the specified checksum value.
+    /// Initializes a new instance of the FileChecksum with the specified value.
     /// </summary>
-    /// <param name="value">The validated SHA-256 checksum value.</param>
-    /// <remarks>
-    /// This constructor is private to enforce the use of factory methods for creating instances.
-    /// This ensures all checksums are properly validated and normalized before construction.
-    /// </remarks>
+    /// <param name="value">The checksum value in hexadecimal format.</param>
+    /// <exception cref="ArgumentException">Thrown when the checksum is invalid.</exception>
     private FileChecksum(string value)
     {
-        Value = value;
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Checksum cannot be null or empty", nameof(value));
+
+        var normalized = NormalizeChecksum(value);
+        var validationResult = ValidateChecksum(normalized);
+
+        if (validationResult.IsFailure)
+            throw new ArgumentException(validationResult.Error?.Message, nameof(value));
+
+        Value = normalized;
     }
 
     /// <summary>
-    /// Creates a new <see cref="FileChecksum"/> value object with validation.
+    /// Creates a new FileChecksum from the specified hexadecimal string with validation.
     /// </summary>
-    /// <param name="value">The checksum string to validate and normalize.</param>
-    /// <returns>
-    /// A <see cref="Result{FileChecksum}"/> containing the created FileChecksum on success,
-    /// or validation errors if the input is invalid.
-    /// </returns>
-    /// <remarks>
-    /// This method performs comprehensive validation including:
-    /// - Null or whitespace checking
-    /// - Length validation (must be exactly 64 characters)
-    /// - Format validation (must contain only hexadecimal characters)
-    /// - Automatic normalization to lowercase
-    /// 
-    /// Example usage:
+    /// <param name="value">The checksum value in hexadecimal format.</param>
+    /// <returns>A Result containing either the created FileChecksum or validation errors.</returns>
+    /// <example>
     /// <code>
-    /// var checksumResult = FileChecksum.Create("A1B2C3D4E5F67890123456789ABCDEF0123456789ABCDEF0123456789ABCDEF01");
-    /// if (checksumResult.IsSuccess)
+    /// var result = FileChecksum.Create("A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9F0A1B2C3D4");
+    /// if (result.IsSuccess)
     /// {
-    ///     var checksum = checksumResult.Value;
-    ///     Console.WriteLine($"Valid checksum: {checksum.Value}");
+    ///     var checksum = result.Value;
+    ///     // Use the checksum
+    /// }
+    /// else
+    /// {
+    ///     // Handle validation errors
+    ///     Console.WriteLine(result.Error.Message);
     /// }
     /// </code>
-    /// </remarks>
-    public static Result<FileChecksum> Create(string value)
+    /// </example>
+    public static Result<FileChecksum> Create(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<FileChecksum>(DomainError.Create(
-                "CHECKSUM_REQUIRED",
-                "File checksum is required and cannot be empty"));
+                "CHECKSUM_NULL_OR_EMPTY",
+                "File checksum cannot be null or empty"));
 
-        var trimmedValue = value.Trim().ToLowerInvariant();
+        var normalized = NormalizeChecksum(value);
+        var validationResult = ValidateChecksum(normalized);
 
-        if (trimmedValue.Length != Sha256HexLength)
-            return Result.Failure<FileChecksum>(DomainError.Create(
-                "CHECKSUM_INVALID_LENGTH",
-                $"File checksum must be exactly {Sha256HexLength} characters long (SHA-256 format)"));
-
-        if (!Sha256Regex.IsMatch(trimmedValue))
-            return Result.Failure<FileChecksum>(DomainError.Create(
-                "CHECKSUM_INVALID_FORMAT",
-                "File checksum must contain only hexadecimal characters (0-9, a-f)"));
-
-        return Result.Success(new FileChecksum(trimmedValue));
+        return validationResult.IsFailure
+            ? Result.Failure<FileChecksum>(validationResult.Error ?? DomainError.Unknown)
+            : Result.Success(new FileChecksum(normalized));
     }
 
     /// <summary>
-    /// Creates a <see cref="FileChecksum"/> from a trusted source without validation.
+    /// Creates a FileChecksum from a trusted source without full validation.
     /// </summary>
-    /// <param name="value">The checksum value from a trusted source.</param>
-    /// <returns>A new <see cref="FileChecksum"/> instance.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="value"/> is null or empty.
-    /// </exception>
+    /// <param name="value">The checksum value from a trusted source (e.g., database).</param>
+    /// <returns>A new FileChecksum instance.</returns>
     /// <remarks>
-    /// <para>
-    /// <strong>WARNING:</strong> This method bypasses validation and should only be used
-    /// when the checksum value is known to be valid and properly formatted, such as
-    /// when loading from a database or trusted configuration source.
-    /// </para>
-    /// 
-    /// The value is still normalized to lowercase for consistency, but no format
-    /// or length validation is performed.
-    /// 
-    /// Example usage:
-    /// <code>
-    /// // Loading from database where checksum is known to be valid
-    /// var checksum = FileChecksum.FromTrustedSource(dbRecord.Checksum);
-    /// </code>
+    /// This method is intended for use when loading data from trusted sources like databases
+    /// where the checksum has already been validated. It performs minimal validation only.
     /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when the value is null or empty.</exception>
+    /// <example>
+    /// <code>
+    /// // Used in Entity Framework value converters
+    /// var checksum = FileChecksum.FromTrustedSource(databaseValue);
+    /// </code>
+    /// </example>
     public static FileChecksum FromTrustedSource(string value)
     {
-        if (string.IsNullOrEmpty(value))
-            throw new ArgumentNullException(nameof(value), "Checksum value cannot be null or empty");
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("Checksum cannot be null or empty", nameof(value));
 
-        return new(value.ToLowerInvariant());
+        return new FileChecksum(NormalizeChecksum(value));
     }
 
     /// <summary>
-    /// Computes the SHA-256 checksum of the provided byte array.
+    /// Computes the SHA-256 checksum for the specified file content.
     /// </summary>
-    /// <param name="data">The data to compute the checksum for.</param>
-    /// <returns>
-    /// A <see cref="Result{FileChecksum}"/> containing the computed checksum on success,
-    /// or error information if the computation fails.
-    /// </returns>
-    /// <remarks>
-    /// This method provides a convenient way to compute checksums for in-memory data.
-    /// It uses the system's SHA-256 implementation for cryptographic integrity.
-    /// 
-    /// Example usage:
+    /// <param name="fileContent">The file content as a byte array.</param>
+    /// <returns>A Result containing the computed FileChecksum.</returns>
+    /// <example>
     /// <code>
-    /// byte[] fileData = File.ReadAllBytes("document.pdf");
-    /// var checksumResult = FileChecksum.ComputeFromData(fileData);
-    /// if (checksumResult.IsSuccess)
+    /// var fileBytes = File.ReadAllBytes("document.pdf");
+    /// var result = FileChecksum.ComputeFromBytes(fileBytes);
+    /// if (result.IsSuccess)
     /// {
-    ///     var checksum = checksumResult.Value;
-    ///     Console.WriteLine($"Computed checksum: {checksum}");
+    ///     var checksum = result.Value;
+    ///     // Store checksum with document
     /// }
     /// </code>
-    /// </remarks>
-    public static Result<FileChecksum> ComputeFromData(byte[] data)
+    /// </example>
+    public static Result<FileChecksum> ComputeFromBytes(byte[] fileContent)
     {
-        if (data == null)
+        if (fileContent == null)
             return Result.Failure<FileChecksum>(DomainError.Create(
-                "CHECKSUM_NULL_DATA",
-                "Cannot compute checksum from null data"));
+                "CHECKSUM_NULL_CONTENT",
+                "File content cannot be null"));
 
-        if (data.Length == 0)
+        if (fileContent.Length == 0)
             return Result.Failure<FileChecksum>(DomainError.Create(
-                "CHECKSUM_EMPTY_DATA",
-                "Cannot compute checksum from empty data"));
+                "CHECKSUM_EMPTY_CONTENT",
+                "File content cannot be empty"));
 
         try
         {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
-            var hashBytes = sha256.ComputeHash(data);
-            var hashString = Convert.ToHexString(hashBytes).ToLowerInvariant();
+            using var sha256 = SHA256.Create();
+            var hashBytes = sha256.ComputeHash(fileContent);
+            var hexString = Convert.ToHexString(hashBytes);
 
-            return Result.Success(new FileChecksum(hashString));
+            return Result.Success(new FileChecksum(hexString));
         }
         catch (Exception ex)
         {
             return Result.Failure<FileChecksum>(DomainError.Create(
                 "CHECKSUM_COMPUTATION_FAILED",
-                $"Failed to compute checksum: {ex.Message}"));
+                $"Failed to compute file checksum: {ex.Message}"));
         }
     }
 
     /// <summary>
-    /// Asynchronously computes the SHA-256 checksum of the provided stream.
+    /// Computes the SHA-256 checksum for the specified file stream.
     /// </summary>
-    /// <param name="stream">The stream to compute the checksum for.</param>
-    /// <returns>
-    /// A <see cref="Task{Result}"/> that represents the asynchronous computation,
-    /// containing the computed checksum on success or error information if the computation fails.
-    /// </returns>
-    /// <remarks>
-    /// This method is optimized for computing checksums of large files without loading
-    /// the entire file into memory. The stream position is not modified by this operation.
-    /// 
-    /// The stream must be readable and positioned at the beginning of the data to be hashed.
-    /// If you need to preserve the original stream position, save it before calling this method.
-    /// 
-    /// Example usage:
+    /// <param name="stream">The file stream to compute the checksum for.</param>
+    /// <returns>A Result containing the computed FileChecksum.</returns>
+    /// <example>
     /// <code>
-    /// using var fileStream = File.OpenRead("large-document.pdf");
-    /// var checksumResult = await FileChecksum.ComputeFromStreamAsync(fileStream);
-    /// if (checksumResult.IsSuccess)
+    /// using var fileStream = File.OpenRead("document.pdf");
+    /// var result = await FileChecksum.ComputeFromStreamAsync(fileStream);
+    /// if (result.IsSuccess)
     /// {
-    ///     var checksum = checksumResult.Value;
-    ///     Console.WriteLine($"Computed checksum: {checksum}");
+    ///     var checksum = result.Value;
+    ///     // Store checksum with document
     /// }
     /// </code>
-    /// </remarks>
+    /// </example>
     public static async Task<Result<FileChecksum>> ComputeFromStreamAsync(Stream stream)
     {
         if (stream == null)
             return Result.Failure<FileChecksum>(DomainError.Create(
                 "CHECKSUM_NULL_STREAM",
-                "Cannot compute checksum from null stream"));
+                "File stream cannot be null"));
 
         if (!stream.CanRead)
             return Result.Failure<FileChecksum>(DomainError.Create(
-                "CHECKSUM_STREAM_NOT_READABLE",
-                "Cannot compute checksum from a non-readable stream"));
+                "CHECKSUM_UNREADABLE_STREAM",
+                "File stream must be readable"));
 
         try
         {
-            using var sha256 = System.Security.Cryptography.SHA256.Create();
+            using var sha256 = SHA256.Create();
             var hashBytes = await sha256.ComputeHashAsync(stream);
-            var hashString = Convert.ToHexString(hashBytes).ToLowerInvariant();
+            var hexString = Convert.ToHexString(hashBytes);
 
-            return Result.Success(new FileChecksum(hashString));
+            return Result.Success(new FileChecksum(hexString));
         }
         catch (Exception ex)
         {
             return Result.Failure<FileChecksum>(DomainError.Create(
                 "CHECKSUM_COMPUTATION_FAILED",
-                $"Failed to compute checksum from stream: {ex.Message}"));
+                $"Failed to compute file checksum: {ex.Message}"));
         }
     }
 
     /// <summary>
-    /// Verifies that the provided byte array matches this checksum.
+    /// Validates whether the specified string is a valid file checksum.
     /// </summary>
-    /// <param name="data">The data to verify against this checksum.</param>
-    /// <returns>
-    /// <c>true</c> if the computed checksum of the data matches this checksum; otherwise, <c>false</c>.
-    /// </returns>
-    /// <remarks>
-    /// This method computes the SHA-256 hash of the provided data and compares it
-    /// with this checksum value. It returns false if the data is null, empty, or
-    /// if the checksum computation fails for any reason.
-    /// 
-    /// Example usage:
+    /// <param name="value">The string to validate.</param>
+    /// <returns>True if the string is a valid checksum; otherwise, false.</returns>
+    /// <example>
     /// <code>
-    /// byte[] originalData = GetDocumentData();
-    /// var checksum = FileChecksum.ComputeFromData(originalData).Value;
-    /// 
-    /// byte[] retrievedData = RetrieveDocumentData();
-    /// bool isIntact = checksum.VerifyData(retrievedData);
-    /// if (!isIntact)
-    /// {
-    ///     Console.WriteLine("Document integrity compromised!");
-    /// }
+    /// var isValid = FileChecksum.IsValid("A1B2C3D4E5F6A7B8C9D0E1F2A3B4C5D6E7F8A9B0C1D2E3F4A5B6C7D8E9F0A1B2C3D4"); // true
+    /// var isInvalid = FileChecksum.IsValid("invalid-checksum"); // false
     /// </code>
-    /// </remarks>
-    public bool VerifyData(byte[] data)
+    /// </example>
+    public static bool IsValid(string? value)
     {
-        var computedResult = ComputeFromData(data);
-        return computedResult.IsSuccess &&
-               string.Equals(computedResult.Value.Value, Value, StringComparison.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(value))
+            return false;
+
+        var normalized = NormalizeChecksum(value);
+        return ValidateChecksum(normalized).IsSuccess;
     }
 
     /// <summary>
-    /// Asynchronously verifies that the provided stream content matches this checksum.
+    /// Verifies that this checksum matches the provided file content.
     /// </summary>
-    /// <param name="stream">The stream to verify against this checksum.</param>
-    /// <returns>
-    /// A <see cref="Task{Boolean}"/> representing the asynchronous verification operation.
-    /// The result is <c>true</c> if the computed checksum matches this checksum; otherwise, <c>false</c>.
-    /// </returns>
-    /// <remarks>
-    /// This method computes the SHA-256 hash of the stream content and compares it
-    /// with this checksum value. It returns false if the stream is null, not readable,
-    /// or if the checksum computation fails for any reason.
-    /// 
-    /// The stream position may be modified during verification. If you need to preserve
-    /// the original position, save it before calling this method and restore it afterward.
-    /// 
-    /// Example usage:
+    /// <param name="fileContent">The file content to verify against.</param>
+    /// <returns>A Result indicating whether the checksum matches the file content.</returns>
+    /// <example>
     /// <code>
-    /// var originalChecksum = await FileChecksum.ComputeFromStreamAsync(originalStream);
-    /// 
-    /// using var retrievedStream = OpenRetrievedDocument();
-    /// bool isIntact = await originalChecksum.Value.VerifyStreamAsync(retrievedStream);
-    /// if (!isIntact)
+    /// var fileBytes = File.ReadAllBytes("document.pdf");
+    /// var verificationResult = checksum.VerifyContent(fileBytes);
+    /// if (verificationResult.IsSuccess)
     /// {
-    ///     Console.WriteLine("Document integrity compromised!");
+    ///     Console.WriteLine("File integrity verified!");
+    /// }
+    /// else
+    /// {
+    ///     Console.WriteLine("File has been tampered with!");
     /// }
     /// </code>
-    /// </remarks>
-    public async Task<bool> VerifyStreamAsync(Stream stream)
+    /// </example>
+    public Result VerifyContent(byte[] fileContent)
+    {
+        var computedResult = ComputeFromBytes(fileContent);
+
+        if (computedResult.IsFailure)
+            return Result.Failure(computedResult.Error ?? DomainError.Unknown);
+
+        if (!Equals(computedResult.Value))
+            return Result.Failure(DomainError.Create(
+                "CHECKSUM_VERIFICATION_FAILED",
+                "File content does not match the expected checksum"));
+
+        return Result.Success();
+    }
+
+    /// <summary>
+    /// Verifies that this checksum matches the provided file stream.
+    /// </summary>
+    /// <param name="stream">The file stream to verify against.</param>
+    /// <returns>A Result indicating whether the checksum matches the stream content.</returns>
+    /// <example>
+    /// <code>
+    /// using var fileStream = File.OpenRead("document.pdf");
+    /// var verificationResult = await checksum.VerifyContentAsync(fileStream);
+    /// if (verificationResult.IsSuccess)
+    /// {
+    ///     Console.WriteLine("File integrity verified!");
+    /// }
+    /// </code>
+    /// </example>
+    public async Task<Result> VerifyContentAsync(Stream stream)
     {
         var computedResult = await ComputeFromStreamAsync(stream);
-        return computedResult.IsSuccess &&
-               string.Equals(computedResult.Value.Value, Value, StringComparison.OrdinalIgnoreCase);
+
+        if (computedResult.IsFailure)
+            return Result.Failure(computedResult.Error ?? DomainError.Unknown);
+
+        if (!Equals(computedResult.Value))
+            return Result.Failure(DomainError.Create(
+                "CHECKSUM_VERIFICATION_FAILED",
+                "Stream content does not match the expected checksum"));
+
+        return Result.Success();
     }
 
     /// <summary>
-    /// Implicitly converts a <see cref="FileChecksum"/> to its string representation.
+    /// Gets the checksum as a byte array.
+    /// </summary>
+    /// <returns>The checksum as a byte array.</returns>
+    /// <example>
+    /// <code>
+    /// var checksum = FileChecksum.Create("A1B2C3D4...").Value;
+    /// var bytes = checksum.ToByteArray();
+    /// </code>
+    /// </example>
+    public byte[] ToByteArray()
+    {
+        return Convert.FromHexString(Value);
+    }
+
+    #region Private Methods
+
+    /// <summary>
+    /// Normalizes a checksum string by converting to uppercase and removing whitespace.
+    /// </summary>
+    /// <param name="value">The checksum to normalize.</param>
+    /// <returns>The normalized checksum.</returns>
+    private static string NormalizeChecksum(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        // Remove whitespace and convert to uppercase
+        return value.Replace(" ", "").Replace("-", "").ToUpperInvariant();
+    }
+
+    /// <summary>
+    /// Validates a checksum against business rules and security requirements.
+    /// </summary>
+    /// <param name="value">The checksum to validate.</param>
+    /// <returns>A Result indicating whether the checksum is valid.</returns>
+    private static Result ValidateChecksum(string value)
+    {
+        // Check length (SHA-256 produces 64 hex characters)
+        if (value.Length != Sha256HexLength)
+            return Result.Failure(DomainError.Create(
+                "CHECKSUM_INVALID_LENGTH",
+                $"Checksum must be exactly {Sha256HexLength} characters long (SHA-256 hex format)"));
+
+        // Check format (must be hexadecimal)
+        if (!HexRegex.IsMatch(value))
+            return Result.Failure(DomainError.Create(
+                "CHECKSUM_INVALID_FORMAT",
+                "Checksum must contain only hexadecimal characters (0-9, A-F)"));
+
+        // Check for obviously invalid patterns
+        if (value.All(c => c == '0') || value.All(c => c == 'F'))
+            return Result.Failure(DomainError.Create(
+                "CHECKSUM_SUSPICIOUS_PATTERN",
+                "Checksum appears to have an invalid pattern"));
+
+        return Result.Success();
+    }
+
+    #endregion
+
+    #region Equality and Comparison
+
+    /// <summary>
+    /// Compares this FileChecksum with another FileChecksum.
+    /// </summary>
+    /// <param name="other">The other FileChecksum to compare with.</param>
+    /// <returns>A value indicating the relative order of the checksums.</returns>
+    public int CompareTo(FileChecksum? other)
+    {
+        if (other is null) return 1;
+        return string.Compare(Value, other.Value, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Determines whether this FileChecksum is equal to another FileChecksum.
+    /// </summary>
+    /// <param name="other">The other FileChecksum to compare with.</param>
+    /// <returns>True if the checksums are equal; otherwise, false.</returns>
+    public bool Equals(FileChecksum? other)
+    {
+        return other is not null && string.Equals(Value, other.Value, StringComparison.Ordinal);
+    }
+
+    /// <summary>
+    /// Returns the hash code for this FileChecksum.
+    /// </summary>
+    /// <returns>A hash code for this FileChecksum.</returns>
+    public override int GetHashCode() => Value.GetHashCode();
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Implicitly converts a FileChecksum to a string.
     /// </summary>
     /// <param name="checksum">The FileChecksum to convert.</param>
-    /// <returns>The checksum value as a string, or null if the checksum is null.</returns>
-    /// <remarks>
-    /// This implicit conversion allows FileChecksum instances to be used seamlessly
-    /// where string values are expected, such as in logging, database operations,
-    /// or API responses.
-    /// 
-    /// Example usage:
-    /// <code>
-    /// var checksum = FileChecksum.Create("abc123...").Value;
-    /// string checksumString = checksum; // Implicit conversion
-    /// </code>
-    /// </remarks>
+    /// <returns>The underlying string value.</returns>
     public static implicit operator string(FileChecksum checksum) => checksum.Value;
 
     /// <summary>
-    /// Returns a string representation of this file checksum.
+    /// Explicitly converts a string to a FileChecksum.
     /// </summary>
-    /// <returns>
-    /// The SHA-256 checksum value as a lowercase hexadecimal string.
-    /// </returns>
-    /// <remarks>
-    /// This method returns the same value as the <see cref="Value"/> property
-    /// and is suitable for display, logging, and serialization purposes.
-    /// </remarks>
+    /// <param name="value">The string value to convert.</param>
+    /// <returns>A new FileChecksum instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the string is not a valid checksum.</exception>
+    public static explicit operator FileChecksum(string value)
+    {
+        var result = Create(value);
+        return result.IsSuccess
+            ? result.Value
+            : throw new ArgumentException(result.Error?.Message, nameof(value));
+    }
+
+    #endregion
+
+    #region String Representation
+
+    /// <summary>
+    /// Returns a string representation of the FileChecksum.
+    /// </summary>
+    /// <returns>The checksum value in uppercase hexadecimal format.</returns>
     public override string ToString() => Value;
+
+    /// <summary>
+    /// Returns a formatted string representation of the FileChecksum.
+    /// </summary>
+    /// <param name="format">The format to use ("S" for short, "F" for full, or null for default).</param>
+    /// <returns>The formatted checksum string.</returns>
+    /// <example>
+    /// <code>
+    /// var checksum = FileChecksum.Create("A1B2C3D4...").Value;
+    /// var short = checksum.ToString("S"); // "A1B2C3D4..."
+    /// var full = checksum.ToString("F");  // "SHA256:A1B2C3D4..."
+    /// </code>
+    /// </example>
+    public string ToString(string? format) => format?.ToUpperInvariant() switch
+    {
+        "S" => Value[..8] + "...",
+        "F" => $"SHA256:{Value}",
+        _ => Value
+    };
+
+    #endregion
 }

@@ -1,364 +1,416 @@
-﻿using System;
-using System.IO;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.RegularExpressions;
 
 using ADMS.Domain.Common;
 
 namespace ADMS.Domain.ValueObjects;
 
 /// <summary>
-/// Represents a validated file name for documents in the ADMS legal document management system.
+/// Represents a strongly-typed file name value object with validation and normalization.
 /// </summary>
 /// <remarks>
-/// This value object encapsulates file name validation rules and ensures that all file names
-/// meet legal document management standards for professional practice. It enforces cross-platform
-/// compatibility and prevents common file system issues that could compromise document accessibility.
+/// FileName provides validation and normalization for file names used in the legal document
+/// management system, ensuring they meet professional standards and security requirements.
 /// 
-/// The validation includes:
-/// - Length restrictions to ensure compatibility with various file systems
-/// - Character validation to prevent file system conflicts
-/// - Reserved name checking to avoid system conflicts on Windows
-/// - Format validation to ensure professional naming standards
+/// <para><strong>Validation Rules:</strong></para>
+/// <list type="bullet">
+/// <item><strong>Length:</strong> Between 1 and 255 characters</item>
+/// <item><strong>Characters:</strong> No invalid file system characters</item>
+/// <item><strong>Security:</strong> No malicious patterns or reserved names</item>
+/// <item><strong>Professional:</strong> Suitable for legal document management</item>
+/// </list>
 /// 
-/// As a value object, FileName instances are immutable and compared by value, ensuring
-/// consistent file naming throughout the document management system.
+/// <para><strong>Normalization Features:</strong></para>
+/// <list type="bullet">
+/// <item>Trims whitespace</item>
+/// <item>Removes multiple consecutive spaces</item>
+/// <item>Ensures professional formatting</item>
+/// <item>Maintains case sensitivity for professional appearance</item>
+/// </list>
 /// </remarks>
-public sealed record FileName
+[ComplexType]
+public sealed record FileName : IComparable<FileName>
 {
-    /// <summary>
-    /// Maximum allowed length for file names in characters.
-    /// </summary>
-    /// <remarks>
-    /// This limit ensures compatibility with most file systems while providing
-    /// sufficient length for descriptive legal document names.
-    /// </remarks>
-    public const int MaxLength = 128;
+    #region Constants
 
     /// <summary>
-    /// Minimum allowed length for file names in characters.
+    /// Maximum allowed length for file names.
     /// </summary>
-    /// <remarks>
-    /// File names must have at least one meaningful character to be valid.
-    /// </remarks>
+    public const int MaxLength = 255;
+
+    /// <summary>
+    /// Minimum allowed length for file names.
+    /// </summary>
     public const int MinLength = 1;
 
     /// <summary>
-    /// Array of characters that are invalid in file names across different operating systems.
+    /// Characters that are not allowed in file names.
     /// </summary>
-    /// <remarks>
-    /// This includes the standard invalid file name characters from Path.GetInvalidFileNameChars()
-    /// plus additional characters that can cause issues in web-based systems or specific platforms.
-    /// The comprehensive list ensures maximum compatibility across all target environments.
-    /// </remarks>
-    private static readonly char[] InvalidChars = Path.GetInvalidFileNameChars()
-        .Concat(new[] { '<', '>', ':', '"', '|', '?', '*' })
-        .Distinct()
-        .ToArray();
+    private static readonly char[] InvalidCharacters = ['<', '>', ':', '"', '|', '?', '*', '/', '\\'];
+
+    /// <summary>
+    /// Reserved file names that are not allowed.
+    /// </summary>
+    private static readonly string[] ReservedNames =
+    [
+        "CON", "PRN", "AUX", "NUL",
+        "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
+        "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
+    ];
+
+    /// <summary>
+    /// Regular expression for validating file name format.
+    /// </summary>
+    private static readonly Regex ValidFileNameRegex = new(
+        @"^[^<>:""/\\|?*\x00-\x1f]+$",
+        RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+    #endregion
 
     /// <summary>
     /// Gets the validated file name value.
     /// </summary>
-    /// <value>
-    /// A string representing the file name that has been validated for compatibility
-    /// and professional naming standards.
-    /// </value>
-    /// <remarks>
-    /// The file name is guaranteed to:
-    /// - Be within the acceptable length range
-    /// - Contain only valid characters for cross-platform compatibility
-    /// - Not conflict with reserved system names
-    /// - Follow professional naming conventions suitable for legal documents
-    /// </remarks>
     public string Value { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="FileName"/> record with the specified value.
+    /// Initializes a new instance of the FileName with the specified value.
     /// </summary>
-    /// <param name="value">The validated file name value.</param>
-    /// <remarks>
-    /// This constructor is private to enforce the use of factory methods for creating instances.
-    /// This ensures all file names are properly validated before construction.
-    /// </remarks>
+    /// <param name="value">The file name value.</param>
+    /// <exception cref="ArgumentException">Thrown when the file name is invalid.</exception>
     private FileName(string value)
     {
-        Value = value;
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("File name cannot be null or empty", nameof(value));
+
+        var normalized = NormalizeFileName(value);
+        var validationResult = ValidateFileName(normalized);
+
+        if (validationResult.IsFailure)
+            throw new ArgumentException(validationResult.Error?.Message, nameof(value));
+
+        Value = normalized;
     }
 
     /// <summary>
-    /// Creates a new <see cref="FileName"/> value object with comprehensive validation.
+    /// Creates a new FileName from the specified value with validation.
     /// </summary>
-    /// <param name="value">The file name string to validate.</param>
-    /// <returns>
-    /// A <see cref="Result{FileName}"/> containing the created FileName on success,
-    /// or validation errors if the input is invalid.
-    /// </returns>
-    /// <remarks>
-    /// This method performs comprehensive validation including:
-    /// - Null and whitespace checking
-    /// - Length validation (1-128 characters)
-    /// - Invalid character detection
-    /// - Reserved name checking (Windows compatibility)
-    /// - Trailing character validation (periods and spaces)
-    /// 
-    /// Example usage:
+    /// <param name="value">The file name value to create from.</param>
+    /// <returns>A Result containing either the created FileName or validation errors.</returns>
+    /// <example>
     /// <code>
-    /// var fileNameResult = FileName.Create("Legal Contract v2.1");
-    /// if (fileNameResult.IsSuccess)
+    /// var result = FileName.Create("My Document.pdf");
+    /// if (result.IsSuccess)
     /// {
-    ///     var fileName = fileNameResult.Value;
-    ///     Console.WriteLine($"Valid file name: {fileName.Value}");
+    ///     var fileName = result.Value;
+    ///     // Use the file name
     /// }
     /// else
     /// {
-    ///     Console.WriteLine($"Invalid file name: {fileNameResult.Error.Message}");
+    ///     // Handle validation errors
+    ///     Console.WriteLine(result.Error.Message);
     /// }
     /// </code>
-    /// </remarks>
-    public static Result<FileName> Create(string value)
+    /// </example>
+    public static Result<FileName> Create(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
             return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_REQUIRED",
-                "File name is required and cannot be empty"));
+                "FILENAME_NULL_OR_EMPTY",
+                "File name cannot be null or empty"));
 
-        var trimmedValue = value.Trim();
+        var normalized = NormalizeFileName(value);
+        var validationResult = ValidateFileName(normalized);
 
-        if (trimmedValue.Length < MinLength)
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_TOO_SHORT",
-                $"File name must be at least {MinLength} character(s) long"));
-
-        if (trimmedValue.Length > MaxLength)
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_TOO_LONG",
-                $"File name cannot exceed {MaxLength} characters"));
-
-        // Check for invalid characters
-        var invalidCharsFound = trimmedValue.Where(c => InvalidChars.Contains(c)).ToArray();
-        if (invalidCharsFound.Length > 0)
-        {
-            var invalidCharsList = string.Join(", ", invalidCharsFound.Distinct().Select(c => $"'{c}'"));
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_INVALID_CHARACTERS",
-                $"File name contains invalid characters: {invalidCharsList}"));
-        }
-
-        // Check for reserved Windows names
-        if (IsReservedName(trimmedValue))
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_RESERVED_NAME",
-                $"'{trimmedValue}' is a reserved system name and cannot be used as a file name"));
-
-        // Check for names ending with period or space (Windows restriction)
-        if (trimmedValue.EndsWith('.'))
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_ENDS_WITH_PERIOD",
-                "File name cannot end with a period"));
-
-        if (trimmedValue.EndsWith(' '))
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_ENDS_WITH_SPACE",
-                "File name cannot end with a space"));
-
-        return Result.Success(new FileName(trimmedValue));
+        return validationResult.IsFailure ? Result.Failure<FileName>(validationResult.Error ?? DomainError.Unknown) : Result.Success(new FileName(normalized));
     }
 
     /// <summary>
-    /// Creates a <see cref="FileName"/> from a trusted source without validation.
+    /// Creates a FileName from a trusted source without full validation.
     /// </summary>
-    /// <param name="value">The file name value from a trusted source.</param>
-    /// <returns>A new <see cref="FileName"/> instance.</returns>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="value"/> is null or empty.
-    /// </exception>
+    /// <param name="value">The file name value from a trusted source (e.g., database).</param>
+    /// <returns>A new FileName instance.</returns>
     /// <remarks>
-    /// <para>
-    /// <strong>WARNING:</strong> This method bypasses validation and should only be used
-    /// when the file name is known to be valid and properly formatted, such as
-    /// when loading from a database or trusted configuration source.
-    /// </para>
-    /// 
-    /// Example usage:
-    /// <code>
-    /// // Loading from database where file name is known to be valid
-    /// var fileName = FileName.FromTrustedSource(dbRecord.FileName);
-    /// </code>
+    /// This method is intended for use when loading data from trusted sources like databases
+    /// where the file name has already been validated. It performs minimal validation only.
     /// </remarks>
+    /// <exception cref="ArgumentException">Thrown when the value is null or empty.</exception>
+    /// <example>
+    /// <code>
+    /// // Used in Entity Framework value converters
+    /// var fileName = FileName.FromTrustedSource(databaseValue);
+    /// </code>
+    /// </example>
     public static FileName FromTrustedSource(string value)
     {
-        if (string.IsNullOrEmpty(value))
-            throw new ArgumentNullException(nameof(value), "File name value cannot be null or empty");
+        if (string.IsNullOrWhiteSpace(value))
+            throw new ArgumentException("File name cannot be null or empty", nameof(value));
 
-        return new(value);
+        return new FileName(value.Trim());
     }
 
     /// <summary>
-    /// Generates a sanitized file name from potentially invalid input.
+    /// Validates whether the specified string is a valid file name.
     /// </summary>
-    /// <param name="value">The potentially invalid file name to sanitize.</param>
-    /// <param name="replacementChar">The character to use as replacement for invalid characters (default: '_').</param>
-    /// <returns>
-    /// A <see cref="Result{FileName}"/> containing a valid FileName with invalid characters replaced,
-    /// or an error if the sanitization cannot produce a valid file name.
-    /// </returns>
-    /// <remarks>
-    /// This method attempts to create a valid file name by:
-    /// - Replacing invalid characters with the specified replacement character
-    /// - Truncating overly long names to the maximum length
-    /// - Adding a prefix if the name would conflict with reserved names
-    /// - Removing trailing periods and spaces
-    /// 
-    /// This is useful when processing file names from external sources that may not
-    /// meet the system's validation requirements.
-    /// 
-    /// Example usage:
+    /// <param name="value">The string to validate.</param>
+    /// <returns>True if the string is a valid file name; otherwise, false.</returns>
+    /// <example>
     /// <code>
-    /// var sanitizedResult = FileName.Sanitize("My File: Version <2>");
-    /// if (sanitizedResult.IsSuccess)
-    /// {
-    ///     Console.WriteLine(sanitizedResult.Value.Value); // "My File_ Version _2_"
-    /// }
+    /// var isValid = FileName.IsValid("Document.pdf"); // true
+    /// var isInvalid = FileName.IsValid("Con.txt"); // false (reserved name)
     /// </code>
-    /// </remarks>
-    public static Result<FileName> Sanitize(string value, char replacementChar = '_')
+    /// </example>
+    public static bool IsValid(string? value)
     {
         if (string.IsNullOrWhiteSpace(value))
-            return Result.Failure<FileName>(DomainError.Create(
-                "FILENAME_SANITIZE_EMPTY",
-                "Cannot sanitize null or empty file name"));
+            return false;
 
-        var trimmedValue = value.Trim();
-
-        // Replace invalid characters
-        var sanitized = new string(trimmedValue.Select(c => InvalidChars.Contains(c) ? replacementChar : c).ToArray());
-
-        // Remove trailing periods and spaces
-        sanitized = sanitized.TrimEnd('.', ' ');
-
-        // Ensure we have at least one character
-        if (string.IsNullOrEmpty(sanitized))
-        {
-            sanitized = "document";
-        }
-
-        // Handle reserved names by prefixing
-        if (IsReservedName(sanitized))
-        {
-            sanitized = $"doc_{sanitized}";
-        }
-
-        // Truncate if too long
-        if (sanitized.Length > MaxLength)
-        {
-            sanitized = sanitized.Substring(0, MaxLength);
-            // Ensure we don't end with a period or space after truncation
-            sanitized = sanitized.TrimEnd('.', ' ');
-        }
-
-        // Final validation
-        return Create(sanitized);
-    }
-
-    /// <summary>
-    /// Determines whether the specified name is a reserved system name on Windows.
-    /// </summary>
-    /// <param name="name">The name to check.</param>
-    /// <returns>
-    /// <c>true</c> if the name is reserved; otherwise, <c>false</c>.
-    /// </returns>
-    /// <remarks>
-    /// This method checks against Windows reserved names including:
-    /// - Device names: CON, PRN, AUX, NUL
-    /// - Serial port names: COM1-COM9
-    /// - Parallel port names: LPT1-LPT9
-    /// - Names with extensions (e.g., CON.txt)
-    /// 
-    /// The check is case-insensitive to ensure compatibility.
-    /// </remarks>
-    private static bool IsReservedName(string name)
-    {
-        var upperName = name.ToUpperInvariant();
-        var reservedNames = new[]
-        {
-            "CON", "PRN", "AUX", "NUL",
-            "COM1", "COM2", "COM3", "COM4", "COM5", "COM6", "COM7", "COM8", "COM9",
-            "LPT1", "LPT2", "LPT3", "LPT4", "LPT5", "LPT6", "LPT7", "LPT8", "LPT9"
-        };
-
-        return reservedNames.Contains(upperName) ||
-               reservedNames.Any(reserved => upperName.StartsWith(reserved + ".", StringComparison.Ordinal));
+        var normalized = NormalizeFileName(value);
+        return ValidateFileName(normalized).IsSuccess;
     }
 
     /// <summary>
     /// Gets the file name without any extension.
     /// </summary>
-    /// <returns>
-    /// The file name with the extension removed, or the full name if no extension is present.
-    /// </returns>
-    /// <remarks>
-    /// This method removes everything from the last period (.) to the end of the file name.
-    /// If no period is found, the entire file name is returned.
-    /// 
-    /// Example:
-    /// - "document.pdf" returns "document"
-    /// - "my.file.v2.docx" returns "my.file.v2"  
-    /// - "no-extension" returns "no-extension"
-    /// </remarks>
+    /// <returns>The file name without the extension.</returns>
+    /// <example>
+    /// <code>
+    /// var fileName = FileName.Create("Document.pdf").Value;
+    /// var nameOnly = fileName.GetNameWithoutExtension(); // "Document"
+    /// </code>
+    /// </example>
     public string GetNameWithoutExtension()
     {
         var lastDotIndex = Value.LastIndexOf('.');
-        return lastDotIndex >= 0 ? Value.Substring(0, lastDotIndex) : Value;
+        return lastDotIndex > 0 ? Value[..lastDotIndex] : Value;
     }
 
     /// <summary>
-    /// Determines whether this file name appears to have an extension.
+    /// Gets the file extension from the file name.
     /// </summary>
-    /// <returns>
-    /// <c>true</c> if the file name contains a period followed by at least one character; otherwise, <c>false</c>.
-    /// </returns>
-    /// <remarks>
-    /// This method checks for the presence of an extension pattern but does not validate
-    /// whether the extension is a recognized file type.
-    /// 
-    /// Examples:
-    /// - "document.pdf" returns true
-    /// - "file." returns false (no characters after period)
-    /// - "no-extension" returns false
-    /// </remarks>
-    public bool HasExtension()
+    /// <returns>The file extension including the dot, or empty string if no extension.</returns>
+    /// <example>
+    /// <code>
+    /// var fileName = FileName.Create("Document.pdf").Value;
+    /// var extension = fileName.GetExtension(); // ".pdf"
+    /// </code>
+    /// </example>
+    public string GetExtension()
     {
         var lastDotIndex = Value.LastIndexOf('.');
-        return lastDotIndex >= 0 && lastDotIndex < Value.Length - 1;
+        return lastDotIndex > 0 && lastDotIndex < Value.Length - 1
+            ? Value[lastDotIndex..]
+            : string.Empty;
     }
 
     /// <summary>
-    /// Implicitly converts a <see cref="FileName"/> to its string representation.
+    /// Creates a new FileName with the specified extension.
     /// </summary>
-    /// <param name="fileName">The FileName to convert.</param>
-    /// <returns>The file name value as a string, or null if the fileName is null.</returns>
-    /// <remarks>
-    /// This implicit conversion allows FileName instances to be used seamlessly
-    /// where string values are expected, such as in file I/O operations,
-    /// logging, or API responses.
-    /// 
-    /// Example usage:
+    /// <param name="newExtension">The new extension (with or without leading dot).</param>
+    /// <returns>A Result containing the new FileName with the updated extension.</returns>
+    /// <example>
     /// <code>
-    /// var fileName = FileName.Create("document.pdf").Value;
-    /// string fileNameString = fileName; // Implicit conversion
-    /// File.WriteAllText(fileNameString, content);
+    /// var fileName = FileName.Create("Document.pdf").Value;
+    /// var result = fileName.WithExtension(".docx");
+    /// if (result.IsSuccess)
+    /// {
+    ///     var newFileName = result.Value; // "Document.docx"
+    /// }
     /// </code>
-    /// </remarks>
-    public static implicit operator string(FileName fileName) => fileName?.Value;
+    /// </example>
+    public Result<FileName> WithExtension(string newExtension)
+    {
+        if (string.IsNullOrWhiteSpace(newExtension))
+            return Result.Failure<FileName>(DomainError.Create(
+                "FILENAME_INVALID_EXTENSION",
+                "Extension cannot be null or empty"));
+
+        var extension = newExtension.StartsWith('.') ? newExtension : $".{newExtension}";
+        var nameWithoutExt = GetNameWithoutExtension();
+        var newFileName = $"{nameWithoutExt}{extension}";
+
+        return Create(newFileName);
+    }
+
+    #region Private Methods
 
     /// <summary>
-    /// Returns a string representation of this file name.
+    /// Normalizes a file name by trimming whitespace and removing invalid patterns.
     /// </summary>
-    /// <returns>
-    /// The validated file name value.
-    /// </returns>
-    /// <remarks>
-    /// This method returns the same value as the <see cref="Value"/> property
-    /// and is suitable for display, logging, and file system operations.
-    /// </remarks>
+    /// <param name="value">The file name to normalize.</param>
+    /// <returns>The normalized file name.</returns>
+    private static string NormalizeFileName(string value)
+    {
+        if (string.IsNullOrWhiteSpace(value))
+            return string.Empty;
+
+        // Trim whitespace
+        var normalized = value.Trim();
+
+        // Remove multiple consecutive spaces
+        normalized = Regex.Replace(normalized, @"\s+", " ");
+
+        // Remove leading and trailing dots (security measure)
+        normalized = normalized.Trim('.');
+
+        return normalized;
+    }
+
+    /// <summary>
+    /// Validates a file name against business rules and security requirements.
+    /// </summary>
+    /// <param name="value">The file name to validate.</param>
+    /// <returns>A Result indicating whether the file name is valid.</returns>
+    private static Result ValidateFileName(string value)
+    {
+        // Check length
+        if (value.Length < MinLength)
+            return Result.Failure(DomainError.Create(
+                "FILENAME_TOO_SHORT",
+                $"File name must be at least {MinLength} character(s) long"));
+
+        if (value.Length > MaxLength)
+            return Result.Failure(DomainError.Create(
+                "FILENAME_TOO_LONG",
+                $"File name cannot exceed {MaxLength} characters"));
+
+        // Check for invalid characters
+        if (value.Any(c => InvalidCharacters.Contains(c)))
+            return Result.Failure(DomainError.Create(
+                "FILENAME_INVALID_CHARACTERS",
+                $"File name contains invalid characters. Invalid characters: {string.Join(", ", InvalidCharacters)}"));
+
+        // Check for control characters
+        if (value.Any(char.IsControl))
+            return Result.Failure(DomainError.Create(
+                "FILENAME_CONTROL_CHARACTERS",
+                "File name cannot contain control characters"));
+
+        // Check regex pattern
+        if (!ValidFileNameRegex.IsMatch(value))
+            return Result.Failure(DomainError.Create(
+                "FILENAME_INVALID_FORMAT",
+                "File name contains invalid characters or format"));
+
+        // Check for reserved names
+        var nameWithoutExtension = value.Contains('.')
+            ? value[..value.LastIndexOf('.')]
+            : value;
+
+        if (ReservedNames.Contains(nameWithoutExtension.ToUpperInvariant()))
+            return Result.Failure(DomainError.Create(
+                "FILENAME_RESERVED_NAME",
+                $"'{nameWithoutExtension}' is a reserved file name and cannot be used"));
+
+        // Check for names ending with space or dot (Windows restriction)
+        if (value.EndsWith(' ') || value.EndsWith('.'))
+            return Result.Failure(DomainError.Create(
+                "FILENAME_INVALID_ENDING",
+                "File name cannot end with a space or dot"));
+
+        return Result.Success();
+    }
+
+    #endregion
+
+    #region Equality and Comparison
+
+    /// <summary>
+    /// Compares this FileName with another FileName.
+    /// </summary>
+    /// <param name="other">The other FileName to compare with.</param>
+    /// <returns>A value indicating the relative order of the FileNames.</returns>
+    public int CompareTo(FileName? other)
+    {
+        if (other is null) return 1;
+        return string.Compare(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Determines whether this FileName is equal to another FileName.
+    /// </summary>
+    /// <param name="other">The other FileName to compare with.</param>
+    /// <returns>True if the FileNames are equal; otherwise, false.</returns>
+    public bool Equals(FileName? other)
+    {
+        return other is not null && string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Returns the hash code for this FileName.
+    /// </summary>
+    /// <returns>A hash code for this FileName.</returns>
+    public override int GetHashCode() => Value.ToLowerInvariant().GetHashCode();
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Implicitly converts a FileName to a string.
+    /// </summary>
+    /// <param name="fileName">The FileName to convert.</param>
+    /// <returns>The underlying string value.</returns>
+    public static implicit operator string(FileName fileName) => fileName.Value;
+
+    /// <summary>
+    /// Explicitly converts a string to a FileName.
+    /// </summary>
+    /// <param name="value">The string value to convert.</param>
+    /// <returns>A new FileName instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the string is not a valid file name.</exception>
+    public static explicit operator FileName(string value)
+    {
+        var result = Create(value);
+        return result.IsSuccess
+            ? result.Value
+            : throw new ArgumentException(result.Error?.Message, nameof(value));
+    }
+
+    /// <summary>
+    /// Determines whether one FileName is less than another.
+    /// </summary>
+    /// <param name="left">The first FileName to compare.</param>
+    /// <param name="right">The second FileName to compare.</param>
+    /// <returns>True if the first FileName is less than the second; otherwise, false.</returns>
+    public static bool operator <(FileName? left, FileName? right) =>
+        left is null ? right is not null : left.CompareTo(right) < 0;
+
+    /// <summary>
+    /// Determines whether one FileName is less than or equal to another.
+    /// </summary>
+    /// <param name="left">The first FileName to compare.</param>
+    /// <param name="right">The second FileName to compare.</param>
+    /// <returns>True if the first FileName is less than or equal to the second; otherwise, false.</returns>
+    public static bool operator <=(FileName? left, FileName? right) =>
+        left is null || left.CompareTo(right) <= 0;
+
+    /// <summary>
+    /// Determines whether one FileName is greater than another.
+    /// </summary>
+    /// <param name="left">The first FileName to compare.</param>
+    /// <param name="right">The second FileName to compare.</param>
+    /// <returns>True if the first FileName is greater than the second; otherwise, false.</returns>
+    public static bool operator >(FileName? left, FileName? right) =>
+        left is not null && left.CompareTo(right) > 0;
+
+    /// <summary>
+    /// Determines whether one FileName is greater than or equal to another.
+    /// </summary>
+    /// <param name="left">The first FileName to compare.</param>
+    /// <param name="right">The second FileName to compare.</param>
+    /// <returns>True if the first FileName is greater than or equal to the second; otherwise, false.</returns>
+    public static bool operator >=(FileName? left, FileName? right) =>
+        left is null ? right is null : left.CompareTo(right) >= 0;
+
+    #endregion
+
+    #region String Representation
+
+    /// <summary>
+    /// Returns a string representation of the FileName.
+    /// </summary>
+    /// <returns>The file name value.</returns>
     public override string ToString() => Value;
+
+    #endregion
 }

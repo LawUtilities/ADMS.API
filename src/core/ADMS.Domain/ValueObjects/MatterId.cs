@@ -1,213 +1,247 @@
-﻿using System;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+using ADMS.Domain.Common;
 
 namespace ADMS.Domain.ValueObjects;
 
 /// <summary>
-/// Represents a unique identifier for a legal matter in the ADMS legal document management system.
+/// Represents a strongly-typed matter identifier value object.
 /// </summary>
 /// <remarks>
-/// This value object encapsulates a GUID-based identifier for legal matters, providing type safety
-/// and preventing accidental mixing of different entity identifiers. Legal matters represent
-/// client cases, projects, or legal engagements that contain related documents and activities.
+/// MatterId provides type safety for matter identifiers, preventing accidental mixing
+/// of different entity IDs and adding domain-specific validation and behavior.
 /// 
-/// The MatterId is immutable and provides validation to ensure the identifier is never empty
-/// or invalid. As a value object, MatterId instances are compared by value rather than reference,
-/// ensuring that two MatterId instances with the same GUID value are considered equal.
+/// <para><strong>Value Object Characteristics:</strong></para>
+/// <list type="bullet">
+/// <item><strong>Immutable:</strong> Once created, the value cannot be changed</item>
+/// <item><strong>Type Safe:</strong> Prevents mixing of different entity identifiers</item>
+/// <item><strong>Validated:</strong> Ensures only valid GUIDs are used</item>
+/// <item><strong>Comparable:</strong> Supports equality and comparison operations</item>
+/// </list>
 /// 
-/// This strongly-typed identifier helps prevent common programming errors such as passing
-/// a DocumentId where a MatterId was expected, improving code reliability and maintaining
-/// the integrity of matter-document relationships in the legal document management system.
+/// <para><strong>Legal Document Management Context:</strong></para>
+/// <list type="bullet">
+/// <item>Ensures matter associations are type-safe and validated</item>
+/// <item>Supports legal practice organization requirements</item>
+/// <item>Provides clear domain intent for matter-related operations</item>
+/// <item>Enables compile-time validation of matter references</item>
+/// </list>
 /// </remarks>
-public sealed record MatterId
+[ComplexType]
+public sealed record MatterId : IComparable<MatterId>
 {
     /// <summary>
-    /// Gets the underlying GUID value of this matter identifier.
+    /// Gets the underlying GUID value.
     /// </summary>
-    /// <value>
-    /// A <see cref="Guid"/> that uniquely identifies a legal matter in the system.
-    /// </value>
-    /// <remarks>
-    /// This property provides access to the underlying GUID value while maintaining
-    /// encapsulation. The value is guaranteed to never be <see cref="Guid.Empty"/>
-    /// due to validation performed during construction.
-    /// 
-    /// The GUID format ensures global uniqueness across all legal matters,
-    /// supporting distributed systems and data migrations.
-    /// </remarks>
     public Guid Value { get; }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="MatterId"/> record with the specified GUID value.
+    /// Initializes a new instance of the MatterId with the specified GUID value.
     /// </summary>
-    /// <param name="value">The GUID value for this matter identifier.</param>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <remarks>
-    /// This constructor is private to enforce the use of factory methods for creating instances.
-    /// This ensures consistent validation and provides controlled ways to create MatterId instances.
-    /// </remarks>
+    /// <param name="value">The GUID value for the matter identifier.</param>
+    /// <exception cref="ArgumentException">Thrown when the GUID is empty.</exception>
     private MatterId(Guid value)
     {
         if (value == Guid.Empty)
             throw new ArgumentException("Matter ID cannot be empty", nameof(value));
+
         Value = value;
     }
 
     /// <summary>
-    /// Creates a new <see cref="MatterId"/> with a randomly generated GUID.
+    /// Creates a new MatterId from the specified GUID value.
     /// </summary>
-    /// <returns>
-    /// A new <see cref="MatterId"/> instance with a unique identifier.
-    /// </returns>
-    /// <remarks>
-    /// This method is the primary way to create new matter identifiers when
-    /// creating new legal matters. It uses <see cref="Guid.NewGuid()"/> to ensure
-    /// the identifier is unique across all systems and time.
-    /// 
-    /// Example usage:
+    /// <param name="value">The GUID value to create the MatterId from.</param>
+    /// <returns>A new MatterId instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the GUID is empty.</exception>
+    /// <example>
     /// <code>
-    /// var matterId = MatterId.New();
-    /// var newMatter = Matter.Create(matterId, "Smith vs. Johnson", clientId);
+    /// var matterId = MatterId.From(Guid.NewGuid());
+    /// var existingId = MatterId.From(Guid.Parse("60000000-0000-0000-0000-000000000001"));
     /// </code>
-    /// </remarks>
-    public static MatterId New() => new(Guid.NewGuid());
-
-    /// <summary>
-    /// Creates a <see cref="MatterId"/> from an existing GUID value.
-    /// </summary>
-    /// <param name="value">The GUID value to convert to a MatterId.</param>
-    /// <returns>
-    /// A new <see cref="MatterId"/> instance wrapping the provided GUID.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <remarks>
-    /// Use this method when you have an existing GUID (e.g., from a database query,
-    /// external system integration, or API request) that you need to convert to a
-    /// strongly-typed MatterId.
-    /// 
-    /// Example usage:
-    /// <code>
-    /// var guid = Guid.Parse("12345678-1234-1234-1234-123456789ABC");
-    /// var matterId = MatterId.From(guid);
-    /// var matter = await matterRepository.GetByIdAsync(matterId);
-    /// </code>
-    /// </remarks>
+    /// </example>
     public static MatterId From(Guid value) => new(value);
 
     /// <summary>
-    /// Creates a <see cref="MatterId"/> from a string representation of a GUID.
+    /// Creates a new MatterId with a new GUID value.
     /// </summary>
-    /// <param name="value">The string representation of the GUID.</param>
-    /// <returns>
-    /// A new <see cref="MatterId"/> instance if parsing is successful.
-    /// </returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is not a valid GUID format or represents <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <exception cref="ArgumentNullException">
-    /// Thrown when <paramref name="value"/> is null.
-    /// </exception>
-    /// <remarks>
-    /// This method accepts standard GUID string formats such as:
-    /// - "12345678-1234-1234-1234-123456789ABC" (with hyphens)
-    /// - "12345678123412341234123456789ABC" (without hyphens)
-    /// - "{12345678-1234-1234-1234-123456789ABC}" (with braces)
-    /// 
-    /// This is commonly used when parsing matter identifiers from URLs,
-    /// configuration files, or user input in administrative interfaces.
-    /// 
-    /// Example usage:
+    /// <returns>A new MatterId instance with a unique identifier.</returns>
+    /// <example>
     /// <code>
-    /// // From API route parameter
-    /// var matterId = MatterId.From(Request.RouteValues["matterId"].ToString());
-    /// 
-    /// // From configuration
-    /// var defaultMatterId = MatterId.From(configuration["DefaultMatterId"]);
+    /// var newMatterId = MatterId.New();
     /// </code>
-    /// </remarks>
-    public static MatterId From(string value)
+    /// </example>
+    public static MatterId New() => new(Guid.NewGuid());
+
+    /// <summary>
+    /// Attempts to parse a string into a MatterId.
+    /// </summary>
+    /// <param name="value">The string value to parse.</param>
+    /// <returns>A Result containing either the parsed MatterId or an error.</returns>
+    /// <example>
+    /// <code>
+    /// var result = MatterId.TryParse("60000000-0000-0000-0000-000000000001");
+    /// if (result.IsSuccess)
+    /// {
+    ///     var matterId = result.Value;
+    ///     // Use the matter ID
+    /// }
+    /// </code>
+    /// </example>
+    public static Result<MatterId> TryParse(string? value)
     {
-        if (value == null)
-            throw new ArgumentNullException(nameof(value));
+        if (string.IsNullOrWhiteSpace(value))
+            return Result.Failure<MatterId>(DomainError.Create(
+                "MATTER_ID_NULL_OR_EMPTY",
+                "Matter ID cannot be null or empty"));
 
         if (!Guid.TryParse(value, out var guid))
-            throw new ArgumentException($"Invalid GUID format: {value}", nameof(value));
+            return Result.Failure<MatterId>(DomainError.Create(
+                "MATTER_ID_INVALID_FORMAT",
+                $"'{value}' is not a valid matter ID format"));
 
-        return new MatterId(guid);
+        if (guid == Guid.Empty)
+            return Result.Failure<MatterId>(DomainError.Create(
+                "MATTER_ID_EMPTY",
+                "Matter ID cannot be empty"));
+
+        return Result.Success(new MatterId(guid));
     }
 
     /// <summary>
-    /// Implicitly converts a <see cref="MatterId"/> to its underlying <see cref="Guid"/> value.
+    /// Validates whether the specified GUID can be used as a MatterId.
     /// </summary>
-    /// <param name="id">The MatterId to convert.</param>
-    /// <returns>The underlying GUID value, or <see cref="Guid.Empty"/> if the id is null.</returns>
-    /// <remarks>
-    /// This implicit conversion allows MatterId instances to be used seamlessly
-    /// where GUID values are expected, such as in Entity Framework queries,
-    /// database parameters, or when interfacing with external APIs that expect GUID parameters.
-    /// 
-    /// Example usage:
+    /// <param name="value">The GUID to validate.</param>
+    /// <returns>True if the GUID is valid for use as a MatterId; otherwise, false.</returns>
+    /// <example>
     /// <code>
-    /// MatterId matterId = MatterId.New();
-    /// Guid guid = matterId; // Implicit conversion
-    /// 
-    /// // Use in Entity Framework query
-    /// var documents = await context.Documents
-    ///     .Where(d => d.MatterId == matterId) // Implicit conversion
-    ///     .ToListAsync();
+    /// var isValid = MatterId.IsValid(someGuid);
+    /// if (isValid)
+    /// {
+    ///     var matterId = MatterId.From(someGuid);
+    /// }
     /// </code>
-    /// </remarks>
-    public static implicit operator Guid(MatterId id) => id?.Value ?? Guid.Empty;
+    /// </example>
+    public static bool IsValid(Guid value) => value != Guid.Empty;
 
     /// <summary>
-    /// Implicitly converts a <see cref="Guid"/> to a <see cref="MatterId"/>.
+    /// Validates whether the specified string can be parsed as a MatterId.
     /// </summary>
-    /// <param name="value">The GUID value to convert.</param>
-    /// <returns>A new MatterId wrapping the GUID value.</returns>
-    /// <exception cref="ArgumentException">
-    /// Thrown when <paramref name="value"/> is <see cref="Guid.Empty"/>.
-    /// </exception>
-    /// <remarks>
-    /// This implicit conversion allows GUID values to be automatically converted
-    /// to MatterId instances when needed, providing convenience while maintaining
-    /// type safety. This is particularly useful when working with database results
-    /// or external API responses.
-    /// 
-    /// Example usage:
+    /// <param name="value">The string to validate.</param>
+    /// <returns>True if the string is a valid MatterId; otherwise, false.</returns>
+    /// <example>
     /// <code>
-    /// Guid guidFromDatabase = dataReader.GetGuid("MatterId");
-    /// MatterId matterId = guidFromDatabase; // Implicit conversion
-    /// 
-    /// // Use in business logic
-    /// var matterDocuments = await documentService.GetByMatterAsync(matterId);
+    /// var isValid = MatterId.IsValid("60000000-0000-0000-0000-000000000001");
     /// </code>
-    /// </remarks>
-    public static implicit operator MatterId(Guid value) => From(value);
+    /// </example>
+    public static bool IsValid(string? value) => TryParse(value).IsSuccess;
+
+    #region Equality and Comparison
 
     /// <summary>
-    /// Returns a string representation of this matter identifier.
+    /// Compares this MatterId with another MatterId.
     /// </summary>
-    /// <returns>
-    /// A string representation of the underlying GUID value in standard format.
-    /// </returns>
-    /// <remarks>
-    /// The returned string uses the standard GUID format with hyphens:
-    /// "12345678-1234-1234-1234-123456789ABC"
-    /// 
-    /// This method is useful for logging, debugging, displaying the identifier
-    /// in user interfaces, and serialization for APIs or configuration files.
-    /// 
-    /// Example usage:
+    /// <param name="other">The other MatterId to compare with.</param>
+    /// <returns>A value indicating the relative order of the MatterIds.</returns>
+    public int CompareTo(MatterId? other) => other is null ? 1 : Value.CompareTo(other.Value);
+
+    /// <summary>
+    /// Determines whether this MatterId is equal to another MatterId.
+    /// </summary>
+    /// <param name="other">The other MatterId to compare with.</param>
+    /// <returns>True if the MatterIds are equal; otherwise, false.</returns>
+    public bool Equals(MatterId? other) => other is not null && Value.Equals(other.Value);
+
+    /// <summary>
+    /// Returns the hash code for this MatterId.
+    /// </summary>
+    /// <returns>A hash code for this MatterId.</returns>
+    public override int GetHashCode() => Value.GetHashCode();
+
+    #endregion
+
+    #region Operators
+
+    /// <summary>
+    /// Implicitly converts a MatterId to a Guid.
+    /// </summary>
+    /// <param name="matterId">The MatterId to convert.</param>
+    /// <returns>The underlying Guid value.</returns>
+    public static implicit operator Guid(MatterId matterId) => matterId.Value;
+
+    /// <summary>
+    /// Explicitly converts a Guid to a MatterId.
+    /// </summary>
+    /// <param name="value">The Guid value to convert.</param>
+    /// <returns>A new MatterId instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when the GUID is empty.</exception>
+    public static explicit operator MatterId(Guid value) => From(value);
+
+    /// <summary>
+    /// Determines whether one MatterId is less than another.
+    /// </summary>
+    /// <param name="left">The first MatterId to compare.</param>
+    /// <param name="right">The second MatterId to compare.</param>
+    /// <returns>True if the first MatterId is less than the second; otherwise, false.</returns>
+    public static bool operator <(MatterId? left, MatterId? right) =>
+        left is null ? right is not null : left.CompareTo(right) < 0;
+
+    /// <summary>
+    /// Determines whether one MatterId is less than or equal to another.
+    /// </summary>
+    /// <param name="left">The first MatterId to compare.</param>
+    /// <param name="right">The second MatterId to compare.</param>
+    /// <returns>True if the first MatterId is less than or equal to the second; otherwise, false.</returns>
+    public static bool operator <=(MatterId? left, MatterId? right) =>
+        left is null || left.CompareTo(right) <= 0;
+
+    /// <summary>
+    /// Determines whether one MatterId is greater than another.
+    /// </summary>
+    /// <param name="left">The first MatterId to compare.</param>
+    /// <param name="right">The second MatterId to compare.</param>
+    /// <returns>True if the first MatterId is greater than the second; otherwise, false.</returns>
+    public static bool operator >(MatterId? left, MatterId? right) =>
+        left is not null && left.CompareTo(right) > 0;
+
+    /// <summary>
+    /// Determines whether one MatterId is greater than or equal to another.
+    /// </summary>
+    /// <param name="left">The first MatterId to compare.</param>
+    /// <param name="right">The second MatterId to compare.</param>
+    /// <returns>True if the first MatterId is greater than or equal to the second; otherwise, false.</returns>
+    public static bool operator >=(MatterId? left, MatterId? right) =>
+        left is null ? right is null : left.CompareTo(right) >= 0;
+
+    #endregion
+
+    #region String Representation
+
+    /// <summary>
+    /// Returns a string representation of the MatterId.
+    /// </summary>
+    /// <returns>The string representation of the underlying GUID.</returns>
+    /// <example>
     /// <code>
     /// var matterId = MatterId.New();
-    /// logger.LogInformation("Processing matter {MatterId}", matterId.ToString());
-    /// 
-    /// // For display in UI
-    /// Console.WriteLine($"Matter ID: {matterId}");
+    /// var idString = matterId.ToString(); // e.g., "60000000-0000-0000-0000-000000000001"
     /// </code>
-    /// </remarks>
+    /// </example>
     public override string ToString() => Value.ToString();
+
+    /// <summary>
+    /// Returns a string representation of the MatterId using the specified format.
+    /// </summary>
+    /// <param name="format">The format string to use.</param>
+    /// <returns>The formatted string representation of the underlying GUID.</returns>
+    /// <example>
+    /// <code>
+    /// var matterId = MatterId.New();
+    /// var shortId = matterId.ToString("N"); // No hyphens
+    /// var bracketed = matterId.ToString("B"); // With braces
+    /// </code>
+    /// </example>
+    public string ToString(string? format) => Value.ToString(format);
+
+    #endregion
 }
