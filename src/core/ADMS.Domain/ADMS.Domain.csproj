@@ -19,24 +19,27 @@
     <Product>ADMS Domain Layer</Product>
     <Copyright>Copyright © ADMS</Copyright>
     <Description>Domain layer containing business entities, value objects, and domain services for the ADMS legal document management system.</Description>
-    <PackageProjectUrl>https://github.com/your-org/adms</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/your-org/adms</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <Optimize>true</Optimize>
     <DefineConstants>TRACE</DefineConstants>
+    <DebugType>pdbonly</DebugType>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Domain should have minimal dependencies -->
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
-    <!-- Consider upgrading to stable version 8.x instead of preview 9.x for production -->
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.8" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,12 +48,16 @@
     <Folder Include="Exceptions\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Specifications\" />
-    <Folder Include="ValueObjects\" />
   </ItemGroup>
 
   <!-- Global analyzer configuration -->
   <ItemGroup>
     <EditorConfigFiles Include="..\..\..\.editorconfig" Condition="Exists('..\..\..\.editorconfig')" />
   </ItemGroup>
+
+  <!-- Enable nullable reference types for better null safety -->
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 
 </Project>

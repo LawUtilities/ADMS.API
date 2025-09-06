@@ -56,7 +56,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
     /// </summary>
     /// <value>An <see cref="IReadOnlyCollection{T}"/> of domain events.</value>
     public virtual IReadOnlyCollection<IDomainEvent> DomainEvents =>
-        _domainEvents?.AsReadOnly() ?? Array.Empty<IDomainEvent>();
+        _domainEvents is not null ? _domainEvents.AsReadOnly() : Array.Empty<IDomainEvent>();
 
     /// <summary>
     /// Adds a domain event to be processed when this entity is persisted.
@@ -67,8 +67,23 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
     {
         ArgumentNullException.ThrowIfNull(eventItem);
 
-        _domainEvents ??= new List<IDomainEvent>();
+        _domainEvents ??= [];
         _domainEvents.Add(eventItem);
+    }
+
+    /// <summary>
+    /// Adds multiple domain events to be processed when this entity is persisted.
+    /// </summary>
+    /// <param name="events">The domain events to add.</param>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="events"/> is null.</exception>
+    public virtual void AddDomainEvents(IEnumerable<IDomainEvent> events)
+    {
+        ArgumentNullException.ThrowIfNull(events);
+
+        foreach (var domainEvent in events)
+        {
+            AddDomainEvent(domainEvent);
+        }
     }
 
     /// <summary>
@@ -95,6 +110,12 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
     /// <returns><c>true</c> if the entity has domain events; otherwise, <c>false</c>.</returns>
     public virtual bool HasDomainEvents() => _domainEvents?.Count > 0;
 
+    /// <summary>
+    /// Gets the count of pending domain events.
+    /// </summary>
+    /// <returns>The number of pending domain events.</returns>
+    public virtual int DomainEventCount => _domainEvents?.Count ?? 0;
+
     #endregion Domain Events
 
     #region Equality and Comparison
@@ -114,7 +135,11 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
+
+        // Fast path: check if types are different
         if (GetType() != other.GetType()) return false;
+
+        // If either entity is transient, they can only be equal if they're the same reference
         if (IsTransient || other.IsTransient) return false;
 
         return EqualityComparer<TId>.Default.Equals(Id, other.Id);
@@ -137,11 +162,14 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
     /// </returns>
     public override int GetHashCode()
     {
-        // S3249: Avoid using base.GetHashCode() for transient entities.
-        // Use a type-based hash code for transient entities to avoid reference-based hash codes.
-        return IsTransient
-            ? GetType().GetHashCode()
-            : EqualityComparer<TId>.Default.GetHashCode(Id!);
+        // For transient entities, use type-based hash code to avoid reference-based hash codes
+        if (IsTransient)
+        {
+            return GetType().GetHashCode();
+        }
+
+        // For non-transient entities, use only immutable fields (Id and type)
+        return HashCode.Combine(GetType(), EqualityComparer<TId>.Default.GetHashCode(Id!));
     }
 
     /// <summary>
@@ -168,12 +196,84 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
 
     #endregion Equality and Comparison
 
+    #region Audit Helper Methods
+
+    /// <summary>
+    /// Sets the audit information for entity creation.
+    /// </summary>
+    /// <param name="createdBy">The user who created the entity.</param>
+    /// <param name="createdDate">The creation date. If null, uses current UTC time.</param>
+    protected virtual void SetCreatedAudit(string createdBy, DateTime? createdDate = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(createdBy);
+
+        CreatedBy = createdBy;
+        CreatedDate = createdDate ?? DateTime.UtcNow;
+        LastModifiedBy = createdBy;
+        LastModifiedDate = null; // No modification at creation
+    }
+
+    /// <summary>
+    /// Sets the audit information for entity modification.
+    /// </summary>
+    /// <param name="modifiedBy">The user who modified the entity.</param>
+    /// <param name="modifiedDate">The modification date. If null, uses current UTC time.</param>
+    protected virtual void SetModifiedAudit(string modifiedBy, DateTime? modifiedDate = null)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(modifiedBy);
+
+        LastModifiedBy = modifiedBy;
+        LastModifiedDate = modifiedDate ?? DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Gets the age of this entity in days since creation.
+    /// </summary>
+    /// <returns>The number of days since the entity was created.</returns>
+    public virtual double GetAgeDays() => (DateTime.UtcNow - CreatedDate).TotalDays;
+
+    /// <summary>
+    /// Gets the time since last modification in days.
+    /// </summary>
+    /// <returns>The number of days since last modification, or null if never modified.</returns>
+    public virtual double? GetDaysSinceLastModification()
+    {
+        return LastModifiedDate.HasValue
+            ? (DateTime.UtcNow - LastModifiedDate.Value).TotalDays
+            : null;
+    }
+
+    #endregion Audit Helper Methods
+
     /// <summary>
     /// Returns a string representation of the entity.
     /// </summary>
     /// <returns>A string that represents the current entity.</returns>
     public override string ToString()
     {
-        return $"{GetType().Name} [Id={Id}]";
+        var typeName = GetType().Name;
+        var id = IsTransient ? "Transient" : Id?.ToString() ?? "Unknown";
+        return $"{typeName} [Id={id}]";
+    }
+}
+
+/// <summary>
+/// Extension methods for nullable values.
+/// </summary>
+internal static class NullableExtensions
+{
+    /// <summary>
+    /// Transforms a nullable value if it has a value.
+    /// </summary>
+    /// <typeparam name="T">The type of the nullable value.</typeparam>
+    /// <typeparam name="TResult">The type of the result.</typeparam>
+    /// <param name="value">The nullable value.</param>
+    /// <param name="transform">The transformation function.</param>
+    /// <returns>The transformed value if the nullable has a value; otherwise, null.</returns>
+    public static TResult? Let<T, TResult>(this T? value, Func<T, TResult> transform)
+        where T : struct
+        where TResult : struct
+    {
+        return value.HasValue ? transform(value.Value) : null;
     }
 }
