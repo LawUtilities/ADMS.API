@@ -20,17 +20,4 @@
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Commands\" />
-    <Folder Include="Queries\" />
-    <Folder Include="DTOs\Requests\" />
-    <Folder Include="DTOs\Responses\" />
-    <Folder Include="Mappings\" />
-    <Folder Include="Validators\" />
-    <Folder Include="Services\" />
-    <Folder Include="Interfaces\" />
-    <Folder Include="Behaviors\" />
-    <Folder Include="Extensions\" />
-  </ItemGroup>
-
 </Project>
