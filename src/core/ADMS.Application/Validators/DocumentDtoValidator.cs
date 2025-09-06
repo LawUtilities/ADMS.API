@@ -69,7 +69,7 @@ public class DocumentDtoValidator : AbstractValidator<DocumentDto>
             .Must(HaveConsistentMimeTypeAndExtension)
             .WithMessage("MIME type does not match the file extension.");
 
-        RuleFor(x => x.CreatedAt)
+        RuleFor(x => x.CreationDate)
             .NotEmpty()
             .WithMessage("Creation date is required.")
             .LessThanOrEqualTo(DateTime.UtcNow)
@@ -100,7 +100,7 @@ public class DocumentDtoValidator : AbstractValidator<DocumentDto>
     private static bool BeValidExtensionFormat(string extension)
     {
         return !string.IsNullOrWhiteSpace(extension) &&
-               extension.All(c => char.IsLetterOrDigit(c)) &&
+               extension.All(char.IsLetterOrDigit) &&
                extension.Equals(extension, StringComparison.InvariantCultureIgnoreCase);
     }
 
@@ -142,13 +142,13 @@ public class DocumentDtoValidator : AbstractValidator<DocumentDto>
     private static bool BeValidChecksum(string checksum)
     {
         return !string.IsNullOrWhiteSpace(checksum) &&
-               checksum.All(c => char.IsDigit(c) || (c >= 'A' && c <= 'F') || (c >= 'a' && c <= 'f'));
+               checksum.All(c => char.IsDigit(c) || c is >= 'A' and <= 'F' || c is >= 'a' and <= 'f');
     }
 
     private static bool HaveConsistentMimeTypeAndExtension(DocumentDto document)
     {
-        var expectedMimeTypes = GetExpectedMimeTypesForExtension(document.Extension?.ToLowerInvariant());
-        return expectedMimeTypes.Contains(document.MimeType?.ToLowerInvariant());
+        var expectedMimeTypes = GetExpectedMimeTypesForExtension(document.Extension.ToLowerInvariant());
+        return expectedMimeTypes.Contains(document.MimeType.ToLowerInvariant());
     }
 
     private static string[] GetExpectedMimeTypesForExtension(string? extension)

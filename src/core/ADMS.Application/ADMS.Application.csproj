@@ -9,6 +9,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Common\DtoValidationHelper.cs" />
+    <Compile Remove="Common\MatterValidationHelper.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\Shared\ADMS.Shared\ADMS.Shared.csproj" />
     <ProjectReference Include="..\ADMS.Domain\ADMS.Domain.csproj" />
   </ItemGroup>

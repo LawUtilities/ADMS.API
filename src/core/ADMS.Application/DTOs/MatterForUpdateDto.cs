@@ -1,607 +1,140 @@
-﻿using System.Collections.Immutable;
+﻿using ADMS.Application.Common;
+using ADMS.Application.Constants;
+using ADMS.Domain.Common;
+using ADMS.Domain.Entities;
+
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel.DataAnnotations.Schema;
+using DomainError = ADMS.Domain.Common.DomainError;
+using Result = ADMS.Domain.Common.Result;
 
 namespace ADMS.Application.DTOs;
 
 /// <summary>
-/// Data Transfer Object for updating existing matters with comprehensive validation and business rule enforcement.
+/// Represents a data transfer object (DTO) for updating a matter, including its description, archive status, and
+/// creation date.
 /// </summary>
-/// <remarks>
-/// This DTO serves as the contract for updating existing matters within the ADMS legal document management system,
-/// providing only the properties that can be safely modified while maintaining data integrity and business rule
-/// compliance. It mirrors updatable properties from <see cref="ADMS.API.Entities.Matter"/> while enforcing
-/// professional standards and validation rules appropriate for matter update operations.
-/// 
-/// <para><strong>Key Characteristics:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Update-Focused Design:</strong> Contains only properties that can be safely updated in existing matters</item>
-/// <item><strong>Professional Validation:</strong> Uses ADMS.API.Common.MatterValidationHelper for comprehensive data integrity</item>
-/// <item><strong>Business Rule Enforcement:</strong> Enforces matter lifecycle and update-specific business rules</item>
-/// <item><strong>Audit Trail Support:</strong> Designed to work with matter activity tracking and audit systems</item>
-/// <item><strong>Immutable Design:</strong> Record type with init-only properties for thread-safe operations</item>
-/// </list>
-/// 
-/// <para><strong>Updatable Properties:</strong></para>
-/// This DTO includes only properties from ADMS.API.Entities.Matter that are appropriate for updates:
-/// <list type="bullet">
-/// <item><strong>Description:</strong> Matter description (with uniqueness validation considerations)</item>
-/// <item><strong>IsArchived:</strong> Archival status (with proper state transition validation)</item>
-/// <item><strong>CreationDate:</strong> Allowed for data correction scenarios under strict validation</item>
-/// </list>
-/// 
-/// <para><strong>Excluded Properties:</strong></para>
-/// Properties excluded for data integrity and business rule compliance:
-/// <list type="bullet">
-/// <item><strong>Id:</strong> Matter ID is immutable and set during creation</item>
-/// <item><strong>IsDeleted:</strong> Deletion requires separate operations with proper audit trails</item>
-/// <item><strong>Document Collections:</strong> Managed through separate document operations</item>
-/// <item><strong>Activity Collections:</strong> Managed through activity tracking systems</item>
-/// </list>
-/// 
-/// <para><strong>Usage Scenarios:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Matter Metadata Updates:</strong> Updating matter descriptions and basic properties</item>
-/// <item><strong>Matter State Management:</strong> Archiving and unarchiving matters through proper workflows</item>
-/// <item><strong>Data Correction:</strong> Correcting matter information while maintaining audit trails</item>
-/// <item><strong>Batch Updates:</strong> Bulk matter updates with consistent validation and business rules</item>
-/// <item><strong>API Operations:</strong> REST API endpoints for matter update operations</item>
-/// </list>
-/// 
-/// <para><strong>Professional Legal Practice Support:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Matter Lifecycle Management:</strong> Proper matter state transitions for legal practice workflows</item>
-/// <item><strong>Professional Standards:</strong> Maintains professional naming conventions and validation rules</item>
-/// <item><strong>Audit Compliance:</strong> Designed to work with audit trail and activity tracking systems</item>
-/// <item><strong>Data Integrity:</strong> Comprehensive validation ensures matter data integrity and consistency</item>
-/// </list>
-/// 
-/// <para><strong>Business Rules for Updates:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Description Updates:</strong> Must maintain uniqueness across the system</item>
-/// <item><strong>Archive State Changes:</strong> Must follow proper matter lifecycle transitions</item>
-/// <item><strong>Creation Date Updates:</strong> Allowed only for data correction with validation</item>
-/// <item><strong>Audit Trail Integration:</strong> All updates should be tracked through matter activity systems</item>
-/// </list>
-/// 
-/// <para><strong>Update Validation Strategy:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Property Validation:</strong> Each property validated against professional standards</item>
-/// <item><strong>Business Rule Validation:</strong> Cross-property validation for business rule compliance</item>
-/// <item><strong>State Transition Validation:</strong> Ensures valid state transitions during updates</item>
-/// <item><strong>Uniqueness Validation:</strong> Description uniqueness validation in update context</item>
-/// </list>
-/// </remarks>
-/// <example>
-/// <code>
-/// // Creating a matter update DTO
-/// var updateDto = new MatterForUpdateDto
-/// {
-///     Description = "Updated Matter Description - Smith Family Trust",
-///     IsArchived = true,
-///     CreationDate = originalMatter.CreationDate // Typically preserved
-/// };
-/// 
-/// // Validating the update DTO
-/// var validationResults = MatterForUpdateDto.ValidateModel(updateDto);
-/// if (validationResults.Any())
-/// {
-///     foreach (var result in validationResults)
-///     {
-///         Console.WriteLine($"Validation Error: {result.ErrorMessage}");
-///     }
-/// }
-/// 
-/// // Using for matter updates
-/// if (updateDto.IsValid)
-/// {
-///     // Apply updates to existing matter
-///     await matterService.UpdateMatterAsync(existingMatterId, updateDto);
-/// }
-/// </code>
-/// </example>
-public record MatterForUpdateDto : IValidatableObject, IEquatable<MatterForUpdateDto>
+/// <remarks>This DTO is used to encapsulate the data required for updating a matter. It includes validation logic
+/// to ensure that the provided data adheres to the expected constraints. The object also provides computed properties
+/// for additional derived information, such as the normalized description, the age of the matter in days, and a
+/// localized string representation of the creation date.</remarks>
+public record MatterForUpdateDto : IValidatableObject
 {
     #region Updatable Properties
 
     /// <summary>
-    /// Gets the matter description for update operations.
+    /// Gets or initializes the description of the matter.
     /// </summary>
-    /// <remarks>
-    /// The matter description serves as the primary human-readable identifier and can be updated to reflect
-    /// changes in matter scope, client requirements, or organizational needs. This property corresponds to
-    /// <see cref="ADMS.API.Entities.Matter.Description"/> and must maintain uniqueness across the system
-    /// while adhering to professional naming conventions.
-    /// 
-    /// <para><strong>Update Validation Rules (via ADMS.API.Common.MatterValidationHelper):</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Required:</strong> Cannot be null, empty, or whitespace</item>
-    /// <item><strong>Length:</strong> 3-128 characters (matching database constraint)</item>
-    /// <item><strong>Uniqueness:</strong> Must be unique across all matters in the system (excluding current matter)</item>
-    /// <item><strong>Format:</strong> Must contain letters and start/end with alphanumeric characters</item>
-    /// <item><strong>Reserved Words:</strong> Cannot contain system-reserved terms</item>
-    /// <item><strong>Professional Standards:</strong> Must follow professional legal practice naming conventions</item>
-    /// </list>
-    /// 
-    /// <para><strong>Update Considerations:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Audit Trail:</strong> Description changes should be tracked through matter activity systems</item>
-    /// <item><strong>Client Communication:</strong> Description changes may require client notification</item>
-    /// <item><strong>System Impact:</strong> Description changes affect all matter references and displays</item>
-    /// <item><strong>Professional Standards:</strong> Updates must maintain professional legal practice standards</item>
-    /// </list>
-    /// 
-    /// <para><strong>Professional Naming Examples for Updates:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Scope Changes:</strong> "Smith Family Trust" → "Smith Family Trust - Estate Planning"</item>
-    /// <item><strong>Status Updates:</strong> "ABC Corp Merger" → "ABC Corp Merger - Phase II"</item>
-    /// <item><strong>Clarifications:</strong> "Johnson Matter" → "Johnson Estate Probate"</item>
-    /// </list>
-    /// 
-    /// <para><strong>Entity Alignment:</strong></para>
-    /// This property mirrors <see cref="ADMS.API.Entities.Matter.Description"/> with identical validation
-    /// rules and professional standards, ensuring consistency between entity and DTO representations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Professional matter description updates
-    /// var updateDto = new MatterForUpdateDto 
-    /// { 
-    ///     Description = "Smith Family Trust - Updated Scope",
-    ///     IsArchived = false,
-    ///     CreationDate = originalMatter.CreationDate
-    /// };
-    /// 
-    /// // Validation before update
-    /// var isValid = MatterValidationHelper.IsValidDescription(updateDto.Description);
-    /// 
-    /// // Audit trail integration
-    /// await auditService.LogMatterDescriptionChange(matterId, oldDescription, updateDto.Description);
-    /// </code>
-    /// </example>
-    [Required(ErrorMessage = "Matter description is required.")]
     [StringLength(
-        128, // Use constant value directly
-        MinimumLength = 3, // Use constant value directly
+        MatterConstants.DescriptionMaxLength,
+        MinimumLength = MatterConstants.DescriptionMinLength,
         ErrorMessage = "Matter description must be between 3 and 128 characters.")]
     public required string Description { get; init; }
 
     /// <summary>
-    /// Gets a value indicating whether the matter should be archived.
+    /// Gets a value indicating whether the item is archived.
     /// </summary>
-    /// <remarks>
-    /// The archived status controls the matter's lifecycle state and can be updated to reflect changes in
-    /// matter activity and client requirements. This property corresponds to <see cref="ADMS.API.Entities.Matter.IsArchived"/>
-    /// and must follow proper state transition rules during updates.
-    /// 
-    /// <para><strong>Archive State Transition Rules:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Active to Archived:</strong> Valid transition for completed or inactive matters</item>
-    /// <item><strong>Archived to Active:</strong> Valid transition when matter becomes active again</item>
-    /// <item><strong>Audit Requirements:</strong> All state changes must be tracked in matter activity logs</item>
-    /// <item><strong>Document Impact:</strong> Archival status affects document accessibility and operations</item>
-    /// </list>
-    /// 
-    /// <para><strong>Professional Practice Integration:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Matter Lifecycle:</strong> Supports professional matter lifecycle management workflows</item>
-    /// <item><strong>Client Communication:</strong> Archival status changes may require client notification</item>
-    /// <item><strong>Practice Organization:</strong> Helps organize active vs completed work for efficiency</item>
-    /// <item><strong>Compliance Support:</strong> Maintains matter records for professional and legal compliance</item>
-    /// </list>
-    /// 
-    /// <para><strong>Update Business Rules:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Active Documents Check:</strong> Consider document checkout status before archiving</item>
-    /// <item><strong>Activity Validation:</strong> Ensure no active operations are in progress</item>
-    /// <item><strong>Client Approval:</strong> May require client approval for archival status changes</item>
-    /// <item><strong>Restoration Rules:</strong> Archived matters can be reactivated when needed</item>
-    /// </list>
-    /// 
-    /// <para><strong>Entity Alignment:</strong></para>
-    /// This property mirrors <see cref="ADMS.API.Entities.Matter.IsArchived"/> with identical business logic
-    /// and state transition rules, ensuring consistency between entity and DTO representations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Archive a completed matter
-    /// var archiveUpdate = new MatterForUpdateDto 
-    /// { 
-    ///     Description = existingMatter.Description,
-    ///     IsArchived = true, // Archiving the matter
-    ///     CreationDate = existingMatter.CreationDate
-    /// };
-    /// 
-    /// // Reactivate an archived matter
-    /// var reactivateUpdate = new MatterForUpdateDto 
-    /// { 
-    ///     Description = existingMatter.Description,
-    ///     IsArchived = false, // Reactivating the matter
-    ///     CreationDate = existingMatter.CreationDate
-    /// };
-    /// 
-    /// // Validate state transition
-    /// var canArchive = !existingMatter.IsArchived && !existingMatter.IsDeleted;
-    /// </code>
-    /// </example>
     public bool IsArchived { get; init; }
 
     /// <summary>
-    /// Gets the UTC creation date of the matter for update operations.
+    /// Gets the creation date of the entity.
     /// </summary>
-    /// <remarks>
-    /// The creation date can be updated in specific scenarios such as data correction, migration, or administrative
-    /// adjustments. This property corresponds to <see cref="ADMS.API.Entities.Matter.CreationDate"/> and is subject
-    /// to strict validation to maintain temporal consistency and audit trail integrity.
-    /// 
-    /// <para><strong>Update Scenarios:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Data Correction:</strong> Correcting incorrectly recorded creation dates</item>
-    /// <item><strong>System Migration:</strong> Preserving historical creation dates during system transitions</item>
-    /// <item><strong>Administrative Adjustment:</strong> Administrative corrections with proper authorization</item>
-    /// <item><strong>Audit Trail Correction:</strong> Correcting temporal inconsistencies in audit records</item>
-    /// </list>
-    /// 
-    /// <para><strong>Strict Validation Requirements (via ADMS.API.Common.MatterValidationHelper):</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Valid Range:</strong> Between January 1, 1980, and current time (with tolerance)</item>
-    /// <item><strong>Not Future:</strong> Cannot be set to future dates to prevent temporal inconsistencies</item>
-    /// <item><strong>Not Default:</strong> Must be a valid DateTime, not DateTime.MinValue or default values</item>
-    /// <item><strong>UTC Requirement:</strong> Must be provided in UTC for global consistency</item>
-    /// <item><strong>Audit Trail Impact:</strong> Changes must not break audit trail chronology</item>
-    /// </list>
-    /// 
-    /// <para><strong>Professional Practice Considerations:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Legal Implications:</strong> Creation date changes may have legal implications for case timelines</item>
-    /// <item><strong>Client Communication:</strong> Date changes may require client notification and explanation</item>
-    /// <item><strong>Audit Requirements:</strong> All creation date changes must be thoroughly documented</item>
-    /// <item><strong>Authorization Required:</strong> Typically requires elevated permissions and audit approval</item>
-    /// </list>
-    /// 
-    /// <para><strong>Update Best Practices:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Preserve Original:</strong> In most cases, preserve the original creation date</item>
-    /// <item><strong>Document Changes:</strong> Thoroughly document reasons for creation date changes</item>
-    /// <item><strong>Audit Trail:</strong> Maintain complete audit trail of all temporal changes</item>
-    /// <item><strong>Authorization:</strong> Ensure proper authorization for creation date modifications</item>
-    /// </list>
-    /// 
-    /// <para><strong>Entity Alignment:</strong></para>
-    /// This property mirrors <see cref="ADMS.API.Entities.Matter.CreationDate"/> with identical validation
-    /// rules and temporal constraints, ensuring consistency between entity and DTO representations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Typical update preserving original creation date
-    /// var standardUpdate = new MatterForUpdateDto 
-    /// { 
-    ///     Description = "Updated Description",
-    ///     IsArchived = false,
-    ///     CreationDate = existingMatter.CreationDate // Preserve original
-    /// };
-    /// 
-    /// // Data correction scenario (requires special authorization)
-    /// var correctionUpdate = new MatterForUpdateDto 
-    /// { 
-    ///     Description = existingMatter.Description,
-    ///     IsArchived = existingMatter.IsArchived,
-    ///     CreationDate = correctedCreationDate // Administrative correction
-    /// };
-    /// 
-    /// // Validation for creation date updates
-    /// var isValidDate = MatterValidationHelper.IsValidDate(correctionUpdate.CreationDate);
-    /// if (correctionUpdate.CreationDate != existingMatter.CreationDate)
-    /// {
-    ///     await auditService.LogCreationDateChange(matterId, existingMatter.CreationDate, correctionUpdate.CreationDate);
-    /// }
-    /// </code>
-    /// </example>
     [Required(ErrorMessage = "Creation date is required.")]
     public required DateTime CreationDate { get; init; } = DateTime.UtcNow;
 
-    #endregion Updatable Properties
+    #endregion
 
     #region Computed Properties
 
     /// <summary>
-    /// Gets the normalized description for consistent comparison and uniqueness validation.
+    /// Gets the normalized version of the description.
     /// </summary>
-    /// <remarks>
-    /// This computed property provides a normalized version of the matter description using
-    /// ADMS.API.Common.MatterValidationHelper normalization rules for consistent comparison
-    /// and uniqueness validation during update operations.
-    /// 
-    /// <para><strong>Normalization Rules:</strong></para>
-    /// <list type="bullet">
-    /// <item>Trims leading and trailing whitespace</item>
-    /// <item>Normalizes multiple consecutive spaces to single spaces</item>
-    /// <item>Preserves internal punctuation and formatting</item>
-    /// <item>Returns null for invalid descriptions</item>
-    /// </list>
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var update1 = new MatterForUpdateDto { Description = "  Contract   Review  " };
-    /// var update2 = new MatterForUpdateDto { Description = "Contract Review" };
-    /// 
-    /// // Both will have the same normalized description: "Contract Review"
-    /// bool areEquivalent = update1.NormalizedDescription == update2.NormalizedDescription; // true
-    /// </code>
-    /// </example>
-    public string? NormalizedDescription => MatterValidationHelper.NormalizeDescription(Description);
+    [NotMapped]
+    public string NormalizedDescription => MatterValidationHelper.NormalizeDescription(Description) ?? string.Empty;
 
     /// <summary>
-    /// Gets the creation date formatted as a localized string for UI display.
+    /// Gets the creation date and time of the entity as a localized string.
     /// </summary>
-    /// <remarks>
-    /// This computed property provides a user-friendly formatted representation of the creation date
-    /// converted to local time, optimized for update interface display and temporal validation feedback.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Display in update interface
-    /// var displayText = $"Creation Date: {updateDto.LocalCreationDateString}";
-    /// </code>
-    /// </example>
+    [NotMapped]
     public string LocalCreationDateString => CreationDate.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss");
 
     /// <summary>
-    /// Gets the age of the matter in days based on the creation date being updated.
+    /// Gets the age of the entity in days, calculated as the difference between the current UTC time and the creation
+    /// date.
     /// </summary>
-    /// <remarks>
-    /// This computed property calculates the number of days since the matter creation date,
-    /// useful for validating the reasonableness of creation date updates and providing
-    /// temporal context during update operations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// Console.WriteLine($"Matter will show as {updateDto.AgeDays} days old after update");
-    /// 
-    /// // Validation for reasonable age
-    /// if (updateDto.AgeDays > 365 * 10) // More than 10 years
-    /// {
-    ///     Console.WriteLine("Warning: Matter creation date is very old");
-    /// }
-    /// </code>
-    /// </example>
+    [NotMapped]
     public double AgeDays => (DateTime.UtcNow - CreationDate).TotalDays;
 
     /// <summary>
-    /// Gets a value indicating whether this update DTO has valid data for system operations.
+    /// Gets a value indicating whether the current object is valid based on its description and creation date.
     /// </summary>
-    /// <remarks>
-    /// This property provides a quick validation check without running full validation logic,
-    /// useful for UI scenarios where immediate feedback is needed before processing update operations.
-    /// 
-    /// <para><strong>Validation Checks:</strong></para>
-    /// <list type="bullet">
-    /// <item>Description passes comprehensive validation</item>
-    /// <item>Creation date is within valid temporal bounds</item>
-    /// <item>All required properties are properly set</item>
-    /// </list>
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (updateDto.IsValid)
-    /// {
-    ///     // Proceed with matter update
-    ///     await ProcessMatterUpdate(matterId, updateDto);
-    /// }
-    /// else
-    /// {
-    ///     // Show validation errors to user
-    ///     DisplayUpdateValidationErrors(updateDto);
-    /// }
-    /// </code>
-    /// </example>
-    public bool IsValid =>
-        MatterValidationHelper.IsValidDescription(Description) &&
-        MatterValidationHelper.IsValidDate(CreationDate);
+    [NotMapped]
+    public bool IsValid => MatterValidationHelper.IsValidDescription(Description) &&
+                          MatterValidationHelper.IsValidDate(CreationDate);
 
     /// <summary>
-    /// Gets the display text suitable for update confirmation and UI display.
+    /// Gets the display text for the entity.
     /// </summary>
-    /// <remarks>
-    /// Provides a consistent format for displaying matter update information in UI elements,
-    /// using the description for clear identification during update operations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Update confirmation display
-    /// var confirmationText = $"Update matter to: {updateDto.DisplayText}";
-    /// </code>
-    /// </example>
+    [NotMapped]
     public string DisplayText => Description;
 
-    /// <summary>
-    /// Gets comprehensive update metrics for validation and analysis.
-    /// </summary>
-    /// <remarks>
-    /// This property provides a structured object containing key metrics and information
-    /// for update validation and professional compliance analysis.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var metrics = updateDto.UpdateMetrics;
-    /// // Access comprehensive update validation metrics
-    /// </code>
-    /// </example>
-    public object UpdateMetrics => new
-    {
-        UpdateInfo = new
-        {
-            Description,
-            NormalizedDescription,
-            IsArchived,
-            LocalCreationDateString,
-            DisplayText
-        },
-        ValidationInfo = new
-        {
-            IsValid,
-            AgeDays
-        },
-        TemporalInfo = new
-        {
-            CreationDate,
-            AgeDays,
-            IsReasonableAge = AgeDays is >= 0 and <= 365 * 20 // Within 20 years
-        }
-    };
-
-    #endregion Computed Properties
+    #endregion
 
     #region Validation Implementation
 
     /// <summary>
-    /// Validates the <see cref="MatterForUpdateDto"/> for data integrity and business rules compliance.
+    /// Validates the current object based on its properties and returns a collection of validation results.
     /// </summary>
-    /// <param name="validationContext">The context information about the validation operation.</param>
-    /// <returns>A collection of validation results indicating any validation failures.</returns>
-    /// <remarks>
-    /// Performs comprehensive validation using the ADMS.API.Common.MatterValidationHelper for consistency 
-    /// with entity validation rules. This ensures the DTO maintains the same validation standards as 
-    /// the corresponding ADMS.API.Entities.Matter entity while enforcing update-specific business rules.
-    /// 
-    /// <para><strong>Update-Specific Validation Categories:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Description Validation:</strong> Comprehensive description validation including format, length, and standards</item>
-    /// <item><strong>Date Validation:</strong> Creation date temporal consistency and update appropriateness</item>
-    /// <item><strong>State Validation:</strong> Archive state transition validation</item>
-    /// <item><strong>Business Rules:</strong> Update-specific business rule compliance</item>
-    /// <item><strong>Professional Standards:</strong> Legal practice professional standard compliance</item>
-    /// </list>
-    /// 
-    /// <para><strong>Integration with Validation Helpers:</strong></para>
-    /// Uses the centralized MatterValidationHelper to ensure consistency across all matter-related
-    /// validation in the system.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new MatterForUpdateDto 
-    /// { 
-    ///     Description = "", // Invalid
-    ///     IsArchived = false,
-    ///     CreationDate = DateTime.MinValue // Invalid
-    /// };
-    /// 
-    /// var context = new ValidationContext(dto);
-    /// var results = dto.Validate(context);
-    /// 
-    /// foreach (var result in results)
-    /// {
-    ///     Console.WriteLine($"Update Validation Error: {result.ErrorMessage}");
-    /// }
-    /// </code>
-    /// </example>
+    /// <remarks>This method performs validation on the <see cref="Description"/>, <see cref="CreationDate"/>,
+    /// and other related properties. It ensures that the description is valid, the creation date does not result in an
+    /// age exceeding the maximum allowed years,  and that the description can be normalized. If any validation rule is
+    /// violated, a corresponding <see cref="ValidationResult"/>  is returned.</remarks>
+    /// <param name="validationContext">The context in which the validation is performed. This parameter provides additional information about the
+    /// validation process.</param>
+    /// <returns>An <see cref="IEnumerable{ValidationResult}"/> containing the validation results. The collection will be empty
+    /// if the object is valid.</returns>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // Validate matter description using centralized helper
-        foreach (var result in ValidateDescription())
+        foreach (var result in MatterValidationHelper.ValidateDescription(Description, nameof(Description)))
             yield return result;
 
-        // Validate creation date for update appropriateness
-        foreach (var result in ValidateCreationDate())
-            yield return result;
-
-        // Validate update-specific business rules
-        foreach (var result in ValidateUpdateBusinessRules())
-            yield return result;
-    }
-
-    /// <summary>
-    /// Validates the <see cref="Description"/> property using ADMS validation standards for updates.
-    /// </summary>
-    /// <returns>A collection of validation results for the matter description.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.MatterValidationHelper.ValidateDescription for comprehensive validation
-    /// including format, length, reserved words, and professional naming standards appropriate for updates.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateDescription()
-    {
-        return MatterValidationHelper.ValidateDescription(Description, nameof(Description));
-    }
-
-    /// <summary>
-    /// Validates the <see cref="CreationDate"/> property using ADMS validation standards for updates.
-    /// </summary>
-    /// <returns>A collection of validation results for the creation date.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.MatterValidationHelper.ValidateDate with additional checks for update
-    /// appropriateness and temporal consistency requirements.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateCreationDate()
-    {
         foreach (var result in MatterValidationHelper.ValidateDate(CreationDate, nameof(CreationDate)))
             yield return result;
 
         // Additional validation for update scenarios
-        if (AgeDays > 365 * 20) // More than 20 years old
+        if (AgeDays > MatterConstants.MaxHistoricalYears * 365)
         {
             yield return new ValidationResult(
-                "Creation date results in unreasonably old matter age. Please verify the date is correct.",
+                $"Creation date results in matter age exceeding {MatterConstants.MaxHistoricalYears} years. Please verify.",
                 [nameof(CreationDate)]);
         }
-    }
 
-    /// <summary>
-    /// Validates update-specific business rules and constraints.
-    /// </summary>
-    /// <returns>A collection of validation results for update business rules.</returns>
-    /// <remarks>
-    /// Validates business rules specific to matter update operations, including professional
-    /// practice standards and update-specific constraints.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateUpdateBusinessRules()
-    {
-        // Validate description normalization for updates
         if (string.IsNullOrEmpty(NormalizedDescription))
         {
             yield return new ValidationResult(
-                "Description cannot be normalized properly. Please ensure it contains valid characters and content.",
+                "Description cannot be normalized properly.",
                 [nameof(Description)]);
         }
-
-        // Additional update-specific validations can be added here
-        // For example, validating against current matter state, checking permissions, etc.
     }
 
-    #endregion Validation Implementation
+    #endregion
 
-    #region Static Methods
+    #region Static Factory Methods
 
     /// <summary>
-    /// Validates a <see cref="MatterForUpdateDto"/> instance and returns detailed validation results.
+    /// Validates the specified <see cref="MatterForUpdateDto"/> instance and returns a collection of validation
+    /// results.
     /// </summary>
-    /// <param name="dto">The MatterForUpdateDto instance to validate. Can be null.</param>
-    /// <returns>A list of validation results indicating any validation failures.</returns>
     /// <remarks>
-    /// This static helper method provides a convenient way to validate MatterForUpdateDto instances
-    /// without requiring a ValidationContext. It performs the same validation as the instance
-    /// Validate method but with null-safety and simplified usage.
-    /// 
-    /// <para><strong>Null Safety:</strong></para>
-    /// Handles null input gracefully by returning appropriate validation errors rather than throwing exceptions.
+    /// This method uses the <see cref="Validator.TryValidateObject(object, ValidationContext, ICollection{ValidationResult}, bool)"/>
+    /// method to perform validation on the provided object. Ensure that the <see cref="MatterForUpdateDto"/> class is decorated with appropriate
+    /// data annotations for validation.
     /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new MatterForUpdateDto 
-    /// { 
-    ///     Description = "Updated Smith Family Trust",
-    ///     IsArchived = true,
-    ///     CreationDate = DateTime.UtcNow.AddDays(-30)
-    /// };
-    /// 
-    /// var results = MatterForUpdateDto.ValidateModel(dto);
-    /// if (results.Any())
-    /// {
-    ///     var errorMessages = string.Join(", ", results.Select(r => r.ErrorMessage));
-    ///     throw new ValidationException($"Matter update validation failed: {errorMessages}");
-    /// }
-    /// </code>
-    /// </example>
-    public static IList<ValidationResult> ValidateModel([AllowNull] MatterForUpdateDto? dto)
+    /// <param name="dto">The <see cref="MatterForUpdateDto"/> instance to validate. This parameter can be null.</param>
+    /// <returns>A collection of <see cref="ValidationResult"/> objects that describe any validation errors.  If the <paramref
+    /// name="dto"/> is null, the collection will contain a single validation error indicating that the instance is
+    /// required. If the object is valid, the collection will be empty.</returns>
+    public static IList<ValidationResult> ValidateModel(MatterForUpdateDto? dto)
     {
         var results = new List<ValidationResult>();
 
@@ -613,39 +146,19 @@ public record MatterForUpdateDto : IValidatableObject, IEquatable<MatterForUpdat
 
         var context = new ValidationContext(dto, serviceProvider: null, items: null);
         Validator.TryValidateObject(dto, context, results, validateAllProperties: true);
-
         return results;
     }
 
     /// <summary>
-    /// Creates a MatterForUpdateDto from an existing ADMS.API.Entities.Matter entity with validation.
+    /// Converts a <see cref="Matter"/> entity into a <see cref="MatterForUpdateDto"/> object.
     /// </summary>
-    /// <param name="matter">The Matter entity to create update DTO from. Cannot be null.</param>
-    /// <returns>A valid MatterForUpdateDto instance representing the current matter state.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when matter is null.</exception>
-    /// <exception cref="ValidationException">Thrown when the resulting DTO fails validation.</exception>
-    /// <remarks>
-    /// This factory method provides a safe way to create MatterForUpdateDto instances from
-    /// existing ADMS.API.Entities.Matter entities, preserving current values for update operations.
-    /// This is useful for pre-populating update forms or creating baseline update DTOs.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Create update DTO from existing matter
-    /// var existingMatter = await context.Matters.FindAsync(matterId);
-    /// var updateDto = MatterForUpdateDto.FromEntity(existingMatter);
-    /// 
-    /// // Modify properties as needed
-    /// updateDto = updateDto with { Description = "Updated Description" };
-    /// 
-    /// // Apply updates
-    /// await matterService.UpdateMatterAsync(matterId, updateDto);
-    /// </code>
-    /// </example>
-    public static MatterForUpdateDto FromEntity([NotNull] Entities.Matter matter)
+    /// <remarks>This method validates the resulting <see cref="MatterForUpdateDto"/> object after conversion.
+    /// If the validation fails, the method returns a failure result with the validation errors.</remarks>
+    /// <param name="matter">The <see cref="Matter"/> entity to convert. Cannot be <see langword="null"/>.</param>
+    /// <returns>A <see cref="Result{T}"/> containing the converted <see cref="MatterForUpdateDto"/> if the operation succeeds; 
+    /// otherwise, a failure result containing the relevant error details.</returns>
+    public static Domain.Common.Result<MatterForUpdateDto> FromEntity(Matter matter)
     {
-        ArgumentNullException.ThrowIfNull(matter, nameof(matter));
-
         var dto = new MatterForUpdateDto
         {
             Description = matter.Description,
@@ -653,112 +166,106 @@ public record MatterForUpdateDto : IValidatableObject, IEquatable<MatterForUpdat
             CreationDate = matter.CreationDate
         };
 
-        // Validate the created DTO
         var validationResults = ValidateModel(dto);
-        if (!validationResults.Any()) return dto;
-        var errorMessages = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
-        throw new ValidationException($"Failed to create valid MatterForUpdateDto from entity: {errorMessages}");
-
+        return validationResults.Count > 0
+            ? Result.Failure<MatterForUpdateDto>(DomainError.Create(
+                "VALIDATION_FAILED", string.Join(", ", validationResults.Select(r => r.ErrorMessage))))
+            : Result.Success(dto);
     }
 
+    #endregion
+
+    #region Change Tracking Methods
+
     /// <summary>
-    /// Creates a MatterForUpdateDto with only the description updated, preserving other properties.
+    /// Analyzes changes compared to current matter state.
     /// </summary>
-    /// <param name="baseMatter">The base matter to preserve properties from. Cannot be null.</param>
-    /// <param name="newDescription">The new description to set. Cannot be null or empty.</param>
-    /// <returns>A valid MatterForUpdateDto instance with updated description.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when baseMatter is null.</exception>
-    /// <exception cref="ArgumentException">Thrown when newDescription is null or empty.</exception>
-    /// <exception cref="ValidationException">Thrown when the resulting DTO fails validation.</exception>
-    /// <remarks>
-    /// This factory method provides a convenient way to create update DTOs for description-only changes,
-    /// which is a common update scenario in matter management.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Update only the description
-    /// var updateDto = MatterForUpdateDto.WithUpdatedDescription(
-    ///     existingMatter, 
-    ///     "Updated Matter Description - Phase II");
-    /// 
-    /// await matterService.UpdateMatterAsync(matterId, updateDto);
-    /// </code>
-    /// </example>
-    public static MatterForUpdateDto WithUpdatedDescription([NotNull] Entities.Matter baseMatter, [NotNull] string newDescription)
+    public ChangeAnalysis AnalyzeChanges(Matter currentMatter)
     {
-        ArgumentNullException.ThrowIfNull(baseMatter, nameof(baseMatter));
-        ArgumentException.ThrowIfNullOrWhiteSpace(newDescription, nameof(newDescription));
+        ArgumentNullException.ThrowIfNull(currentMatter);
 
-        var dto = new MatterForUpdateDto
+        return new ChangeAnalysis
         {
-            Description = newDescription.Trim(),
-            IsArchived = baseMatter.IsArchived,
-            CreationDate = baseMatter.CreationDate
+            HasChanges = HasAnyChanges(currentMatter),
+            DescriptionChanged = IsDescriptionChange(currentMatter),
+            ArchiveStatusChanged = IsArchiveStatusChange(currentMatter),
+            CreationDateChanged = IsCreationDateChange(currentMatter),
+            Changes = GetDetailedChanges(currentMatter)
         };
-
-        // Validate the created DTO
-        var validationResults = ValidateModel(dto);
-        if (!validationResults.Any()) return dto;
-        var errorMessages = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
-        throw new ValidationException($"Failed to create valid MatterForUpdateDto with updated description: {errorMessages}");
-
     }
 
     /// <summary>
-    /// Creates a MatterForUpdateDto with only the archive status updated, preserving other properties.
+    /// Determines whether the description of the current matter differs from the specified matter.
     /// </summary>
-    /// <param name="baseMatter">The base matter to preserve properties from. Cannot be null.</param>
-    /// <param name="newIsArchived">The new archive status to set.</param>
-    /// <returns>A valid MatterForUpdateDto instance with updated archive status.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when baseMatter is null.</exception>
-    /// <exception cref="ValidationException">Thrown when the resulting DTO fails validation.</exception>
-    /// <remarks>
-    /// This factory method provides a convenient way to create update DTOs for archive status changes,
-    /// which is a common update scenario in matter lifecycle management.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Archive a matter
-    /// var archiveDto = MatterForUpdateDto.WithUpdatedArchiveStatus(existingMatter, true);
-    /// await matterService.UpdateMatterAsync(matterId, archiveDto);
-    /// 
-    /// // Unarchive a matter
-    /// var unarchiveDto = MatterForUpdateDto.WithUpdatedArchiveStatus(existingMatter, false);
-    /// await matterService.UpdateMatterAsync(matterId, unarchiveDto);
-    /// </code>
-    /// </example>
-    public static MatterForUpdateDto WithUpdatedArchiveStatus([NotNull] Entities.Matter baseMatter, bool newIsArchived)
+    /// <param name="currentMatter">The matter to compare against the current instance.</param>
+    /// <returns><see langword="true"/> if the descriptions are different; otherwise, <see langword="false"/>.</returns>
+    public bool IsDescriptionChange(Matter currentMatter) =>
+        !string.Equals(Description, currentMatter.Description, StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Determines whether the archive status of the current matter differs from the specified matter.
+    /// </summary>
+    /// <param name="currentMatter">The matter to compare against the current instance.</param>
+    /// <returns><see langword="true"/> if the archive status of the current matter differs from the specified matter; 
+    /// otherwise, <see langword="false"/>.</returns>
+    public bool IsArchiveStatusChange(Matter currentMatter) =>
+        IsArchived != currentMatter.IsArchived;
+
+    /// <summary>
+    /// Determines whether the creation date of the current matter differs from the specified matter.
+    /// </summary>
+    /// <param name="currentMatter">The matter to compare against the current instance.</param>
+    /// <returns><see langword="true"/> if the creation date of the current matter is different from the specified matter;
+    /// otherwise, <see langword="false"/>.</returns>
+    public bool IsCreationDateChange(Matter currentMatter) =>
+        CreationDate != currentMatter.CreationDate;
+
+    /// <summary>
+    /// Determines whether any changes have occurred in the specified matter.
+    /// </summary>
+    /// <param name="currentMatter">The current state of the matter to compare against.</param>
+    /// <returns><see langword="true"/> if there are changes in the matter's description, archive status, or creation date;
+    /// otherwise, <see langword="false"/>.</returns>
+    private bool HasAnyChanges(Matter currentMatter) =>
+        IsDescriptionChange(currentMatter) ||
+        IsArchiveStatusChange(currentMatter) ||
+        IsCreationDateChange(currentMatter);
+
+    /// <summary>
+    /// Compares the current instance of a matter with the specified matter and identifies detailed property changes.
+    /// </summary>
+    /// <remarks>This method evaluates specific properties of the matter, such as <see cref="Description"/>,
+    /// <see cref="IsArchived"/>, and <see cref="CreationDate"/>, to determine if their values differ between the
+    /// current instance and the specified <paramref name="currentMatter"/>.</remarks>
+    /// <param name="currentMatter">The matter to compare against the current instance.</param>
+    /// <returns>A list of <see cref="PropertyChange"/> objects representing the properties that have changed, including their
+    /// previous and current values. Returns an empty list if no changes are detected.</returns>
+    private List<PropertyChange> GetDetailedChanges(Matter currentMatter)
     {
-        ArgumentNullException.ThrowIfNull(baseMatter, nameof(baseMatter));
+        var changes = new List<PropertyChange>();
 
-        var dto = new MatterForUpdateDto
-        {
-            Description = baseMatter.Description,
-            IsArchived = newIsArchived,
-            CreationDate = baseMatter.CreationDate
-        };
+        if (IsDescriptionChange(currentMatter))
+            changes.Add(new PropertyChange(nameof(Description), currentMatter.Description, Description));
 
-        // Validate the created DTO
-        var validationResults = ValidateModel(dto);
-        if (!validationResults.Any()) return dto;
-        var errorMessages = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
-        throw new ValidationException($"Failed to create valid MatterForUpdateDto with updated archive status: {errorMessages}");
+        if (IsArchiveStatusChange(currentMatter))
+            changes.Add(new PropertyChange(nameof(IsArchived), currentMatter.IsArchived, IsArchived));
 
+        if (IsCreationDateChange(currentMatter))
+            changes.Add(new PropertyChange(nameof(CreationDate), currentMatter.CreationDate, CreationDate));
+
+        return changes;
     }
 
-    #endregion Static Methods
+    #endregion
 
-    #region Equality Implementation
+    #region Equality and String Representation
 
     /// <summary>
-    /// Determines whether the specified MatterForUpdateDto is equal to the current MatterForUpdateDto.
+    /// Determines whether the specified <see cref="MatterForUpdateDto"/> is equal to the current instance.
     /// </summary>
-    /// <param name="other">The MatterForUpdateDto to compare with the current MatterForUpdateDto.</param>
-    /// <returns>true if the specified MatterForUpdateDto is equal to the current MatterForUpdateDto; otherwise, false.</returns>
-    /// <remarks>
-    /// Equality is determined by comparing all updatable properties to identify identical update operations.
-    /// This is useful for detecting duplicate update requests and optimizing update operations.
-    /// </remarks>
+    /// <param name="other">The <see cref="MatterForUpdateDto"/> to compare with the current instance.</param>
+    /// <returns><see langword="true"/> if the specified <see cref="MatterForUpdateDto"/> is equal to the current instance;
+    /// otherwise, <see langword="false"/>.</returns>
     public virtual bool Equals(MatterForUpdateDto? other)
     {
         if (other is null) return false;
@@ -770,171 +277,250 @@ public record MatterForUpdateDto : IValidatableObject, IEquatable<MatterForUpdat
     }
 
     /// <summary>
-    /// Serves as the default hash function.
+    /// Returns a hash code for the current object.
     /// </summary>
-    /// <returns>A hash code for the current MatterForUpdateDto.</returns>
-    /// <remarks>
-    /// The hash code is based on all updatable properties to ensure consistent hashing behavior
-    /// that aligns with the equality implementation.
-    /// </remarks>
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(
-            Description.GetHashCode(StringComparison.OrdinalIgnoreCase),
-            IsArchived,
-            CreationDate);
-    }
-
-    #endregion Equality Implementation
-
-    #region String Representation
+    /// <remarks>The hash code is computed based on the description (case-insensitive), the archived state, 
+    /// and the creation date of the object. This ensures that objects with the same values for  these properties
+    /// produce the same hash code.</remarks>
+    /// <returns>A 32-bit signed integer that serves as the hash code for the current object.</returns>
+    public override int GetHashCode() => HashCode.Combine(
+        Description.GetHashCode(StringComparison.OrdinalIgnoreCase),
+        IsArchived,
+        CreationDate);
 
     /// <summary>
-    /// Returns a string representation of the MatterForUpdateDto.
+    /// Returns a string representation of the update matter, including its description and archive status.
     /// </summary>
-    /// <returns>A string that represents the current MatterForUpdateDto.</returns>
-    /// <remarks>
-    /// The string representation includes key update information for identification and logging purposes.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new MatterForUpdateDto 
-    /// { 
-    ///     Description = "Updated Smith Family Trust",
-    ///     IsArchived = true,
-    ///     CreationDate = DateTime.UtcNow
-    /// };
-    /// 
-    /// Console.WriteLine(dto);
-    /// // Output: "Update Matter: Updated Smith Family Trust - Archive: True"
-    /// </code>
-    /// </example>
+    /// <returns>A string that contains the description of the update matter and its archive status in the format: "Update
+    /// Matter: {Description} - Archive: {IsArchived}".</returns>
     public override string ToString() => $"Update Matter: {Description} - Archive: {IsArchived}";
 
-    #endregion String Representation
+    #endregion
+}
 
-    #region Business Logic Methods
+/// <summary>
+/// Represents a summary of the creation details for an object, including its description, status,  creation date, and
+/// other metadata.
+/// </summary>
+/// <remarks>This record provides a comprehensive overview of an object's creation-related information,  such as
+/// its description, status, and creation date, along with additional metadata like  whether the object is archived,
+/// backdated, or considered historical. It is designed to be  immutable after initialization, with all properties being
+/// required during construction.</remarks>
+public sealed record CreationSummary
+{
+    /// <summary>
+    /// Gets the description associated with the object.
+    /// </summary>
+    public required string Description { get; init; }
 
     /// <summary>
-    /// Determines whether this update represents an archive status change.
+    /// Gets the normalized description of the entity.
     /// </summary>
-    /// <param name="currentMatter">The current matter state to compare against. Cannot be null.</param>
-    /// <returns>true if the archive status is being changed; otherwise, false.</returns>
-    /// <remarks>
-    /// This method helps identify when an update operation includes an archive status change,
-    /// which may require additional processing, notifications, or audit trail entries.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (updateDto.IsArchiveStatusChange(currentMatter))
-    /// {
-    ///     // Handle archive status change
-    ///     await notificationService.NotifyArchiveStatusChange(matterId, updateDto.IsArchived);
-    ///     await auditService.LogArchiveStatusChange(matterId, currentMatter.IsArchived, updateDto.IsArchived);
-    /// }
-    /// </code>
-    /// </example>
-    public bool IsArchiveStatusChange([NotNull] Entities.Matter currentMatter)
+    public required string NormalizedDescription { get; init; }
+
+    /// <summary>
+    /// Gets the initial status of the object, which must be specified during initialization.
+    /// </summary>
+    public required string InitialStatus { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the item is archived.
+    /// </summary>
+    public required bool IsArchived { get; init; }
+
+    /// <summary>
+    /// Gets the date and time when the object was created.
+    /// </summary>
+    public required DateTime CreationDate { get; init; }
+
+    /// <summary>
+    /// Gets the creation date as a string formatted in the local culture.
+    /// </summary>
+    public required string LocalCreationDateString { get; init; }
+
+    /// <summary>
+    /// Gets the initial age, in days, used to initialize the object.
+    /// </summary>
+    public required double InitialAgeDays { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the creation is backdated.
+    /// </summary>
+    public required bool IsBackdatedCreation { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the creation is considered historical.
+    /// </summary>
+    public required bool IsHistoricalCreation { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the current object is in a valid state.
+    /// </summary>
+    public required bool IsValid { get; init; }
+}
+
+/// <summary>
+/// Represents the analysis of changes made to an object, including details about specific property modifications.
+/// </summary>
+/// <remarks>This type provides a summary of changes to an object, including whether specific aspects of the
+/// object  (such as its description, archive status, or creation date) have been modified. It also includes a
+/// collection  of detailed property changes for further inspection.</remarks>
+public sealed record ChangeAnalysis
+{
+    /// <summary>
+    /// Gets a value indicating whether there are any changes to the current object.
+    /// </summary>
+    public required bool HasChanges { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the description has been modified.
+    /// </summary>
+    public required bool DescriptionChanged { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the archive status has changed.
+    /// </summary>
+    public required bool ArchiveStatusChanged { get; init; }
+
+    /// <summary>
+    /// Gets a value indicating whether the creation date of the entity has been modified.
+    /// </summary>
+    public required bool CreationDateChanged { get; init; }
+
+    /// <summary>
+    /// Gets the collection of property changes associated with the current operation.
+    /// </summary>
+    public required List<PropertyChange> Changes { get; init; }
+}
+
+/// <summary>
+/// Represents a change to a property, including the property's name, its previous value, and its new value.
+/// </summary>
+/// <remarks>This record is immutable and can be used to track changes to properties in scenarios such as data
+/// binding, change tracking, or logging. The <see cref="Summary"/> property provides a human-readable description of
+/// the change.</remarks>
+/// <param name="PropertyName">The name of the property that changed. This value cannot be <see langword="null"/> or empty.</param>
+/// <param name="OldValue">The previous value of the property. This value may be <see langword="null"/> if the property was not previously set.</param>
+/// <param name="NewValue">The new value of the property. This value may be <see langword="null"/> if the property was cleared or unset.</param>
+public sealed record PropertyChange(string PropertyName, object? OldValue, object? NewValue)
+{
+    /// <summary>
+    /// Gets a summary of the property change, including the property name, old value, and new value.
+    /// </summary>
+    public string Summary => $"{PropertyName}: '{OldValue}' → '{NewValue}'";
+}
+
+/// <summary>
+/// Provides a builder for creating and configuring instances of <see cref="MatterForCreationDto"/>.
+/// </summary>
+/// <remarks>This builder allows for the step-by-step configuration of a <see cref="MatterForCreationDto"/>
+/// instance, including setting properties such as the description, archived status, and creation date. It supports
+/// method chaining for a fluent API experience. The <see cref="Build"/> method validates the configured state and
+/// returns the constructed <see cref="MatterForCreationDto"/> or a failure result with error details.</remarks>
+public sealed class MatterForCreationDtoBuilder
+{
+    private string? _description;
+    private bool _isArchived;
+    private DateTime _creationDate = DateTime.UtcNow;
+
+    /// <summary>
+    /// Sets the description for the matter being created.
+    /// </summary>
+    /// <param name="description">The description of the matter. Leading and trailing whitespace will be trimmed. Can be null or empty.</param>
+    /// <returns>The current <see cref="MatterForCreationDtoBuilder"/> instance, allowing for method chaining.</returns>
+    public MatterForCreationDtoBuilder WithDescription(string description)
     {
-        ArgumentNullException.ThrowIfNull(currentMatter, nameof(currentMatter));
-        return IsArchived != currentMatter.IsArchived;
+        _description = description?.Trim();
+        return this;
     }
 
     /// <summary>
-    /// Determines whether this update represents a description change.
+    /// Sets the archived status for the matter being created.
     /// </summary>
-    /// <param name="currentMatter">The current matter state to compare against. Cannot be null.</param>
-    /// <returns>true if the description is being changed; otherwise, false.</returns>
-    /// <remarks>
-    /// This method helps identify when an update operation includes a description change,
-    /// which may require uniqueness validation, client notification, or system-wide reference updates.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (updateDto.IsDescriptionChange(currentMatter))
-    /// {
-    ///     // Validate uniqueness and handle description change
-    ///     await ValidateDescriptionUniqueness(updateDto.Description, currentMatter.Id);
-    ///     await auditService.LogDescriptionChange(matterId, currentMatter.Description, updateDto.Description);
-    /// }
-    /// </code>
-    /// </example>
-    public bool IsDescriptionChange([NotNull] Entities.Matter currentMatter)
+    /// <param name="isArchived">A value indicating whether the matter should be marked as archived. The default value is <see langword="true"/>.</param>
+    /// <returns>The current instance of <see cref="MatterForCreationDtoBuilder"/> to allow for method chaining.</returns>
+    public MatterForCreationDtoBuilder AsArchived(bool isArchived = true)
     {
-        ArgumentNullException.ThrowIfNull(currentMatter, nameof(currentMatter));
-        return !string.Equals(Description, currentMatter.Description, StringComparison.OrdinalIgnoreCase);
+        _isArchived = isArchived;
+        return this;
     }
 
     /// <summary>
-    /// Determines whether this update represents a creation date change.
+    /// Sets the creation date for the matter being built.
     /// </summary>
-    /// <param name="currentMatter">The current matter state to compare against. Cannot be null.</param>
-    /// <returns>true if the creation date is being changed; otherwise, false.</returns>
-    /// <remarks>
-    /// This method helps identify when an update operation includes a creation date change,
-    /// which typically requires special authorization and audit trail considerations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (updateDto.IsCreationDateChange(currentMatter))
-    /// {
-    ///     // Handle creation date change with special authorization
-    ///     await authorizationService.ValidateCreationDateChangePermission(userId, matterId);
-    ///     await auditService.LogCreationDateChange(matterId, currentMatter.CreationDate, updateDto.CreationDate);
-    /// }
-    /// </code>
-    /// </example>
-    public bool IsCreationDateChange([NotNull] Entities.Matter currentMatter)
+    /// <param name="creationDate">The creation date to assign to the matter.</param>
+    /// <returns>The current instance of <see cref="MatterForCreationDtoBuilder"/> to allow method chaining.</returns>
+    public MatterForCreationDtoBuilder WithCreationDate(DateTime creationDate)
     {
-        ArgumentNullException.ThrowIfNull(currentMatter, nameof(currentMatter));
-        return CreationDate != currentMatter.CreationDate;
+        _creationDate = creationDate;
+        return this;
     }
 
     /// <summary>
-    /// Gets a summary of all changes represented by this update DTO.
+    /// Configures the builder to create a matter for historical migration with the specified creation date.
     /// </summary>
-    /// <param name="currentMatter">The current matter state to compare against. Cannot be null.</param>
-    /// <returns>A dictionary containing information about all changes in this update.</returns>
-    /// <remarks>
-    /// This method provides a comprehensive analysis of what changes are represented by the update DTO,
-    /// useful for audit logging, user notifications, and update processing decisions.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var changeSummary = updateDto.GetChangeSummary(currentMatter);
-    /// foreach (var change in changeSummary)
-    /// {
-    ///     Console.WriteLine($"{change.Key}: {change.Value}");
-    /// }
-    /// </code>
-    /// </example>
-    public IReadOnlyDictionary<string, object> GetChangeSummary([NotNull] Entities.Matter currentMatter)
+    /// <remarks>This method sets the creation date of the matter to the specified <paramref
+    /// name="historicalDate"/>  and marks the matter as archived, as historical matters are typically
+    /// archived.</remarks>
+    /// <param name="historicalDate">The date to set as the creation date for the historical matter.</param>
+    /// <returns>The current <see cref="MatterForCreationDtoBuilder"/> instance with the historical migration configuration
+    /// applied.</returns>
+    public MatterForCreationDtoBuilder ForHistoricalMigration(DateTime historicalDate)
     {
-        ArgumentNullException.ThrowIfNull(currentMatter, nameof(currentMatter));
+        _creationDate = historicalDate;
+        _isArchived = true; // Historical matters are typically archived
+        return this;
+    }
 
-        return new Dictionary<string, object>
+    /// <summary>
+    /// Builds a new <see cref="MatterForCreationDto"/> instance based on the current state of the builder.
+    /// </summary>
+    /// <remarks>This method validates the required fields and the overall model before returning the result. 
+    /// If the description is missing or the model fails validation, the method returns a failure result  containing the
+    /// relevant error details.</remarks>
+    /// <returns>A <see cref="Result{T}"/> containing the constructed <see cref="MatterForCreationDto"/> if successful;
+    /// otherwise, a failure result with error details.</returns>
+    public Domain.Common.Result<MatterForCreationDto> Build()
+    {
+        if (string.IsNullOrWhiteSpace(_description))
+            return Result.Failure<MatterForCreationDto>(DomainError.Create(
+                "DESCRIPTION_REQUIRED", "Description is required"));
+
+        var dto = new MatterForCreationDto
         {
-            ["HasChanges"] = IsDescriptionChange(currentMatter) || IsArchiveStatusChange(currentMatter) || IsCreationDateChange(currentMatter),
-            ["DescriptionChange"] = new
-            {
-                IsChanged = IsDescriptionChange(currentMatter),
-                OldValue = currentMatter.Description,
-                NewValue = Description
-            },
-            ["ArchiveStatusChange"] = new
-            {
-                IsChanged = IsArchiveStatusChange(currentMatter),
-                OldValue = currentMatter.IsArchived,
-                NewValue = IsArchived
-            },
-            ["CreationDateChange"] = new
-            {
-                IsChanged = IsCreationDateChange(currentMatter),
-                OldValue = currentMatter.CreationDate,
-                NewValue = CreationDate
-            }
-        }.ToImmutableDictionary();
-    }
+            Description = _description,
+            IsArchived = _isArchived,
+            CreationDate = _creationDate
+        };
 
-    #endregion Business Logic Methods
+        var validationResults = MatterForCreationDto.ValidateModel(dto);
+        return validationResults.Count > 0
+            ? Result.Failure<MatterForCreationDto>(DomainError.Create(
+                "VALIDATION_FAILED", string.Join(", ", validationResults.Select(r => r.ErrorMessage))))
+            : Result.Success(dto);
+    }
+}
+
+/// <summary>
+/// Provides extension methods for creating and initializing instances of <see cref="MatterForCreationDtoBuilder"/>.
+/// </summary>
+/// <remarks>This static class contains helper methods to simplify the creation of <see
+/// cref="MatterForCreationDtoBuilder"/> instances, either with default values or pre-initialized with specific data
+/// such as a description.</remarks>
+public static class MatterForCreationDtoExtensions
+{
+    /// <summary>
+    /// Creates and returns a new instance of <see cref="MatterForCreationDtoBuilder"/>.
+    /// </summary>
+    /// <returns>A new <see cref="MatterForCreationDtoBuilder"/> instance for constructing a matter creation DTO.</returns>
+    public static MatterForCreationDtoBuilder CreateMatter() => new();
+
+    /// <summary>
+    /// Creates a new <see cref="MatterForCreationDtoBuilder"/> instance and initializes it with the specified
+    /// description.
+    /// </summary>
+    /// <param name="description">The description to associate with the new matter. Cannot be null or empty.</param>
+    /// <returns>A <see cref="MatterForCreationDtoBuilder"/> instance initialized with the provided description.</returns>
+    public static MatterForCreationDtoBuilder CreateMatter(this string description) =>
+        new MatterForCreationDtoBuilder().WithDescription(description);
 }
