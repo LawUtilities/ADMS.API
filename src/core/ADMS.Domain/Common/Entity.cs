@@ -56,7 +56,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IAuditableEntity
     /// </summary>
     /// <value>An <see cref="IReadOnlyCollection{T}"/> of domain events.</value>
     public virtual IReadOnlyCollection<IDomainEvent> DomainEvents =>
-        _domainEvents?.AsReadOnly() ?? [];
+        _domainEvents?.AsReadOnly() ?? Array.Empty<IDomainEvent>();
 
     /// <summary>
     /// Adds a domain event to be processed when this entity is persisted.

@@ -77,35 +77,38 @@ public interface IDocumentValidationService
 /// </summary>
 public sealed class DocumentValidationService : IDocumentValidationService
 {
-    private static readonly string[] AllowedExtensions = [
+    private static readonly HashSet<string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
+    {
         "pdf", "doc", "docx", "rtf", "txt",
         "xls", "xlsx", "csv",
         "ppt", "pptx",
         "jpg", "jpeg", "png", "gif", "tiff", "bmp"
-    ];
-
-    private static readonly Dictionary<string, string[]> MimeTypeMap = new()
-    {
-        ["pdf"] = ["application/pdf"],
-        ["doc"] = ["application/msword"],
-        ["docx"] = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
-        ["rtf"] = ["application/rtf", "text/rtf"],
-        ["txt"] = ["text/plain"],
-        ["xls"] = ["application/vnd.ms-excel"],
-        ["xlsx"] = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
-        ["csv"] = ["text/csv", "application/csv"],
-        ["ppt"] = ["application/vnd.ms-powerpoint"],
-        ["pptx"] = ["application/vnd.openxmlformats-officedocument.presentationml.presentation"],
-        ["jpg"] = ["image/jpeg"],
-        ["jpeg"] = ["image/jpeg"],
-        ["png"] = ["image/png"],
-        ["gif"] = ["image/gif"],
-        ["tiff"] = ["image/tiff"],
-        ["bmp"] = ["image/bmp"]
     };
 
-    private const long MaxFileSize = 50 * 1024 * 1024; // 50 MB
-    private const long MinFileSize = 1; // 1 byte
+    private static readonly IReadOnlyDictionary<string, string[]> MimeTypeMap =
+        new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["pdf"] = ["application/pdf"],
+            ["doc"] = ["application/msword"],
+            ["docx"] = ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+            ["rtf"] = ["application/rtf", "text/rtf"],
+            ["txt"] = ["text/plain"],
+            ["xls"] = ["application/vnd.ms-excel"],
+            ["xlsx"] = ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+            ["csv"] = ["text/csv", "application/csv"],
+            ["ppt"] = ["application/vnd.ms-powerpoint"],
+            ["pptx"] = ["application/vnd.openxmlformats-officedocument.presentationml.presentation"],
+            ["jpg"] = ["image/jpeg"],
+            ["jpeg"] = ["image/jpeg"],
+            ["png"] = ["image/png"],
+            ["gif"] = ["image/gif"],
+            ["tiff"] = ["image/tiff"],
+            ["bmp"] = ["image/bmp"]
+        };
+
+    private const long MaxFileSize = 50L * 1024 * 1024; // 50 MB
+    private const long MinFileSize = 1L; // 1 byte
+    private const int MaxExtensionLength = 10; // Maximum reasonable extension length
 
     public Result ValidateDocumentCreation(
         string fileName,
@@ -115,40 +118,40 @@ public sealed class DocumentValidationService : IDocumentValidationService
         string checksum,
         MatterId matterId)
     {
+        ArgumentNullException.ThrowIfNull(matterId);
+
         // Validate file name
         var fileNameResult = FileName.Create(fileName);
         if (fileNameResult.IsFailure)
-            return Result.Failure(fileNameResult.Error);
+            return fileNameResult;
 
         // Validate extension
         var extensionResult = ValidateFileExtension(extension);
         if (extensionResult.IsFailure)
-            return Result.Failure(extensionResult.Error);
+            return extensionResult;
 
         // Validate file size
         var fileSizeResult = ValidateFileSize(fileSize);
         if (fileSizeResult.IsFailure)
-            return Result.Failure(fileSizeResult.Error);
+            return fileSizeResult;
 
         // Validate MIME type
         var mimeTypeResult = ValidateMimeType(mimeType, extension);
         if (mimeTypeResult.IsFailure)
-            return Result.Failure(mimeTypeResult.Error);
+            return mimeTypeResult;
 
         // Validate checksum
         var checksumResult = FileChecksum.Create(checksum);
         if (checksumResult.IsFailure)
-            return Result.Failure(checksumResult.Error);
-
-        // Validate matter ID
-        if (matterId == null)
-            return Result.Failure(new DomainError("DOCUMENT_MATTER_REQUIRED", "Matter ID is required"));
+            return checksumResult;
 
         return Result.Success();
     }
 
     public Result ValidateDocumentDeletion(Document document)
     {
+        ArgumentNullException.ThrowIfNull(document);
+
         if (document.IsDeleted)
             return Result.Failure(DocumentErrors.AlreadyDeleted);
 
@@ -160,6 +163,8 @@ public sealed class DocumentValidationService : IDocumentValidationService
 
     public Result ValidateDocumentCheckOut(Document document)
     {
+        ArgumentNullException.ThrowIfNull(document);
+
         if (document.IsDeleted)
             return Result.Failure(DocumentErrors.DocumentDeleted);
 
@@ -171,6 +176,8 @@ public sealed class DocumentValidationService : IDocumentValidationService
 
     public Result ValidateDocumentCheckIn(Document document)
     {
+        ArgumentNullException.ThrowIfNull(document);
+
         if (document.IsDeleted)
             return Result.Failure(DocumentErrors.DocumentDeleted);
 
@@ -185,16 +192,21 @@ public sealed class DocumentValidationService : IDocumentValidationService
         if (string.IsNullOrWhiteSpace(extension))
             return Result.Failure(DocumentErrors.ExtensionRequired);
 
-        var normalizedExtension = extension.Trim().ToLowerInvariant().TrimStart('.');
+        var normalizedExtension = NormalizeExtension(extension);
 
-        if (normalizedExtension.Length > 5)
+        if (normalizedExtension.Length == 0)
+            return Result.Failure(DocumentErrors.ExtensionRequired);
+
+        if (normalizedExtension.Length > MaxExtensionLength)
             return Result.Failure(DocumentErrors.ExtensionTooLong);
 
         if (!IsValidExtensionFormat(normalizedExtension))
             return Result.Failure(DocumentErrors.ExtensionInvalidFormat);
 
         if (!AllowedExtensions.Contains(normalizedExtension))
-            return Result.Failure(new DomainError("DOCUMENT_EXTENSION_NOT_ALLOWED", $"File extension '{extension}' is not allowed"));
+            return Result.Failure(DomainError.Custom(
+                "DOCUMENT_EXTENSION_NOT_ALLOWED",
+                $"File extension '{extension}' is not allowed. Supported extensions: {string.Join(", ", AllowedExtensions.Order())}"));
 
         return Result.Success();
     }
@@ -202,10 +214,14 @@ public sealed class DocumentValidationService : IDocumentValidationService
     public Result ValidateFileSize(long fileSize)
     {
         if (fileSize < MinFileSize)
-            return Result.Failure(DocumentErrors.InvalidFileSize);
+            return Result.Failure(DomainError.Custom(
+                "DOCUMENT_FILE_TOO_SMALL",
+                $"File size must be at least {MinFileSize} byte(s). Current size: {fileSize} bytes"));
 
         if (fileSize > MaxFileSize)
-            return Result.Failure(DocumentErrors.FileSizeExceedsLimit);
+            return Result.Failure(DomainError.Custom(
+                "DOCUMENT_FILE_TOO_LARGE",
+                $"File size cannot exceed {MaxFileSize:N0} bytes ({MaxFileSize / (1024.0 * 1024.0):F1} MB). Current size: {fileSize:N0} bytes ({fileSize / (1024.0 * 1024.0):F1} MB)"));
 
         return Result.Success();
     }
@@ -215,20 +231,44 @@ public sealed class DocumentValidationService : IDocumentValidationService
         if (string.IsNullOrWhiteSpace(mimeType))
             return Result.Failure(DocumentErrors.InvalidMimeType);
 
-        var normalizedExtension = extension.Trim().ToLowerInvariant().TrimStart('.');
+        var normalizedExtension = NormalizeExtension(extension);
+        var normalizedMimeType = mimeType.Trim().ToLowerInvariant();
 
         if (!MimeTypeMap.TryGetValue(normalizedExtension, out var allowedMimeTypes))
-            return Result.Failure(new DomainError("DOCUMENT_EXTENSION_MIME_TYPE_MISMATCH", "Extension and MIME type combination is not supported"));
+            return Result.Failure(DomainError.Custom(
+                "DOCUMENT_EXTENSION_MIME_TYPE_MISMATCH",
+                $"Extension '{extension}' is not supported or MIME type mapping is not available"));
 
-        if (!allowedMimeTypes.Contains(mimeType, StringComparer.OrdinalIgnoreCase))
-            return Result.Failure(new DomainError("DOCUMENT_MIME_TYPE_EXTENSION_MISMATCH", $"MIME type '{mimeType}' does not match extension '{extension}'"));
+        if (!allowedMimeTypes.Any(allowed => string.Equals(allowed, normalizedMimeType, StringComparison.OrdinalIgnoreCase)))
+            return Result.Failure(DomainError.Custom(
+                "DOCUMENT_MIME_TYPE_EXTENSION_MISMATCH",
+                $"MIME type '{mimeType}' does not match extension '{extension}'. Expected MIME types: {string.Join(", ", allowedMimeTypes)}"));
 
         return Result.Success();
     }
 
+    /// <summary>
+    /// Normalizes a file extension by trimming, converting to lowercase, and removing leading dots.
+    /// </summary>
+    /// <param name="extension">The extension to normalize.</param>
+    /// <returns>The normalized extension.</returns>
+    private static string NormalizeExtension(string extension)
+    {
+        if (string.IsNullOrWhiteSpace(extension))
+            return string.Empty;
+
+        return extension.Trim().TrimStart('.').ToLowerInvariant();
+    }
+
+    /// <summary>
+    /// Determines whether the extension contains only valid characters.
+    /// </summary>
+    /// <param name="extension">The normalized extension to validate.</param>
+    /// <returns>True if the extension format is valid; otherwise, false.</returns>
     private static bool IsValidExtensionFormat(string extension)
     {
-        // Extension should contain only letters and numbers
-        return extension.All(char.IsLetterOrDigit);
+        // Extension should contain only letters and numbers, no special characters
+        return !string.IsNullOrEmpty(extension) &&
+               extension.All(c => char.IsLetterOrDigit(c));
     }
 }

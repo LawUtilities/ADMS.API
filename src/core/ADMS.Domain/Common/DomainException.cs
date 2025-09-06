@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace ADMS.Domain.Common;
 
@@ -53,14 +53,14 @@ namespace ADMS.Domain.Common;
 /// }
 /// </code>
 /// </example>
-[Serializable]
 public sealed class DomainException : Exception
 {
     /// <summary>
     /// Gets the structured domain error information associated with this exception.
     /// </summary>
     /// <value>A DomainError containing the error code and message.</value>
-    public DomainError Error { get; }
+    [JsonInclude]
+    public DomainError Error { get; private set; }
 
     /// <summary>
     /// Initializes a new instance of the <see cref="DomainException"/> class with a structured domain error.
@@ -117,30 +117,60 @@ public sealed class DomainException : Exception
     }
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="DomainException"/> class with serialized data.
+    /// Parameterless constructor for JSON deserialization.
     /// </summary>
-    /// <param name="info">The serialization info.</param>
-    /// <param name="context">The streaming context.</param>
-    private DomainException(SerializationInfo info, StreamingContext context) : base(info, context)
+    /// <remarks>
+    /// This constructor is required for JSON serialization frameworks.
+    /// It should not be used directly in application code.
+    /// </remarks>
+    [JsonConstructor]
+    private DomainException() : base("Unknown domain error occurred")
     {
-        var errorCode = info.GetString(nameof(Error) + ".Code") ?? "UNKNOWN_ERROR";
-        var errorMessage = info.GetString(nameof(Error) + ".Message") ?? "An unknown error occurred.";
-        Error = DomainError.Custom(errorCode, errorMessage);
+        Error = DomainError.Unknown;
     }
 
     /// <summary>
-    /// Sets the SerializationInfo with information about the exception.
+    /// Creates a DomainException from JSON-serialized data.
     /// </summary>
-    /// <param name="info">The SerializationInfo that holds the serialized object data about the exception being thrown.</param>
-    /// <param name="context">The StreamingContext that contains contextual information about the source or destination.</param>
-    public override void GetObjectData(SerializationInfo info, StreamingContext context)
+    /// <param name="errorCode">The error code from serialized data.</param>
+    /// <param name="errorMessage">The error message from serialized data.</param>
+    /// <param name="exceptionMessage">The exception message from serialized data.</param>
+    /// <returns>A new DomainException instance.</returns>
+    /// <remarks>
+    /// This method is used for deserializing exceptions from modern JSON-based APIs
+    /// and logging systems. It replaces the obsolete binary serialization approach.
+    /// </remarks>
+    public static DomainException FromSerialized(string errorCode, string errorMessage, string exceptionMessage)
     {
-        if (info == null)
-            throw new ArgumentNullException(nameof(info));
+        var error = DomainError.Custom(
+            errorCode ?? "DESERIALIZATION_ERROR",
+            errorMessage ?? "Error occurred during deserialization");
 
-        base.GetObjectData(info, context);
-        info.AddValue(nameof(Error) + ".Code", Error.Code);
-        info.AddValue(nameof(Error) + ".Message", Error.Message);
+        return new DomainException(error)
+        {
+            // Note: We can't directly set the Message property, but the Error contains the information
+        };
+    }
+
+    /// <summary>
+    /// Converts this exception to a serializable format for modern APIs.
+    /// </summary>
+    /// <returns>An anonymous object containing the serializable exception data.</returns>
+    /// <remarks>
+    /// This method provides a modern alternative to the obsolete GetObjectData method,
+    /// returning data suitable for JSON serialization in APIs and logging systems.
+    /// </remarks>
+    public object ToSerializable()
+    {
+        return new
+        {
+            ErrorCode = Error.Code,
+            ErrorMessage = Error.Message,
+            ExceptionMessage = Message,
+            ExceptionType = GetType().FullName,
+            StackTrace = StackTrace,
+            InnerException = InnerException?.ToString()
+        };
     }
 
     /// <summary>
