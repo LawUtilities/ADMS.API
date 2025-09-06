@@ -32,10 +32,8 @@
 
   <ItemGroup>
     <Folder Include="Controllers\" />
-    <Folder Include="Middleware\" />
     <Folder Include="Filters\" />
     <Folder Include="Extensions\" />
-    <Folder Include="Configuration\" />
   </ItemGroup>
 
 </Project>
