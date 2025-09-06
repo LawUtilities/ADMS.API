@@ -6,18 +6,51 @@
     <Nullable>enable</Nullable>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <WarningsNotAsErrors>CS1591</WarningsNotAsErrors>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <Version>1.0.0</Version>
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Company>ADMS</Company>
+    <Product>ADMS Domain Layer</Product>
+    <Copyright>Copyright © ADMS</Copyright>
+    <Description>Domain layer containing business entities, value objects, and domain services for the ADMS legal document management system.</Description>
+    <PackageProjectUrl>https://github.com/your-org/adms</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/your-org/adms</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <Optimize>true</Optimize>
+    <DefineConstants>TRACE</DefineConstants>
   </PropertyGroup>
 
   <ItemGroup>
     <!-- Domain should have minimal dependencies -->
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
+    <!-- Consider upgrading to stable version 8.x instead of preview 9.x for production -->
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="Enums\" />
+    <Folder Include="Events\" />
     <Folder Include="Exceptions\" />
     <Folder Include="Interfaces\" />
     <Folder Include="Specifications\" />
+    <Folder Include="ValueObjects\" />
+  </ItemGroup>
+
+  <!-- Global analyzer configuration -->
+  <ItemGroup>
+    <EditorConfigFiles Include="..\..\..\.editorconfig" Condition="Exists('..\..\..\.editorconfig')" />
   </ItemGroup>
 
 </Project>

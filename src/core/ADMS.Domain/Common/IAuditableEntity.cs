@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ADMS.Domain.Entities.Common
+namespace ADMS.Domain.Common
 {
     /// <summary>
     /// Defines the contract for entities that require audit trail functionality.
@@ -15,59 +15,37 @@ namespace ADMS.Domain.Entities.Common
     /// concerns from the base entity functionality, allowing entities to opt-in
     /// to audit tracking as needed.
     /// </remarks>
+    /// <summary>
+    /// Interface for entities that support audit trail functionality.
+    /// </summary>
+    /// <remarks>
+    /// This interface defines the contract for entities that require tracking of 
+    /// creation and modification metadata for audit and compliance purposes.
+    /// </remarks>
     public interface IAuditableEntity
     {
         /// <summary>
         /// Gets or sets the identifier of the user who created this entity.
         /// </summary>
-        /// <value>
-        /// A string representing the user identifier (could be username, email, or user ID).
-        /// </value>
-        /// <remarks>
-        /// This property should be populated when the entity is first created.
-        /// The format and content of this field depends on your authentication system
-        /// (e.g., username, email address, or GUID).
-        /// </remarks>
+        /// <value>The user identifier who created the entity.</value>
         string CreatedBy { get; set; }
 
         /// <summary>
-        /// Gets or sets the date and time when this entity was created.
+        /// Gets or sets the UTC date and time when this entity was created.
         /// </summary>
-        /// <value>
-        /// A <see cref="DateTime"/> representing when the entity was created.
-        /// </value>
-        /// <remarks>
-        /// This property should be automatically populated when the entity is first
-        /// persisted to the database. It's recommended to use UTC time to avoid
-        /// timezone-related issues in distributed systems.
-        /// </remarks>
+        /// <value>The UTC timestamp of entity creation.</value>
         DateTime CreatedDate { get; set; }
 
         /// <summary>
         /// Gets or sets the identifier of the user who last modified this entity.
         /// </summary>
-        /// <value>
-        /// A string representing the user identifier, or null if the entity has never been modified.
-        /// </value>
-        /// <remarks>
-        /// This property should be updated every time the entity is modified.
-        /// It will be null for newly created entities that haven't been modified yet.
-        /// The format should match the CreatedBy field format.
-        /// </remarks>
+        /// <value>The user identifier who last modified the entity.</value>
         string LastModifiedBy { get; set; }
 
         /// <summary>
-        /// Gets or sets the date and time when this entity was last modified.
+        /// Gets or sets the UTC date and time when this entity was last modified.
         /// </summary>
-        /// <value>
-        /// A nullable <see cref="DateTime"/> representing when the entity was last modified,
-        /// or null if it has never been modified.
-        /// </value>
-        /// <remarks>
-        /// This property should be automatically updated every time the entity is
-        /// modified and persisted. It will be null for newly created entities.
-        /// It's recommended to use UTC time for consistency.
-        /// </remarks>
+        /// <value>The UTC timestamp of the last modification, or null if never modified.</value>
         DateTime? LastModifiedDate { get; set; }
     }
 

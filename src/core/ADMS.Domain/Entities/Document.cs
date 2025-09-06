@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using ADMS.Domain.Common;
-using ADMS.Domain.Entities.Common;
 using ADMS.Domain.ValueObjects;
 using ADMS.Domain.Events;
-using ADMS.Domain.Common;
 
 namespace ADMS.Domain.Entities
 {
