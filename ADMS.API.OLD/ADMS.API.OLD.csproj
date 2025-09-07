@@ -95,13 +95,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADMS.API.Common\ADMS.API.Common.OLD.csproj" />
-    <ProjectReference Include="..\ADMS.API.Entities\ADMS.API.Entities.OLD.csproj" />
-    <ProjectReference Include="..\ADMS.API.Models\ADMS.API.Models.OLD.csproj" />
+    <ProjectReference Include="..\ADMS.API.Common.OLD\ADMS.API.Common.OLD.csproj" />
+    <ProjectReference Include="..\ADMS.API.Entities.OLD\ADMS.API.Entities.OLD.csproj" />
+    <ProjectReference Include="..\ADMS.API.Models.OLD\ADMS.API.Models.OLD.csproj" />
   </ItemGroup>
-
-  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <Exec Command="rem signtool sign /v /f &quot;C:\Dev\Repos\AdapDev.pfx&quot; /p ind!ecent-ascii-mistress!-!free!way-magnetic-ki!t /d &quot;$(SolutionName)&quot; /tr http://timestamp.apple.com/ts01 /v &quot;$(TargetPath)&quot;" />
-  </Target>
 
 </Project>
