@@ -1,8 +1,6 @@
 using ADMS.API.Extensions;
+using ADMS.API.HealthChecks;
 using ADMS.API.Middleware;
-using ADMS.Application;
-using ADMS.Infrastructure;
-using ADMS.Shared;
 
 using Asp.Versioning;
 
@@ -56,6 +54,7 @@ public class Program
                     retainedFileCountLimit: 30));
 
             // Add services to the container
+//            builder.Services.AddAutoMapper(cfg => { }).AddLi .license("eyJhbGciOiJSUzI1NiIsImtpZCI6Ikx1Y2t5UGVubnlTb2Z0d2FyZUxpY2Vuc2VLZXkvYmJiMTNhY2I1OTkwNGQ4OWI0Y2IxYzg1ZjA4OGNjZjkiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2x1Y2t5cGVubnlzb2Z0d2FyZS5jb20iLCJhdWQiOiJMdWNreVBlbm55U29mdHdhcmUiLCJleHAiOiIxNzg4NDgwMDAwIiwiaWF0IjoiMTc1Njk2NDA5NCIsImFjY291bnRfaWQiOiIwMTk5MTMzN2UyNzM3ZWQzYTM2YThkZTNhNjZiMjM3NSIsImN1c3RvbWVyX2lkIjoiY3RtXzAxazQ5a2gwMWFjcXZkMzZjenJjdGYxcXE4Iiwic3ViX2lkIjoiLSIsImVkaXRpb24iOiIwIiwidHlwZSI6IjIifQ.QQvv1Xu5xZDQ6Vla_GzUEpRuGK6qaGTMrw7cC5oK1S1c4rTPRQ1QhBFqeBlUnKYAa4fTD-xZ8Tme0D2yJk28i0k31CwpiDop8Z07r_57tXaCiSjceXJq9wD5TeqT6czduu9y6Y31gLdZF0ZyQ6KZQ1DCeElUNJKf6di4LiW63xwFt2wgWTx8xoR1dgUAlwSHd8Yrpgwi4fb0AqcMQGUtx2sBQNQqIE5vP6ybRWhBGMYDftivjUK6Il7lr4BezPmAokHna7Z0xgDFQIFnUCBiIywCkaNjjKdJIReXhhW2Ac18BUVhOvlOL1bQ31x1QGIrlhj09S2xm1kYO50_79z1Og");
             builder.Services.AddApplicationServices(builder.Configuration);
 
             var app = builder.Build();
@@ -209,7 +208,7 @@ public static class ServiceConfigurationExtensions
         {
             options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                 RateLimitPartition.GetFixedWindowLimiter(
-                    partitionKey: context.User?.Identity?.Name ?? context.Request.Headers.Host.ToString(),
+                    partitionKey: context.User.Identity?.Name ?? context.Request.Headers.Host.ToString(),
                     factory: partition => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true,
