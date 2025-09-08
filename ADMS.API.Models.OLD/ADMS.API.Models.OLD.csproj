@@ -18,7 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADMS.API.Common.\ADMS.API.Common.OLD.csproj" />
+    <ProjectReference Include="..\ADMS.API.Common.Old\ADMS.API.Common.OLD.csproj" />
     <ProjectReference Include="..\ADMS.API.Entities.OLD\ADMS.API.Entities.OLD.csproj" />
   </ItemGroup>
 

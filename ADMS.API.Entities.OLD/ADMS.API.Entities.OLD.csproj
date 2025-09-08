@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ADMS.API.Common.OLD\ADMS.API.Common.csproj" />
+    <ProjectReference Include="..\ADMS.API.Common.OLD\ADMS.API.Common.OLD.csproj" />
   </ItemGroup>
 
 </Project>
