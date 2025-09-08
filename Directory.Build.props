@@ -1,17 +1,17 @@
-﻿<Project>
+<Project>
   <PropertyGroup>
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
 
-  <ItemGroup Label="Core Framework - .NET 8 LTS">
+  <ItemGroup Label="Core Framework">
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageVersion Include="System.Text.Json" Version="8.0.5" />
     <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
   </ItemGroup>
 
-  <ItemGroup Label="Entity Framework - .NET 8 LTS">
+  <ItemGroup Label="Entity Framework">
     <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" />
@@ -19,7 +19,7 @@
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
   </ItemGroup>
 
-  <ItemGroup Label="Web API - .NET 8 LTS">
+  <ItemGroup Label="Web API">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
@@ -36,7 +36,7 @@
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.0.0" />
   </ItemGroup>
 
-  <ItemGroup Label="Security & File Processing">
+  <ItemGroup Label="Security and File Processing">
     <PackageVersion Include="nClam" Version="9.0.0" />
     <PackageVersion Include="File.TypeChecker" Version="4.2.0" />
     <PackageVersion Include="Mime-Detective" Version="25.8.1" />
@@ -44,7 +44,7 @@
     <PackageVersion Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
 
-  <ItemGroup Label="Document Processing (Syncfusion) - .NET 8 Compatible">
+  <ItemGroup Label="Document Processing - Syncfusion">
     <PackageVersion Include="Syncfusion.DocIO.Net.Core" Version="30.2.6" />
     <PackageVersion Include="Syncfusion.DocIORenderer.Net.Core" Version="30.2.6" />
     <PackageVersion Include="Syncfusion.Pdf.Net.Core" Version="30.2.6" />
@@ -54,14 +54,14 @@
     <PackageVersion Include="Syncfusion.XlsIORenderer.Net.Core" Version="30.2.6" />
   </ItemGroup>
 
-  <ItemGroup Label="Caching & Extensions - .NET 8 LTS">
+  <ItemGroup Label="Caching and Extensions">
     <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
     <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
   </ItemGroup>
 
-  <ItemGroup Label="Cloud Storage (Optional)">
+  <ItemGroup Label="Cloud Storage - Optional">
     <PackageVersion Include="Azure.Storage.Blobs" Version="12.22.2" />
     <PackageVersion Include="AWSSDK.S3" Version="3.7.412.5" />
   </ItemGroup>
