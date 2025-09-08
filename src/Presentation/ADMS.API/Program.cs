@@ -4,6 +4,8 @@ using ADMS.API.Middleware;
 
 using Asp.Versioning;
 
+using AutoMapper;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.OpenApi.Models;
@@ -21,7 +23,7 @@ namespace ADMS.API;
 /// The main entry point for the ADMS API application.
 /// Configures services, middleware pipeline, and application startup.
 /// </summary>
-public class Program
+public static class Program
 {
     /// <summary>
     /// The main method that starts the application.
@@ -91,6 +93,10 @@ public static class ServiceConfigurationExtensions
     /// <returns>The service collection for chaining.</returns>
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Configure third-party licenses first
+        services.ConfigureThirdPartyLicenses(configuration);
+        ValidateLicenseConfiguration(configuration);
+
         // Add core services
         services.AddCoreServices(configuration);
 
@@ -107,11 +113,62 @@ public static class ServiceConfigurationExtensions
     }
 
     /// <summary>
+    /// Configures third-party software licenses securely.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">The application configuration.</param>
+    /// <returns>The service collection for chaining.</returns>
+    private static IServiceCollection ConfigureThirdPartyLicenses(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Configure Syncfusion license
+        var syncfusionLicense = configuration["Licenses:SyncfusionLicenseKey"];
+        if (!string.IsNullOrEmpty(syncfusionLicense))
+        {
+            Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense(syncfusionLicense);
+            Log.Information("Syncfusion license configured successfully");
+        }
+        else
+        {
+            Log.Warning("Syncfusion license key not found in configuration. Some features may not work correctly.");
+        }
+       
+        // Add other license configurations here as needed
+        // Example: Configure AutoMapper license if required in future versions
+
+        return services;
+    }
+
+    private static void ValidateLicenseConfiguration(IConfiguration configuration)
+    {
+        var requiredLicenses = new[]
+        {
+            "Licenses:SyncfusionLicenseKey",
+            "Licenses:AutoMapperLicenseKey"
+        };
+
+        var missingLicenses = requiredLicenses
+            .Where(key => string.IsNullOrEmpty(configuration[key]))
+            .ToList();
+
+        if (!missingLicenses.Any()) return;
+        var message = $"Missing required license keys: {string.Join(", ", missingLicenses)}";
+        Log.Warning(message);
+
+        // Optionally throw in production if licenses are critical
+//        if (environment.IsProduction())
+//        {
+//            throw new InvalidOperationException(message);
+//        }
+    }
+
+    /// <summary>
     /// Adds API-specific services.
     /// </summary>
     private static IServiceCollection AddApiServices(this IServiceCollection services, IConfiguration configuration)
     {
-        Syncfusion.Licensing.SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JFaF5cXGRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXZeeHRVQ2VcV0ZzXEZWYEg=");
+        // Configure AutoMapper
+        services.AddAutoMapperConfiguration(configuration);
+
         // Configure controllers with advanced options
         services.AddControllers(options =>
         {
@@ -262,4 +319,119 @@ public static class ServiceConfigurationExtensions
 
         return services;
     }
+
+    /// <summary>
+    /// Configures AutoMapper with all mapping profiles.
+    /// </summary>
+    /// <param name="services">The service collection.</param>
+    /// <param name="configuration">The application configuration.</param>
+    /// <returns>The service collection for chaining.</returns>
+    private static IServiceCollection AddAutoMapperConfiguration(this IServiceCollection services, IConfiguration configuration)
+    {
+        var autoMapperLicense = configuration["Licenses:AutoMapperLicenseKey"];
+        if (string.IsNullOrEmpty(autoMapperLicense))
+        {
+            Log.Warning("AutoMapper license key not found in configuration. Some features may not work correctly.");
+            return services;
+        }
+
+        // Configure AutoMapper with assembly scanning for profiles
+        services.AddAutoMapper(cfg =>
+            {
+                cfg.LicenseKey = autoMapperLicense;
+                // Configure AutoMapper settings
+                cfg.AllowNullDestinationValues = true;
+                cfg.AllowNullCollections = true;
+
+                // Add custom value resolvers, type converters, etc.
+                // configuration.AddProfile<CustomMappingProfile>();
+
+            },
+            // Scan these assemblies for AutoMapper profiles
+            Assembly.GetExecutingAssembly(),           // Current API assembly
+            typeof(ADMS.Application.AssemblyMarker).Assembly,  // Application assembly
+            typeof(ADMS.Domain.AssemblyMarker).Assembly        // Domain assembly (if needed)
+        );
+
+        // Validate AutoMapper configuration in development
+        services.AddSingleton<IHostedService, AutoMapperValidationService>();
+
+        Log.Information("AutoMapper configuration completed successfully");
+        return services;
+    }
+}
+
+/// <summary>
+/// Background service to validate AutoMapper configuration on startup.
+/// </summary>
+public class AutoMapperValidationService : IHostedService
+{
+    private readonly IMapper _mapper;
+    private readonly ILogger<AutoMapperValidationService> _logger;
+    private readonly IHostEnvironment _environment;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="AutoMapperValidationService"/> class.
+    /// </summary>
+    /// <param name="mapper">The AutoMapper instance used for object mapping operations.</param>
+    /// <param name="logger">The logger instance used for logging diagnostic and error information.</param>
+    /// <param name="environment">The host environment providing information about the application's runtime environment.</param>
+    public AutoMapperValidationService(
+        IMapper mapper,
+        ILogger<AutoMapperValidationService> logger,
+        IHostEnvironment environment)
+    {
+        _mapper = mapper;
+        _logger = logger;
+        _environment = environment;
+    }
+
+    /// <summary>
+    /// Performs startup validation for the application in a development environment.
+    /// </summary>
+    /// <remarks>This method validates the AutoMapper configuration and logs the result. If the configuration
+    /// is invalid, an exception is thrown to prevent the application from starting. This validation is only performed
+    /// when the application is running in a development environment.</remarks>
+    /// <param name="cancellationToken">A token that can be used to cancel the operation. This parameter is not used in the current implementation.</param>
+    /// <returns>A <see cref="Task"/> that represents the asynchronous operation. The task is completed immediately.</returns>
+    public Task StartAsync(CancellationToken cancellationToken)
+    {
+        if (!_environment.IsDevelopment()) return Task.CompletedTask;
+        try
+        {
+            _mapper.ConfigurationProvider.AssertConfigurationIsValid();
+            _logger.LogInformation("AutoMapper configuration validation passed");
+        }
+        catch (Exception exception)
+        {
+            _logger.LogError(exception, "AutoMapper configuration validation failed");
+            throw new InvalidOperationException("AutoMapper configuration validation failed during startup. See inner exception for details.", exception); // Fail fast in development
+        }
+
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Stops the asynchronous operation gracefully.
+    /// </summary>
+    /// <param name="cancellationToken">A token that can be used to signal the request to cancel the stop operation.</param>
+    /// <returns>A completed <see cref="Task"/> representing the asynchronous stop operation.</returns>
+    public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
+}
+
+// Assembly marker classes for AutoMapper assembly scanning
+namespace ADMS.Application
+{
+    /// <summary>
+    /// Marker class for Application assembly identification.
+    /// </summary>
+    public class AssemblyMarker { }
+}
+
+namespace ADMS.Domain
+{
+    /// <summary>
+    /// Marker class for Domain assembly identification.
+    /// </summary>
+    public class AssemblyMarker { }
 }
