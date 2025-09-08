@@ -349,8 +349,8 @@ public static class ServiceConfigurationExtensions
             },
             // Scan these assemblies for AutoMapper profiles
             Assembly.GetExecutingAssembly(),           // Current API assembly
-            typeof(ADMS.Application.AssemblyMarker).Assembly,  // Application assembly
-            typeof(ADMS.Domain.AssemblyMarker).Assembly        // Domain assembly (if needed)
+            typeof(Application.AssemblyMarker).Assembly  // Application assembly
+            //typeof(ADMS.Domain.AssemblyMarker).Assembly        // Domain assembly (if needed)
         );
 
         // Validate AutoMapper configuration in development
@@ -417,21 +417,4 @@ public class AutoMapperValidationService : IHostedService
     /// <param name="cancellationToken">A token that can be used to signal the request to cancel the stop operation.</param>
     /// <returns>A completed <see cref="Task"/> representing the asynchronous stop operation.</returns>
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
-}
-
-// Assembly marker classes for AutoMapper assembly scanning
-namespace ADMS.Application
-{
-    /// <summary>
-    /// Marker class for Application assembly identification.
-    /// </summary>
-    public class AssemblyMarker { }
-}
-
-namespace ADMS.Domain
-{
-    /// <summary>
-    /// Marker class for Domain assembly identification.
-    /// </summary>
-    public class AssemblyMarker { }
 }
