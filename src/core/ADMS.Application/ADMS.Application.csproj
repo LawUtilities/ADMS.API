@@ -39,6 +39,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Application Layer Packages - Versions inherited from Directory.Build.props -->
     <PackageReference Include="MediatR" />
     <PackageReference Include="FluentValidation" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />

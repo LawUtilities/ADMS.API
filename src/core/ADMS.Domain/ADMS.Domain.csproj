@@ -36,7 +36,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Domain should have minimal dependencies -->
+    <!-- Domain should have minimal dependencies - Versions inherited from Directory.Build.props -->
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
     <PackageReference Include="System.ComponentModel.Annotations" />
     <PackageReference Include="System.Text.Json" />

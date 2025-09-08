@@ -15,21 +15,21 @@
   </ItemGroup>
 
   <ItemGroup>
-    <!-- Core Infrastructure -->
+    <!-- Core Infrastructure - Versions inherited from Directory.Build.props -->
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" >
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
 
-    <!-- Security & Validation -->
+    <!-- Security & Validation - Versions inherited from Directory.Build.props -->
     <PackageReference Include="nClam" />
     <PackageReference Include="File.TypeChecker" />
     <PackageReference Include="Mime-Detective" />
     <PackageReference Include="MimeTypesMap" />
 
-    <!-- Document Processing (Syncfusion Suite) -->
+    <!-- Document Processing (Syncfusion Suite) - Versions inherited from Directory.Build.props -->
     <PackageReference Include="Syncfusion.DocIO.Net.Core" />
     <PackageReference Include="Syncfusion.DocIORenderer.Net.Core" />
     <PackageReference Include="Syncfusion.Pdf.Net.Core" />
@@ -38,14 +38,12 @@
     <PackageReference Include="Syncfusion.XlsIO.Net.Core" />
     <PackageReference Include="Syncfusion.XlsIORenderer.Net.Core" />
 
-    <!-- Additional Useful Infrastructure Packages -->
+    <!-- Additional Infrastructure Packages - Versions inherited from Directory.Build.props -->
     <PackageReference Include="Microsoft.Extensions.Caching.Memory" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
     <PackageReference Include="Microsoft.Extensions.Http" />
-    <!-- For HttpClient factory -->
     <PackageReference Include="System.Security.Cryptography.Algorithms" />
-    <!-- For checksum calculations -->
   </ItemGroup>
 
   <ItemGroup>
@@ -54,7 +52,6 @@
     <Folder Include="Persistence\Migrations\" />
     <Folder Include="Persistence\Repositories\" />
     <Folder Include="Persistence\Interceptors\" />
-    <!-- EF Core interceptors -->
     <Folder Include="Services\Document\" />
     <Folder Include="Services\Security\" />
     <Folder Include="Services\Storage\" />
@@ -62,7 +59,6 @@
     <Folder Include="Services\Caching\" />
     <Folder Include="Extensions\" />
     <Folder Include="Options\" />
-    <!-- Configuration option classes -->
   </ItemGroup>
 
 </Project>

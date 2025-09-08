@@ -4,22 +4,22 @@
     <CentralPackageTransitivePinningEnabled>true</CentralPackageTransitivePinningEnabled>
   </PropertyGroup>
 
-  <ItemGroup Label="Core Framework">
-    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+  <ItemGroup Label="Core Framework - .NET 8 LTS">
+    <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageVersion Include="System.ComponentModel.Annotations" Version="5.0.0" />
-    <PackageVersion Include="System.Text.Json" Version="9.0.0" />
-    <PackageVersion Include="System.Collections.Immutable" Version="9.0.0" />
+    <PackageVersion Include="System.Text.Json" Version="8.0.5" />
+    <PackageVersion Include="System.Collections.Immutable" Version="8.0.0" />
   </ItemGroup>
 
-  <ItemGroup Label="Entity Framework">
-    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+  <ItemGroup Label="Entity Framework - .NET 8 LTS">
+    <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.11" />
   </ItemGroup>
 
-  <ItemGroup Label="Web API">
+  <ItemGroup Label="Web API - .NET 8 LTS">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="8.0.11" />
     <PackageVersion Include="Swashbuckle.AspNetCore" Version="9.0.4" />
     <PackageVersion Include="Asp.Versioning.Mvc" Version="8.1.0" />
@@ -44,21 +44,21 @@
     <PackageVersion Include="System.Security.Cryptography.Algorithms" Version="4.3.1" />
   </ItemGroup>
 
-  <ItemGroup Label="Document Processing (Syncfusion)">
-    <PackageVersion Include="Syncfusion.DocIO.Net.Core" Version="31.1.17" />
-    <PackageVersion Include="Syncfusion.DocIORenderer.Net.Core" Version="31.1.17" />
-    <PackageVersion Include="Syncfusion.Pdf.Net.Core" Version="31.1.17" />
-    <PackageVersion Include="Syncfusion.Presentation.Net.Core" Version="31.1.17" />
-    <PackageVersion Include="Syncfusion.PresentationRenderer.Net.Core" Version="31.1.17" />
-    <PackageVersion Include="Syncfusion.XlsIO.Net.Core" Version="31.1.17" />
-    <PackageVersion Include="Syncfusion.XlsIORenderer.Net.Core" Version="31.1.17" />
+  <ItemGroup Label="Document Processing (Syncfusion) - .NET 8 Compatible">
+    <PackageVersion Include="Syncfusion.DocIO.Net.Core" Version="30.2.6" />
+    <PackageVersion Include="Syncfusion.DocIORenderer.Net.Core" Version="30.2.6" />
+    <PackageVersion Include="Syncfusion.Pdf.Net.Core" Version="30.2.6" />
+    <PackageVersion Include="Syncfusion.Presentation.Net.Core" Version="30.2.6" />
+    <PackageVersion Include="Syncfusion.PresentationRenderer.Net.Core" Version="30.2.6" />
+    <PackageVersion Include="Syncfusion.XlsIO.Net.Core" Version="30.2.6" />
+    <PackageVersion Include="Syncfusion.XlsIORenderer.Net.Core" Version="30.2.6" />
   </ItemGroup>
 
-  <ItemGroup Label="Caching & Extensions">
-    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="9.0.0" />
-    <PackageVersion Include="Microsoft.Extensions.Http" Version="9.0.0" />
+  <ItemGroup Label="Caching & Extensions - .NET 8 LTS">
+    <PackageVersion Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.11" />
+    <PackageVersion Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="8.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Http" Version="8.0.1" />
   </ItemGroup>
 
   <ItemGroup Label="Cloud Storage (Optional)">
