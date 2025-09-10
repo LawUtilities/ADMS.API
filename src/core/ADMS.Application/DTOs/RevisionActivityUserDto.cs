@@ -12,7 +12,7 @@ namespace ADMS.Application.DTOs;
 /// Represents the association between a revision, revision activity, and user for audit trail purposes.
 /// Links revision operations to users for accountability and compliance tracking.
 /// </remarks>
-public sealed record RevisionActivityUserDto : IValidatableObject
+public sealed record RevisionActivityUserDto : IValidatableObject, IEquatable<RevisionActivityUserDto>
 {
     #region Core Properties
 
@@ -94,7 +94,7 @@ public sealed record RevisionActivityUserDto : IValidatableObject
     /// </summary>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // Validate core GUIDs
+        // Validate core GUIDs using consistent helper
         foreach (var result in UserValidationHelper.ValidateUserId(RevisionId, nameof(RevisionId)))
             yield return result;
 
@@ -138,9 +138,11 @@ public sealed record RevisionActivityUserDto : IValidatableObject
         }
 
         // Validate revision activity type if RevisionActivity is loaded
-        if (RevisionActivity == null) yield break;
-        foreach (var result in RevisionActivityValidationHelper.ValidateActivity(RevisionActivity.Activity, $"{nameof(RevisionActivity)}.{nameof(RevisionActivity.Activity)}"))
-            yield return result;
+        if (RevisionActivity != null)
+        {
+            foreach (var result in RevisionActivityValidationHelper.ValidateActivity(RevisionActivity.Activity, $"{nameof(RevisionActivity)}.{nameof(RevisionActivity.Activity)}"))
+                yield return result;
+        }
     }
 
     #endregion Validation Implementation
@@ -226,11 +228,8 @@ public sealed record RevisionActivityUserDto : IValidatableObject
     #region Equality Implementation
 
     /// <summary>
-    /// Determines whether the specified <see cref="RevisionActivityUserDto"/> is equal to the current instance.
+    /// Determines whether the specified RevisionActivityUserDto is equal to the current instance.
     /// </summary>
-    /// <param name="other">The <see cref="RevisionActivityUserDto"/> to compare with the current instance.</param>
-    /// <returns><see langword="true"/> if the specified <see cref="RevisionActivityUserDto"/> is equal to the current instance;
-    /// otherwise, <see langword="false"/>.</returns>
     public bool Equals(RevisionActivityUserDto? other)
     {
         if (other is null) return false;
@@ -245,10 +244,6 @@ public sealed record RevisionActivityUserDto : IValidatableObject
     /// <summary>
     /// Returns a hash code for the current object based on its key properties.
     /// </summary>
-    /// <remarks>The hash code is computed using the values of <see cref="RevisionId"/>, <see
-    /// cref="RevisionActivityId"/>, <see cref="UserId"/>, and <see cref="CreatedAt"/>. This ensures that objects with
-    /// the same key property values produce the same hash code.</remarks>
-    /// <returns>An integer representing the hash code for the current object.</returns>
     public override int GetHashCode() =>
         HashCode.Combine(RevisionId, RevisionActivityId, UserId, CreatedAt);
 
@@ -257,12 +252,8 @@ public sealed record RevisionActivityUserDto : IValidatableObject
     #region String Representation
 
     /// <summary>
-    /// Returns a string representation of the revision activity, including the activity type, revision ID, user ID, and
-    /// creation timestamp.
+    /// Returns a string representation of the revision activity.
     /// </summary>
-    /// <returns>A string describing the revision activity in the format:  "Revision Activity: [Activity] on Revision
-    /// ([RevisionId]) by User ([UserId]) at [CreatedAt]". If <see cref="RevisionActivity"/> is null, "ACTIVITY" is used
-    /// as the activity type.</returns>
     public override string ToString() =>
         $"Revision Activity: {RevisionActivity?.Activity ?? "ACTIVITY"} on Revision ({RevisionId}) by User ({UserId}) at {CreatedAt:yyyy-MM-dd HH:mm:ss}";
 
