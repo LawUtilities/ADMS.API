@@ -1,36 +1,37 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
-using ADMS.Application.Common.Validation;
+﻿using ADMS.Application.Common.Validation;
 using ADMS.Domain.Common;
+
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 
 namespace ADMS.Application.DTOs;
 
 /// <summary>
-/// Data Transfer Object representing a user with audit trail relationships.
+/// Data Transfer Object representing a user with streamlined validation and comprehensive audit trail relationships.
 /// </summary>
 /// <remarks>
 /// This DTO serves as the complete representation of a user within the ADMS legal document management system,
 /// including activity associations for audit trail support. It provides validation and computed properties
-/// optimized for application layer operations.
+/// optimized for application layer operations using the standardized BaseValidationDto approach.
 /// 
-/// <para><strong>Clean Architecture Integration:</strong></para>
+/// <para><strong>Key Characteristics:</strong></para>
 /// <list type="bullet">
-/// <item>Maps to Domain User entity while remaining in Application layer</item>
-/// <item>Uses Result pattern for error handling</item>
-/// <item>Integrates with centralized validation helpers</item>
-/// <item>Supports optional loading of activity relationships</item>
+/// <item><strong>Streamlined Validation:</strong> Uses BaseValidationDto for consistent, performant validation</item>
+/// <item><strong>Domain Alignment:</strong> Maps directly to ADMS.Domain.Entities.User</item>
+/// <item><strong>Professional Standards:</strong> Enforces legal practice naming conventions and business rules</item>
+/// <item><strong>Clean Architecture:</strong> Maintains separation between domain and application layers</item>
+/// <item><strong>Validation Integration:</strong> Uses UserValidationHelper for consistency</item>
 /// </list>
 /// 
 /// <para><strong>Legal Practice Support:</strong></para>
 /// <list type="bullet">
-/// <item>Professional naming conventions with validation</item>
-/// <item>Complete audit trail relationships for compliance</item>
-/// <item>User accountability for all system operations</item>
-/// <item>Activity attribution for professional responsibility</item>
+/// <item><strong>Professional naming conventions with validation</strong></item>
+/// <item><strong>Complete audit trail relationships for compliance</strong></item>
+/// <item><strong>User accountability for all system operations</strong></item>
+/// <item><strong>Activity attribution for professional responsibility</strong></item>
 /// </list>
 /// </remarks>
-public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
+public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
 {
     #region Core Properties
 
@@ -48,7 +49,8 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
     /// Validated for length, format, and professional standards.
     /// </remarks>
     [Required(ErrorMessage = "User name is required.")]
-    [StringLength(50, MinimumLength = 2, ErrorMessage = "User name must be between 2 and 50 characters.")]
+    [StringLength(UserValidationHelper.MaxUserNameLength, MinimumLength = UserValidationHelper.MinUserNameLength, 
+        ErrorMessage = "User name must be between 2 and 50 characters.")]
     public required string Name { get; set; }
 
     #endregion Core Properties
@@ -127,123 +129,128 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
     /// Gets the normalized version of the user's name for comparison operations.
     /// </summary>
     /// <remarks>
-    /// Normalizes by trimming whitespace and collapsing multiple spaces.
+    /// Uses UserValidationHelper for consistent normalization across the system.
     /// Returns null for invalid or empty names.
     /// </remarks>
-    public string? NormalizedName
-    {
-        get
-        {
-            if (string.IsNullOrWhiteSpace(Name))
-                return null;
-
-            var trimmed = Name.Trim();
-            return string.IsNullOrEmpty(trimmed) ? null :
-                   System.Text.RegularExpressions.Regex.Replace(trimmed, @"\s+", " ");
-        }
-    }
+    public string NormalizedName => UserValidationHelper.NormalizeUsername(Name);
 
     /// <summary>
     /// Gets the display name optimized for user interface presentation.
     /// </summary>
-    public string DisplayName => NormalizedName ?? Name;
+    public string DisplayName => NormalizedName;
 
     /// <summary>
     /// Gets a value indicating whether this user DTO has valid core data.
     /// </summary>
-    public bool IsValid => Id != Guid.Empty && !string.IsNullOrWhiteSpace(Name) && Name.Length >= 2;
+    public bool IsValid => 
+        UserValidationHelper.IsValidUserId(Id) && 
+        UserValidationHelper.IsUsernameAllowed(Name);
+
+    /// <summary>
+    /// Gets a value indicating whether the user has sufficient data for professional operations.
+    /// </summary>
+    public bool IsSufficientForOperations => 
+        UserValidationHelper.IsSufficientUserContext(Id, Name, DateTime.UtcNow);
 
     #endregion Computed Properties
 
-    #region Validation Implementation
+    #region Validation Implementation (BaseValidationDto)
 
     /// <summary>
-    /// Validates the UserDto for data integrity and business rules compliance.
+    /// Validates core properties such as ID and name.
     /// </summary>
-    /// <param name="validationContext">The validation context.</param>
-    /// <returns>A collection of validation results.</returns>
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    /// <returns>A collection of validation results for core property validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateCoreProperties()
     {
-        // Validate core properties
-        foreach (var result in ValidateUserId())
+        // Validate User ID using UserValidationHelper
+        foreach (var result in UserValidationHelper.ValidateUserId(Id, nameof(Id)))
             yield return result;
 
-        foreach (var result in ValidateUserName())
+        // Validate Name using UserValidationHelper
+        foreach (var result in UserValidationHelper.ValidateUsername(Name, nameof(Name)))
             yield return result;
+    }
 
-        // Validate collections if loaded
+    /// <summary>
+    /// Validates business rules and domain-specific logic.
+    /// </summary>
+    /// <returns>A collection of validation results for business rule validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateBusinessRules()
+    {
+        // Validate that user has sufficient context for operations
+        if (!IsSufficientForOperations)
+        {
+            yield return CreateValidationResult(
+                "User does not have sufficient data for professional operations.",
+                nameof(Id), nameof(Name));
+        }
+
+        // Validate normalized name consistency
+        var normalizedName = NormalizeUsername();
+        if (!string.IsNullOrEmpty(normalizedName) && normalizedName != Name?.Trim())
+        {
+            yield return CreateValidationResult(
+                "User name contains formatting that will be normalized. Consider using the normalized format.",
+                nameof(Name));
+        }
+    }
+
+    /// <summary>
+    /// Validates relationships and constraints between multiple properties.
+    /// </summary>
+    /// <returns>A collection of validation results for cross-property validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateCrossPropertyRules()
+    {
+        // Validate name and ID consistency for professional standards
+        if (Id == Guid.Empty || string.IsNullOrWhiteSpace(Name)) yield break;
+        // Check for reserved names that conflict with system operations
+        if (UserValidationHelper.IsReservedUsername(Name))
+        {
+            yield return CreateValidationResult(
+                "User name conflicts with system reserved names.",
+                nameof(Name));
+        }
+    }
+
+    /// <summary>
+    /// Validates collections and nested objects.
+    /// </summary>
+    /// <returns>A collection of validation results for collection validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateCollections()
+    {
+        // Validate MatterActivityUsers collection if loaded
         if (MatterActivityUsers != null)
         {
-            foreach (var result in ValidationHelper.ValidateCollection(MatterActivityUsers, nameof(MatterActivityUsers)))
+            foreach (var result in ValidateCollection(MatterActivityUsers, nameof(MatterActivityUsers)))
                 yield return result;
         }
 
+        // Validate DocumentActivityUsers collection if loaded
         if (DocumentActivityUsers != null)
         {
-            foreach (var result in ValidationHelper.ValidateCollection(DocumentActivityUsers, nameof(DocumentActivityUsers)))
+            foreach (var result in ValidateCollection(DocumentActivityUsers, nameof(DocumentActivityUsers)))
                 yield return result;
         }
 
+        // Validate RevisionActivityUsers collection if loaded
         if (RevisionActivityUsers != null)
         {
-            foreach (var result in ValidationHelper.ValidateCollection(RevisionActivityUsers, nameof(RevisionActivityUsers)))
+            foreach (var result in ValidateCollection(RevisionActivityUsers, nameof(RevisionActivityUsers)))
                 yield return result;
         }
 
+        // Validate MatterDocumentActivityUsersFrom collection if loaded
         if (MatterDocumentActivityUsersFrom != null)
         {
-            foreach (var result in ValidationHelper.ValidateCollection(MatterDocumentActivityUsersFrom, nameof(MatterDocumentActivityUsersFrom)))
+            foreach (var result in ValidateCollection(MatterDocumentActivityUsersFrom, nameof(MatterDocumentActivityUsersFrom)))
                 yield return result;
         }
 
+        // Validate MatterDocumentActivityUsersTo collection if loaded
         if (MatterDocumentActivityUsersTo != null)
         {
-            foreach (var result in ValidationHelper.ValidateCollection(MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
+            foreach (var result in ValidateCollection(MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
                 yield return result;
-        }
-    }
-
-    /// <summary>
-    /// Validates the user ID property.
-    /// </summary>
-    private IEnumerable<ValidationResult> ValidateUserId()
-    {
-        if (Id == Guid.Empty)
-        {
-            yield return new ValidationResult("User ID cannot be empty.", [nameof(Id)]);
-        }
-    }
-
-    /// <summary>
-    /// Validates the user name property.
-    /// </summary>
-    private IEnumerable<ValidationResult> ValidateUserName()
-    {
-        if (string.IsNullOrWhiteSpace(Name))
-        {
-            yield return new ValidationResult("User name is required.", [nameof(Name)]);
-            yield break;
-        }
-
-        if (Name.Length < 2)
-        {
-            yield return new ValidationResult("User name must be at least 2 characters long.", [nameof(Name)]);
-        }
-
-        if (Name.Length > 50)
-        {
-            yield return new ValidationResult("User name cannot exceed 50 characters.", [nameof(Name)]);
-        }
-
-        if (Name.Trim() != Name)
-        {
-            yield return new ValidationResult("User name should not have leading or trailing whitespace.", [nameof(Name)]);
-        }
-
-        // Basic professional naming validation
-        if (!System.Text.RegularExpressions.Regex.IsMatch(Name, @"^[a-zA-Z0-9\s\.\-_]+$"))
-        {
-            yield return new ValidationResult("User name contains invalid characters. Use letters, numbers, spaces, periods, hyphens, or underscores.", [nameof(Name)]);
         }
     }
 
@@ -274,9 +281,9 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
         // Validate the created DTO
         var validationResults = ValidateModel(dto);
         if (!validationResults.Any()) return Result.Success(dto);
+        
         var errors = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
         return Result.Failure<UserDto>(DomainError.Create("VALIDATION_FAILED", errors));
-
     }
 
     /// <summary>
@@ -320,18 +327,7 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
     /// <returns>A list of validation results.</returns>
     public static IList<ValidationResult> ValidateModel([AllowNull] UserDto? dto)
     {
-        var results = new List<ValidationResult>();
-
-        if (dto is null)
-        {
-            results.Add(new ValidationResult("UserDto instance is required."));
-            return results;
-        }
-
-        var context = new ValidationContext(dto);
-        Validator.TryValidateObject(dto, context, results, validateAllProperties: true);
-
-        return results;
+        return BaseValidationDto.ValidateModel(dto);
     }
 
     #endregion Static Factory Methods
@@ -353,6 +349,43 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
         // For now, this serves as a placeholder for audit functionality
     }
 
+    /// <summary>
+    /// Normalizes the user's name using the validation helper.
+    /// </summary>
+    /// <returns>Normalized username or null if invalid.</returns>
+    public string? NormalizeUsername()
+    {
+        return UserValidationHelper.NormalizeUsername(Name);
+    }
+
+    /// <summary>
+    /// Determines if this user can be safely deleted without compromising audit trails.
+    /// </summary>
+    /// <returns>True if the user can be deleted; otherwise, false.</returns>
+    public bool CanBeDeleted()
+    {
+        return !HasActivities;
+    }
+
+    /// <summary>
+    /// Gets user activity statistics for monitoring and reporting.
+    /// </summary>
+    /// <returns>Dictionary containing activity statistics.</returns>
+    public IReadOnlyDictionary<string, object> GetActivityStatistics()
+    {
+        return new Dictionary<string, object>
+        {
+            ["TotalActivities"] = TotalActivityCount,
+            ["MatterActivities"] = MatterActivityUsers?.Count ?? 0,
+            ["DocumentActivities"] = DocumentActivityUsers?.Count ?? 0,
+            ["RevisionActivities"] = RevisionActivityUsers?.Count ?? 0,
+            ["TransferActivitiesFrom"] = MatterDocumentActivityUsersFrom?.Count ?? 0,
+            ["TransferActivitiesTo"] = MatterDocumentActivityUsersTo?.Count ?? 0,
+            ["HasAuditTrail"] = HasActivities,
+            ["CanBeDeleted"] = CanBeDeleted()
+        };
+    }
+
     #endregion Business Methods
 
     #region Equality Implementation
@@ -368,13 +401,13 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
         if (ReferenceEquals(this, other)) return true;
 
         // Compare by ID if both have valid IDs
-        if (Id != Guid.Empty && other.Id != Guid.Empty)
+        if (UserValidationHelper.IsValidUserId(Id) && UserValidationHelper.IsValidUserId(other.Id))
         {
             return Id == other.Id;
         }
 
         // Otherwise compare by normalized content
-        return string.Equals(NormalizedName, other.NormalizedName, StringComparison.OrdinalIgnoreCase);
+        return UserValidationHelper.AreUsernamesEquivalent(Name, other.Name);
     }
 
     /// <summary>
@@ -387,8 +420,11 @@ public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
     /// </summary>
     public override int GetHashCode()
     {
-        return Id != Guid.Empty ? Id.GetHashCode() :
-               StringComparer.OrdinalIgnoreCase.GetHashCode(NormalizedName ?? string.Empty);
+        if (UserValidationHelper.IsValidUserId(Id))
+            return Id.GetHashCode();
+
+        var normalizedName = UserValidationHelper.NormalizeUsername(Name);
+        return StringComparer.OrdinalIgnoreCase.GetHashCode(normalizedName);
     }
 
     /// <summary>

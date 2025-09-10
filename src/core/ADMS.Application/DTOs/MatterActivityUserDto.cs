@@ -204,10 +204,15 @@ public sealed record MatterActivityUserDto : IValidatableObject, IEquatable<Matt
             CreatedAt = entity.CreatedAt
         };
 
-        // Navigation properties can be set separately if needed for performance
-        // dto.Matter = entity.Matter != null ? MatterWithoutDocumentsDto.FromEntity(entity.Matter) : null;
-        // dto.MatterActivity = entity.MatterActivity != null ? MatterActivityDto.FromEntity(entity.MatterActivity) : null;
-        // dto.User = entity.User != null ? UserDto.FromEntity(entity.User) : null;
+        if (includeNavigationProperties)
+        {
+            dto = dto with
+            {
+                Matter = entity.Matter != null ? MatterWithoutDocumentsDto.FromEntity(entity.Matter) : null,
+                MatterActivity = entity.MatterActivity != null ? MatterActivityDto.FromEntity(entity.MatterActivity) : null,
+                User = entity.User != null ? UserDto.FromEntity(entity.User) : null
+            };
+        }
 
         var validationResults = ValidateModel(dto);
         if (!validationResults.Any()) return dto;

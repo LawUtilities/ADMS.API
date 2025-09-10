@@ -1,13 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
-
+﻿using ADMS.Application.Common.Validation;
+using ADMS.Application.Constants;
 using ADMS.Domain.Common;
-using ADMS.Domain.ValueObjects;
+
+using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace ADMS.Application.DTOs;
 
 /// <summary>
-/// Comprehensive Data Transfer Object representing a matter with core properties and navigation collections for complete matter operations.
+/// Comprehensive Data Transfer Object representing a matter with streamlined validation and professional standards.
 /// </summary>
 /// <remarks>
 /// This DTO serves as the standard representation of a matter within the ADMS legal document management system,
@@ -16,19 +18,11 @@ namespace ADMS.Application.DTOs;
 /// 
 /// <para><strong>Key Characteristics:</strong></para>
 /// <list type="bullet">
-/// <item><strong>Balanced Representation:</strong> Core properties with selective document inclusion</item>
+/// <item><strong>Streamlined Validation:</strong> Uses BaseValidationDto for consistent, performant validation</item>
 /// <item><strong>Domain Alignment:</strong> Maps directly to ADMS.Domain.Entities.Matter</item>
-/// <item><strong>Flexible Loading:</strong> Supports both minimal and comprehensive data loading strategies</item>
+/// <item><strong>Professional Standards:</strong> Enforces legal practice naming conventions and business rules</item>
 /// <item><strong>Clean Architecture:</strong> Maintains separation between domain and application layers</item>
 /// <item><strong>Validation Integration:</strong> Uses domain validation helpers for consistency</item>
-/// </list>
-/// 
-/// <para><strong>Clean Architecture Integration:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Domain Entity Mirror:</strong> Directly corresponds to ADMS.Domain.Entities.Matter</item>
-/// <item><strong>Application Layer DTO:</strong> Optimized for application service operations</item>
-/// <item><strong>Value Object Support:</strong> Works with MatterId and MatterDescription value objects</item>
-/// <item><strong>Result Pattern Ready:</strong> Compatible with domain Result pattern implementations</item>
 /// </list>
 /// 
 /// <para><strong>Usage Scenarios:</strong></para>
@@ -40,7 +34,7 @@ namespace ADMS.Application.DTOs;
 /// <item><strong>Business Operations:</strong> Matter lifecycle operations and state management</item>
 /// </list>
 /// </remarks>
-public class MatterDto : IValidatableObject, IEquatable<MatterDto>
+public sealed class MatterDto : BaseValidationDto, IEquatable<MatterDto>
 {
     #region Core Properties
 
@@ -61,7 +55,8 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
     /// the system and follows professional legal practice naming conventions.
     /// </remarks>
     [Required(ErrorMessage = "Matter description is required.")]
-    [StringLength(128, MinimumLength = 3, ErrorMessage = "Matter description must be between 3 and 128 characters.")]
+    [StringLength(MatterConstants.DescriptionMaxLength, MinimumLength = MatterConstants.DescriptionMinLength,
+        ErrorMessage = "Matter description must be between 3 and 128 characters.")]
     public required string Description { get; set; }
 
     /// <summary>
@@ -84,12 +79,16 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
     /// Gets or sets the user who created the matter.
     /// </summary>
     [Required(ErrorMessage = "Created by is required.")]
+    [StringLength(UserValidationHelper.MaxUserNameLength, MinimumLength = UserValidationHelper.MinUserNameLength,
+        ErrorMessage = "Created by must be between 2 and 50 characters.")]
     public required string CreatedBy { get; set; }
 
     /// <summary>
     /// Gets or sets the user who last modified the matter.
     /// </summary>
     [Required(ErrorMessage = "Last modified by is required.")]
+    [StringLength(UserValidationHelper.MaxUserNameLength, MinimumLength = UserValidationHelper.MinUserNameLength,
+        ErrorMessage = "Last modified by must be between 2 and 50 characters.")]
     public required string LastModifiedBy { get; set; }
 
     /// <summary>
@@ -147,7 +146,7 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
     /// <summary>
     /// Gets the creation date formatted for display.
     /// </summary>
-    public string FormattedCreationDate => CreationDate.ToString("yyyy-MM-dd HH:mm:ss") + " UTC";
+    public string FormattedCreationDate => CreationDate.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture) + " UTC";
 
     /// <summary>
     /// Gets the number of documents in this matter (if documents are loaded).
@@ -169,124 +168,118 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
     /// </summary>
     public string DisplayText => Description;
 
-    #endregion Computed Properties
-
-    #region Validation Implementation
+    /// <summary>
+    /// Gets the normalized description using validation helper.
+    /// </summary>
+    public string NormalizedDescription => MatterValidationHelper.NormalizeDescription(Description);
 
     /// <summary>
-    /// Validates the MatterDto using domain validation rules.
+    /// Gets the local creation date string for display.
     /// </summary>
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    public string LocalCreationDateString => CreationDate.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+
+    #endregion Computed Properties
+
+    #region Validation Implementation (BaseValidationDto)
+
+    /// <summary>
+    /// Validates core properties such as ID, description, and creation date.
+    /// </summary>
+    /// <returns>A collection of validation results for core property validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateCoreProperties()
     {
         // Validate ID (allow empty for creation scenarios)
-        if (Id != Guid.Empty && !IsValidGuid(Id))
-        {
-            yield return new ValidationResult("Invalid matter ID format.", [nameof(Id)]);
-        }
-
-        // Validate Description using domain rules
-        foreach (var result in ValidateDescription())
-        {
+        foreach (var result in ValidateGuid(Id, nameof(Id), allowEmpty: true))
             yield return result;
-        }
 
-        // Validate creation date
-        foreach (var result in ValidateCreationDate())
-        {
+        // Validate Description using MatterValidationHelper
+        foreach (var result in MatterValidationHelper.ValidateDescription(Description, nameof(Description)))
             yield return result;
-        }
 
-        // Validate audit fields
-        foreach (var result in ValidateAuditFields())
-        {
+        // Validate CreationDate using MatterValidationHelper
+        foreach (var result in MatterValidationHelper.ValidateCreationDate(CreationDate, nameof(CreationDate)))
             yield return result;
-        }
 
-        // Validate business rules
-        foreach (var result in ValidateBusinessRules())
-        {
+        // Validate user fields using UserValidationHelper
+        foreach (var result in UserValidationHelper.ValidateUsername(CreatedBy, nameof(CreatedBy)))
             yield return result;
+
+        foreach (var result in UserValidationHelper.ValidateUsername(LastModifiedBy, nameof(LastModifiedBy)))
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates business rules and domain-specific logic.
+    /// </summary>
+    /// <returns>A collection of validation results for business rule validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateBusinessRules()
+    {
+        // Validate matter state consistency using MatterValidationHelper
+        foreach (var result in MatterValidationHelper.ValidateStateConsistency(IsArchived, IsDeleted))
+            yield return result;
+
+        // Validate audit fields consistency
+        foreach (var result in MatterValidationHelper.ValidateAuditFields(
+            CreatedBy, LastModifiedBy, LastModifiedDate, CreationDate))
+            yield return result;
+
+        // Validate business rules using MatterValidationHelper
+        foreach (var result in MatterValidationHelper.ValidateBusinessRules(
+            Description, CreationDate, IsArchived, IsDeleted))
+            yield return result;
+
+        // Age validation for business context
+        if (AgeDays > MatterConstants.MaxHistoricalYears * 365)
+        {
+            yield return CreateValidationResult(
+                $"Matter age exceeds reasonable bounds for active practice ({MatterConstants.MaxHistoricalYears} years).",
+                nameof(CreationDate));
         }
     }
 
-    private IEnumerable<ValidationResult> ValidateDescription()
+    /// <summary>
+    /// Validates relationships and constraints between multiple properties.
+    /// </summary>
+    /// <returns>A collection of validation results for cross-property validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateCrossPropertyRules()
     {
-        if (string.IsNullOrWhiteSpace(Description))
+        // Validate LastModifiedDate relationship
+        if (LastModifiedDate < CreationDate)
         {
-            yield return new ValidationResult("Description is required.", [nameof(Description)]);
-            yield break;
+            yield return CreateValidationResult(
+                "Last modified date cannot be before creation date.",
+                nameof(LastModifiedDate), nameof(CreationDate));
         }
 
-        if (Description.Length < 3)
+        // Validate normalized description consistency
+        var normalizedInput = MatterValidationHelper.NormalizeDescription(Description);
+        if (!string.IsNullOrEmpty(normalizedInput) && normalizedInput != Description.Trim())
         {
-            yield return new ValidationResult("Description must be at least 3 characters long.", [nameof(Description)]);
-        }
-
-        if (Description.Length > 128)
-        {
-            yield return new ValidationResult("Description cannot exceed 128 characters.", [nameof(Description)]);
-        }
-
-        if (Description.Trim() != Description)
-        {
-            yield return new ValidationResult("Description should not have leading or trailing whitespace.", [nameof(Description)]);
+            yield return CreateValidationResult(
+                "Description contains formatting that will be normalized. Consider using the normalized format.",
+                nameof(Description));
         }
     }
 
-    private IEnumerable<ValidationResult> ValidateCreationDate()
+    /// <summary>
+    /// Validates collections and nested objects.
+    /// </summary>
+    /// <returns>A collection of validation results for collection validation.</returns>
+    protected override IEnumerable<ValidationResult> ValidateCollections()
     {
-        if (CreationDate == default)
+        // Validate Documents collection if loaded
+        if (Documents != null)
         {
-            yield return new ValidationResult("Creation date is required.", [nameof(CreationDate)]);
+            foreach (var result in ValidateCollection(Documents, nameof(Documents), maxItems: MatterConstants.LargeDocumentCollectionThreshold))
+                yield return result;
         }
 
-        if (CreationDate > DateTime.UtcNow.AddMinutes(5))
+        // Validate MatterActivityUsers collection if loaded
+        if (MatterActivityUsers != null)
         {
-            yield return new ValidationResult("Creation date cannot be in the future.", [nameof(CreationDate)]);
+            foreach (var result in ValidateCollection(MatterActivityUsers, nameof(MatterActivityUsers), maxItems: MatterConstants.HighActivityCountThreshold))
+                yield return result;
         }
-
-        if (CreationDate < new DateTime(1980, 1, 1, 0, 0, 0, DateTimeKind.Utc))
-        {
-            yield return new ValidationResult("Creation date is unreasonably far in the past.", [nameof(CreationDate)]);
-        }
-    }
-
-    private IEnumerable<ValidationResult> ValidateAuditFields()
-    {
-        if (string.IsNullOrWhiteSpace(CreatedBy))
-        {
-            yield return new ValidationResult("Created by is required.", [nameof(CreatedBy)]);
-        }
-
-        if (string.IsNullOrWhiteSpace(LastModifiedBy))
-        {
-            yield return new ValidationResult("Last modified by is required.", [nameof(LastModifiedBy)]);
-        }
-
-        if (LastModifiedDate.HasValue && LastModifiedDate < CreationDate)
-        {
-            yield return new ValidationResult("Last modified date cannot be before creation date.", [nameof(LastModifiedDate)]);
-        }
-    }
-
-    private IEnumerable<ValidationResult> ValidateBusinessRules()
-    {
-        // Business rule: Deleted matters should be archived
-        if (IsDeleted && !IsArchived)
-        {
-            yield return new ValidationResult("Deleted matters must be archived.", [nameof(IsDeleted), nameof(IsArchived)]);
-        }
-
-        // Validate age reasonableness for business context
-        if (AgeDays > 365 * 20) // 20 years
-        {
-            yield return new ValidationResult("Matter age exceeds reasonable bounds for active practice.", [nameof(CreationDate)]);
-        }
-    }
-
-    private static bool IsValidGuid(Guid guid)
-    {
-        return guid != Guid.Empty;
     }
 
     #endregion Validation Implementation
@@ -296,6 +289,10 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
     /// <summary>
     /// Creates a new MatterDto with validation.
     /// </summary>
+    /// <param name="description">The matter description.</param>
+    /// <param name="createdBy">The user creating the matter.</param>
+    /// <param name="creationDate">Optional creation date (defaults to UtcNow).</param>
+    /// <returns>A Result containing either the MatterDto or validation errors.</returns>
     public static Result<MatterDto> Create(string description, string createdBy, DateTime? creationDate = null)
     {
         if (string.IsNullOrWhiteSpace(description))
@@ -313,8 +310,8 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
             Id = Guid.NewGuid(),
             Description = description.Trim(),
             CreationDate = creationDate ?? DateTime.UtcNow,
-            CreatedBy = createdBy,
-            LastModifiedBy = createdBy,
+            CreatedBy = createdBy.Trim(),
+            LastModifiedBy = createdBy.Trim(),
             IsArchived = false,
             IsDeleted = false
         };
@@ -322,19 +319,26 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
         // Validate the created DTO
         var validationResults = ValidateModel(dto);
         if (!validationResults.Any()) return Result.Success(dto);
+
         var errors = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
         return Result.Failure<MatterDto>(DomainError.Create("VALIDATION_FAILED", errors));
-
     }
 
     /// <summary>
     /// Creates a MatterDto from a domain Matter entity.
     /// </summary>
-    public static MatterDto FromDomainEntity(ADMS.Domain.Entities.Matter matter)
+    /// <param name="matter">The domain matter entity.</param>
+    /// <param name="includeDocuments">Whether to include document collections.</param>
+    /// <returns>A MatterDto instance.</returns>
+    /// <remarks>
+    /// Maps from Domain layer Matter entity to Application layer DTO.
+    /// Document collections are excluded by default for performance.
+    /// </remarks>
+    public static MatterDto FromDomainEntity(ADMS.Domain.Entities.Matter matter, bool includeDocuments = false)
     {
         ArgumentNullException.ThrowIfNull(matter);
 
-        return new MatterDto
+        var dto = new MatterDto
         {
             Id = matter.Id.Value,
             Description = matter.Description.Value,
@@ -345,25 +349,26 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
             LastModifiedBy = matter.LastModifiedBy,
             LastModifiedDate = matter.LastModifiedDate
         };
+
+        // Document collections would be mapped here if needed
+        if (includeDocuments)
+        {
+            // Note: In a real implementation, you would map the document collections
+            // This would typically be done by a mapping framework like Mapster or AutoMapper
+            // dto.Documents = matter.Documents?.Select(DocumentDto.FromDomainEntity).ToList();
+        }
+
+        return dto;
     }
 
     /// <summary>
-    /// Validates a MatterDto and returns validation results.
+    /// Validates a MatterDto instance and returns validation results.
     /// </summary>
+    /// <param name="dto">The MatterDto to validate.</param>
+    /// <returns>A list of validation results.</returns>
     public static IList<ValidationResult> ValidateModel([AllowNull] MatterDto? dto)
     {
-        var results = new List<ValidationResult>();
-
-        if (dto is null)
-        {
-            results.Add(new ValidationResult("MatterDto instance is required."));
-            return results;
-        }
-
-        var context = new ValidationContext(dto);
-        Validator.TryValidateObject(dto, context, results, validateAllProperties: true);
-
-        return results;
+        return BaseValidationDto.ValidateModel(dto);
     }
 
     #endregion Static Factory Methods
@@ -373,31 +378,52 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
     /// <summary>
     /// Determines whether this matter can be archived based on current state.
     /// </summary>
+    /// <returns>True if the matter can be archived; otherwise, false.</returns>
     public bool CanBeArchived() => !IsArchived && !IsDeleted;
 
     /// <summary>
     /// Determines whether this matter can be restored from deleted state.
     /// </summary>
+    /// <returns>True if the matter can be restored; otherwise, false.</returns>
     public bool CanBeRestored() => IsDeleted;
 
     /// <summary>
     /// Determines whether this matter can be deleted safely.
     /// </summary>
+    /// <returns>True if the matter can be deleted; otherwise, false.</returns>
     public bool CanBeDeleted() => !IsDeleted && (!HasDocumentsLoaded || ActiveDocumentCount == 0);
 
     /// <summary>
-    /// Updates the last modified information.
+    /// Updates the last modified information for audit purposes.
     /// </summary>
+    /// <param name="modifiedBy">The user making the modification.</param>
+    /// <exception cref="ArgumentException">Thrown when modifiedBy is null or whitespace.</exception>
     public void UpdateLastModified(string modifiedBy)
     {
-        LastModifiedBy = modifiedBy ?? throw new ArgumentNullException(nameof(modifiedBy));
+        ArgumentException.ThrowIfNullOrWhiteSpace(modifiedBy);
+
+        LastModifiedBy = modifiedBy.Trim();
         LastModifiedDate = DateTime.UtcNow;
+    }
+
+    /// <summary>
+    /// Determines if matter data is sufficient for professional legal practice requirements.
+    /// </summary>
+    /// <returns>True if data is sufficient; otherwise, false.</returns>
+    public bool IsSufficientMatterData()
+    {
+        return MatterValidationHelper.IsSufficientMatterData(Description, CreationDate, CreatedBy);
     }
 
     #endregion Business Methods
 
     #region Equality Implementation
 
+    /// <summary>
+    /// Determines whether the specified MatterDto is equal to the current MatterDto.
+    /// </summary>
+    /// <param name="other">The MatterDto to compare with the current MatterDto.</param>
+    /// <returns>True if the specified MatterDto is equal to the current MatterDto; otherwise, false.</returns>
     public bool Equals(MatterDto? other)
     {
         if (other is null) return false;
@@ -409,26 +435,62 @@ public class MatterDto : IValidatableObject, IEquatable<MatterDto>
             return Id == other.Id;
         }
 
-        // Otherwise compare by content
-        return Description == other.Description &&
+        // Otherwise compare by normalized content
+        var thisNormalized = MatterValidationHelper.NormalizeDescription(Description);
+        var otherNormalized = MatterValidationHelper.NormalizeDescription(other.Description);
+
+        return string.Equals(thisNormalized, otherNormalized, StringComparison.OrdinalIgnoreCase) &&
                IsArchived == other.IsArchived &&
                IsDeleted == other.IsDeleted;
     }
 
+    /// <summary>
+    /// Determines whether the specified object is equal to the current MatterDto.
+    /// </summary>
+    /// <param name="obj">The object to compare with the current MatterDto.</param>
+    /// <returns>True if the specified object is equal to the current MatterDto; otherwise, false.</returns>
     public override bool Equals(object? obj) => Equals(obj as MatterDto);
 
+    /// <summary>
+    /// Serves as the default hash function.
+    /// </summary>
+    /// <returns>A hash code for the current MatterDto.</returns>
     public override int GetHashCode()
     {
-        return Id != Guid.Empty ? Id.GetHashCode() : HashCode.Combine(Description, IsArchived, IsDeleted);
+        if (Id != Guid.Empty) return Id.GetHashCode();
+
+        var normalizedDescription = MatterValidationHelper.NormalizeDescription(Description);
+        return HashCode.Combine(
+            normalizedDescription?.GetHashCode(StringComparison.OrdinalIgnoreCase),
+            IsArchived,
+            IsDeleted
+        );
     }
 
+    /// <summary>
+    /// Determines whether two specified MatterDto instances are equal.
+    /// </summary>
+    /// <param name="left">The first MatterDto to compare.</param>
+    /// <param name="right">The second MatterDto to compare.</param>
+    /// <returns>True if the MatterDto instances are equal; otherwise, false.</returns>
     public static bool operator ==(MatterDto? left, MatterDto? right) => EqualityComparer<MatterDto>.Default.Equals(left, right);
+
+    /// <summary>
+    /// Determines whether two specified MatterDto instances are not equal.
+    /// </summary>
+    /// <param name="left">The first MatterDto to compare.</param>
+    /// <param name="right">The second MatterDto to compare.</param>
+    /// <returns>True if the MatterDto instances are not equal; otherwise, false.</returns>
     public static bool operator !=(MatterDto? left, MatterDto? right) => !(left == right);
 
     #endregion Equality Implementation
 
     #region String Representation
 
+    /// <summary>
+    /// Returns a string that represents the current MatterDto.
+    /// </summary>
+    /// <returns>A string that represents the current MatterDto.</returns>
     public override string ToString()
     {
         return $"Matter: {Description} ({Status})";
