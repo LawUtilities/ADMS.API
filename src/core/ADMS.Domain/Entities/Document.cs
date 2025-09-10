@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using ADMS.Domain.Common;
+using ADMS.Domain.Events;
+using ADMS.Domain.ValueObjects;
+
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using ADMS.Domain.Common;
-using ADMS.Domain.ValueObjects;
-using ADMS.Domain.Events;
 
 namespace ADMS.Domain.Entities
 {

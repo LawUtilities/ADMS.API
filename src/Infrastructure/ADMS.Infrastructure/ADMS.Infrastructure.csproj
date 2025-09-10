@@ -50,7 +50,6 @@
     <!-- Organized folder structure -->
     <Folder Include="Persistence\Configurations\" />
     <Folder Include="Persistence\Migrations\" />
-    <Folder Include="Persistence\Repositories\" />
     <Folder Include="Persistence\Interceptors\" />
     <Folder Include="Services\Document\" />
     <Folder Include="Services\Security\" />
