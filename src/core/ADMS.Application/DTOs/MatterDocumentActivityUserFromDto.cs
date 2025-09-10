@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-
 using ADMS.Application.Common.Validation;
 
 namespace ADMS.Application.DTOs;
@@ -92,11 +91,11 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     /// Gets a value indicating whether this DTO has valid core data.
     /// </summary>
     public bool IsValid =>
-        MatterId != Guid.Empty &&
-        DocumentId != Guid.Empty &&
-        MatterDocumentActivityId != Guid.Empty &&
-        UserId != Guid.Empty &&
-        CreatedAt != default;
+        UserValidationHelper.IsValidUserId(MatterId) &&
+        UserValidationHelper.IsValidUserId(DocumentId) &&
+        UserValidationHelper.IsValidUserId(MatterDocumentActivityId) &&
+        UserValidationHelper.IsValidUserId(UserId) &&
+        UserValidationHelper.IsValidActivityTimestamp(CreatedAt);
 
     /// <summary>
     /// Gets comprehensive transfer metrics for analysis and reporting.
@@ -129,8 +128,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         {
             HasCompleteInformation = Matter != null && Document != null &&
                                    MatterDocumentActivity != null && User != null,
-            RequiredFieldsPresent = MatterId != Guid.Empty && DocumentId != Guid.Empty &&
-                                  MatterDocumentActivityId != Guid.Empty && UserId != Guid.Empty
+            RequiredFieldsPresent = IsValid
         }
     };
 
@@ -143,7 +141,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     /// </summary>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // Validate core GUIDs using consistent helper
+        // Validate core GUIDs using UserValidationHelper
         foreach (var result in UserValidationHelper.ValidateUserId(MatterId, nameof(MatterId)))
             yield return result;
 
@@ -201,6 +199,33 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         {
             foreach (var result in MatterDocumentActivityValidationHelper.ValidateActivity(MatterDocumentActivity.Activity, $"{nameof(MatterDocumentActivity)}.{nameof(MatterDocumentActivity.Activity)}"))
                 yield return result;
+        }
+
+        // Validate activity consistency for transfer operations
+        if (MatterDocumentActivity != null && DocumentId != Guid.Empty)
+        {
+            foreach (var result in UserValidationHelper.ValidateActivityConsistency(
+                UserId, DocumentId, MatterDocumentActivity.Activity, MatterId, "TransferActivity"))
+                yield return result;
+        }
+
+        // Validate complete user activity record if navigation properties are loaded
+        if (User != null && MatterDocumentActivity != null)
+        {
+            foreach (var result in UserValidationHelper.ValidateActivityRecord(
+                UserId, User.Name, MatterId, "MATTER_DOCUMENT", MatterDocumentActivity.Activity, CreatedAt, "TransferActivity"))
+                yield return result;
+        }
+
+        // Validate activity sequence if multiple activities are present
+        if (MatterDocumentActivity == null || User == null) yield break;
+        
+        // Validate that the activity makes sense for the context
+        if (MatterDocumentActivity.Activity == "MOVED" && Matter?.IsDeleted == true)
+        {
+            yield return new ValidationResult(
+                "Cannot move documents from a deleted matter.",
+                [nameof(MatterDocumentActivity), nameof(Matter)]);
         }
     }
 
@@ -275,7 +300,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
             catch (Exception ex) when (ex is ValidationException or ArgumentException)
             {
                 // Log invalid entity but continue processing others
-                Console.WriteLine($"Warning: Skipped invalid transfer audit entity: {ex.Message}");
+                Console.WriteLine($"Warning: Skipped invalid source transfer audit entity: {ex.Message}");
             }
         }
 
@@ -314,7 +339,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         if (!validationResults.Any()) return dto;
 
         var errorMessages = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
-        throw new ValidationException($"Failed to create valid transfer audit entry: {errorMessages}");
+        throw new ValidationException($"Failed to create valid source transfer audit entry: {errorMessages}");
     }
 
     #endregion Static Factory Methods
@@ -362,7 +387,8 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
             ["IsRecentTransfer"] = IsRecentTransfer(),
             ["TransferSummary"] = TransferSummary,
             ["HasCompleteInformation"] = Matter != null && Document != null &&
-                                       MatterDocumentActivity != null && User != null
+                                       MatterDocumentActivity != null && User != null,
+            ["ValidationStatus"] = IsValid
         };
     }
 
@@ -379,17 +405,23 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         return $"On {LocalCreatedAtDateString}, {userName} {operationType} {documentName} FROM {sourceMatter}";
     }
 
+    /// <summary>
+    /// Determines if this transfer activity requires bidirectional tracking.
+    /// </summary>
+    public bool RequiresBidirectionalTracking()
+    {
+        return UserValidationHelper.RequiresRelatedEntity(MatterDocumentActivity?.Activity);
+    }
+
     #endregion Business Methods
 
     #region Equality Implementation
 
     /// <summary>
-    /// Determines whether the specified <see cref="MatterDocumentActivityUserFromDto"/> is equal to the current
-    /// instance.
+    /// Determines whether the specified MatterDocumentActivityUserFromDto is equal to the current instance.
     /// </summary>
-    /// <param name="other">The <see cref="MatterDocumentActivityUserFromDto"/> to compare with the current instance.</param>
-    /// <returns><see langword="true"/> if the specified object is equal to the current instance; otherwise, <see
-    /// langword="false"/>.</returns>
+    /// <param name="other">The MatterDocumentActivityUserFromDto to compare with the current instance.</param>
+    /// <returns>True if the specified object is equal to the current instance; otherwise, false.</returns>
     public bool Equals(MatterDocumentActivityUserFromDto? other)
     {
         if (other is null) return false;
@@ -405,11 +437,6 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     /// <summary>
     /// Returns a hash code for the current object.
     /// </summary>
-    /// <remarks>The hash code is computed based on the values of the <see cref="MatterId"/>, <see
-    /// cref="DocumentId"/>, <see cref="MatterDocumentActivityId"/>, <see cref="UserId"/>, and <see cref="CreatedAt"/>
-    /// properties.</remarks>
-    /// <returns>A 32-bit signed integer hash code that can be used for hashing algorithms and data structures such as a hash
-    /// table.</returns>
     public override int GetHashCode() =>
         HashCode.Combine(MatterId, DocumentId, MatterDocumentActivityId, UserId, CreatedAt);
 
@@ -420,8 +447,6 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     /// <summary>
     /// Returns a string representation of the transfer, including the document, matter, user, and timestamp details.
     /// </summary>
-    /// <returns>A string in the format: "Transfer FROM: Document (<c>DocumentId</c>) ← Matter (<c>MatterId</c>) by User
-    /// (<c>UserId</c>) at <c>CreatedAt</c>".</returns>
     public override string ToString() =>
         $"Transfer FROM: Document ({DocumentId}) ← Matter ({MatterId}) by User ({UserId}) at {CreatedAt:yyyy-MM-dd HH:mm:ss}";
 
