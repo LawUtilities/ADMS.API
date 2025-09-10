@@ -30,7 +30,7 @@ namespace ADMS.Application.DTOs;
 /// <item>Activity attribution for professional responsibility</item>
 /// </list>
 /// </remarks>
-public class UserDto : IValidatableObject, IEquatable<UserDto>
+public sealed class UserDto : IValidatableObject, IEquatable<UserDto>
 {
     #region Core Properties
 
