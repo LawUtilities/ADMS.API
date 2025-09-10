@@ -40,14 +40,17 @@ public class Result : IEquatable<Result>
     /// </exception>
     protected Result(bool isSuccess, DomainError? error)
     {
-        if (isSuccess && error != null)
-            throw new ArgumentException("Successful result cannot have an error.", nameof(error));
-
-        if (!isSuccess && error == null)
-            throw new ArgumentException("Failed result must have an error.", nameof(error));
-
-        IsSuccess = isSuccess;
-        Error = error;
+        switch (isSuccess)
+        {
+            case true when error != null:
+                throw new ArgumentException("Successful result cannot have an error.", nameof(error));
+            case false when error == null:
+                throw new ArgumentException("Failed result must have an error.", nameof(error));
+            default:
+                IsSuccess = isSuccess;
+                Error = error;
+                break;
+        }
     }
 
     /// <summary>
@@ -221,7 +224,7 @@ public class Result : IEquatable<Result>
     /// <returns>The current result.</returns>
     public Result Finally(Action action)
     {
-        action?.Invoke();
+        action();
         return this;
     }
 
@@ -284,10 +287,7 @@ public class Result : IEquatable<Result>
     /// <returns>A successful result if the condition is true; otherwise, a failure result.</returns>
     public Result Ensure(bool condition, DomainError error)
     {
-        if (IsFailure)
-            return this;
-
-        if (condition)
+        if (IsFailure || condition)
             return this;
 
         return Failure(error);
@@ -412,7 +412,7 @@ public sealed class Result<T> : Result, IEquatable<Result<T>>
     public Result<T> OnSuccess(Action<T> action)
     {
         if (IsSuccess)
-            action?.Invoke(Value);
+            action(Value);
 
         return this;
     }
@@ -478,10 +478,7 @@ public sealed class Result<T> : Result, IEquatable<Result<T>>
     /// <returns>This result if successful and the predicate returns true; otherwise, a failure result.</returns>
     public Result<T> Ensure(Func<T, bool> predicate, DomainError error)
     {
-        if (IsFailure)
-            return this;
-
-        if (predicate(Value))
+        if (IsFailure || predicate(Value))
             return this;
 
         return Failure<T>(error);
