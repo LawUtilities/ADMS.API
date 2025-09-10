@@ -509,22 +509,4 @@ public class User : IEquatable<User>
 
     #endregion String Representation
 
-    #region Validation Methods
-
-    /// <summary>
-    /// Validates the current User instance using UserValidationHelper.
-    /// </summary>
-    /// <returns>Validation results (empty if valid).</returns>
-    public IEnumerable<ValidationResult> Validate()
-    {
-        var results = new List<ValidationResult>();
-
-        // Use the centralized validation helper
-        results.AddRange(ADMS.Common.Validation.UserValidationHelper.ValidateUserId(Id, nameof(Id)));
-        results.AddRange(ADMS.Common.Validation.UserValidationHelper.ValidateUsername(Name, nameof(Name)));
-
-        return results;
-    }
-
-    #endregion Validation Methods
 }
