@@ -19,25 +19,24 @@ namespace ADMS.Application.Common.Validation;
 /// <item>Providing consistent validation across DTOs and commands/queries</item>
 /// </list>
 /// 
-/// <para><strong>Clean Architecture Alignment:</strong></para>
+/// <para><strong>User Entity Focus:</strong></para>
+/// Validates the core User entity requirements:
 /// <list type="bullet">
-/// <item><strong>Application Layer:</strong> Serves application services and DTOs</item>
-/// <item><strong>Framework Independent:</strong> Uses only .NET base class library</item>
-/// <item><strong>Domain Agnostic:</strong> Validates data without domain entity knowledge</item>
-/// <item><strong>Testable:</strong> Pure functions with no side effects</item>
+/// <item><strong>ID:</strong> Database identifier (GUID) validation</item>
+/// <item><strong>Username:</strong> Display name validation with professional standards</item>
 /// </list>
 /// </remarks>
 public static partial class UserValidationHelper
 {
-    #region Clean Architecture Constants
+    #region Core Constants
 
     /// <summary>
-    /// Maximum allowed length for a user name (matches domain constraints).
+    /// Maximum allowed length for a username (matches domain constraints).
     /// </summary>
     public const int MaxUserNameLength = 50;
 
     /// <summary>
-    /// Minimum allowed length for a user name.
+    /// Minimum allowed length for a username.
     /// </summary>
     public const int MinUserNameLength = 2;
 
@@ -51,7 +50,7 @@ public static partial class UserValidationHelper
     /// </summary>
     public const int FutureDateToleranceMinutes = 5;
 
-    #endregion Clean Architecture Constants
+    #endregion Core Constants
 
     #region Reserved Names (High Performance)
 
@@ -79,7 +78,7 @@ public static partial class UserValidationHelper
         "security", "auth", "authentication", "token", "session",
         
         // Common internet names
-        "support", "help", "info", "contact", "admin", "webmaster",
+        "support", "help", "info", "contact", "webmaster",
         
         // Potentially confusing
         "null", "undefined", "none", "empty", "void", "test"
@@ -98,7 +97,7 @@ public static partial class UserValidationHelper
 
     #endregion Reserved Names
 
-    #region Core Validation Methods (Clean Architecture)
+    #region Core Validation Methods
 
     /// <summary>
     /// Validates a user ID according to Clean Architecture business rules.
@@ -107,7 +106,7 @@ public static partial class UserValidationHelper
     /// <param name="propertyName">The property name for validation messages.</param>
     /// <returns>Validation results (empty if valid).</returns>
     /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
-    public static IEnumerable<ValidationResult> ValidateUserId(Guid userId, string propertyName)
+    public static IEnumerable<ValidationResult> ValidateUserId(Guid userId, [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
@@ -120,18 +119,22 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Validates a user name according to Clean Architecture business rules.
+    /// Validates a username according to Clean Architecture business rules.
     /// </summary>
-    /// <param name="name">The user name to validate.</param>
+    /// <param name="username">The username to validate.</param>
     /// <param name="propertyName">The property name for validation messages.</param>
     /// <returns>Validation results (empty if valid).</returns>
     /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
-    public static IEnumerable<ValidationResult> ValidateName(string? name, [NotNull] string propertyName)
+    /// <remarks>
+    /// Validates the username for use as a display name in the system.
+    /// Supports professional naming conventions without email or phone requirements.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateUsername(string? username, [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
         // Required validation
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(username))
         {
             yield return new ValidationResult(
                 $"{propertyName} is required and cannot be empty.",
@@ -139,7 +142,7 @@ public static partial class UserValidationHelper
             yield break;
         }
 
-        var trimmed = name.Trim();
+        var trimmed = username.Trim();
 
         // Length validation
         if (trimmed.Length < MinUserNameLength)
@@ -165,7 +168,7 @@ public static partial class UserValidationHelper
         }
 
         // Format validation
-        if (!IsValidUserNameFormat(trimmed))
+        if (!IsValidUsernameFormat(trimmed))
         {
             yield return new ValidationResult(
                 GetFormatErrorMessage(propertyName, trimmed),
@@ -180,7 +183,7 @@ public static partial class UserValidationHelper
     /// <param name="propertyName">The property name for validation messages.</param>
     /// <returns>Validation results (empty if valid).</returns>
     /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
-    public static IEnumerable<ValidationResult> ValidateDate(DateTime date, string propertyName)
+    public static IEnumerable<ValidationResult> ValidateDate(DateTime date, [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
@@ -217,21 +220,21 @@ public static partial class UserValidationHelper
     public static bool IsValidUserId(Guid userId) => userId != Guid.Empty;
 
     /// <summary>
-    /// Quick validation check for user name (optimized for performance).
+    /// Quick validation check for username (optimized for performance).
     /// </summary>
-    /// <param name="name">The user name to validate.</param>
+    /// <param name="username">The username to validate.</param>
     /// <returns>True if valid; otherwise, false.</returns>
-    public static bool IsNameAllowed([NotNullWhen(true)] string? name)
+    public static bool IsUsernameAllowed([NotNullWhen(true)] string? username)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(username))
             return false;
 
-        var trimmed = name.Trim();
+        var trimmed = username.Trim();
 
         return trimmed.Length >= MinUserNameLength &&
                trimmed.Length <= MaxUserNameLength &&
                !_reservedNamesSet.Contains(trimmed) &&
-               IsValidUserNameFormat(trimmed);
+               IsValidUsernameFormat(trimmed);
     }
 
     /// <summary>
@@ -249,25 +252,25 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Checks if a name is reserved (optimized for performance).
+    /// Checks if a username is reserved (optimized for performance).
     /// </summary>
-    /// <param name="name">The name to check.</param>
+    /// <param name="username">The username to check.</param>
     /// <returns>True if reserved; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsReservedName([NotNullWhen(true)] string? name)
+    public static bool IsReservedUsername([NotNullWhen(true)] string? username)
     {
-        return !string.IsNullOrWhiteSpace(name) && _reservedNamesSet.Contains(name.Trim());
+        return !string.IsNullOrWhiteSpace(username) && _reservedNamesSet.Contains(username.Trim());
     }
 
     #endregion Quick Validation Methods
 
-    #region Normalization Methods (Clean Architecture)
+    #region Normalization Methods
 
     /// <summary>
-    /// Normalizes a user name for consistent storage and comparison.
+    /// Normalizes a username for consistent storage and comparison.
     /// </summary>
-    /// <param name="name">The name to normalize.</param>
-    /// <returns>Normalized name or null if invalid.</returns>
+    /// <param name="username">The username to normalize.</param>
+    /// <returns>Normalized username or null if invalid.</returns>
     /// <remarks>
     /// Normalization includes:
     /// <list type="bullet">
@@ -276,14 +279,13 @@ public static partial class UserValidationHelper
     /// <item>Preserving case for professional appearance</item>
     /// </list>
     /// </remarks>
-    [return: NotNullIfNotNull(nameof(name))]
-    public static string? NormalizeName(string? name)
+    [return: NotNullIfNotNull(nameof(username))]
+    public static string? NormalizeUsername(string? username)
     {
-        if (string.IsNullOrWhiteSpace(name))
+        if (string.IsNullOrWhiteSpace(username))
             return null;
 
-        var trimmed = name.Trim();
-        // Ensure that if input is non-null, output is also non-null
+        var trimmed = username.Trim();
         return trimmed.Length == 0 ? string.Empty : MultipleSpacesRegex().Replace(trimmed, " ");
     }
 
@@ -308,22 +310,37 @@ public static partial class UserValidationHelper
 
     #endregion Normalization Methods
 
-    #region Utility Methods (Clean Architecture)
+    #region Utility Methods
 
     /// <summary>
-    /// Checks if two user names are equivalent after normalization.
+    /// Checks if two usernames are equivalent after normalization.
     /// </summary>
-    /// <param name="name1">First name to compare.</param>
-    /// <param name="name2">Second name to compare.</param>
+    /// <param name="username1">First username to compare.</param>
+    /// <param name="username2">Second username to compare.</param>
     /// <returns>True if equivalent; otherwise, false.</returns>
-    public static bool AreNamesEquivalent(string? name1, string? name2)
+    public static bool AreUsernamesEquivalent(string? username1, string? username2)
     {
-        var normalized1 = NormalizeName(name1);
-        var normalized2 = NormalizeName(name2);
+        var normalized1 = NormalizeUsername(username1);
+        var normalized2 = NormalizeUsername(username2);
 
         return !string.IsNullOrEmpty(normalized1) &&
                !string.IsNullOrEmpty(normalized2) &&
                string.Equals(normalized1, normalized2, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Determines if user context is sufficient for basic audit requirements.
+    /// </summary>
+    /// <param name="userId">The user ID.</param>
+    /// <param name="username">The username.</param>
+    /// <param name="actionTimestamp">The action timestamp.</param>
+    /// <returns>True if context is sufficient; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsSufficientUserContext(Guid userId, string? username, DateTime actionTimestamp)
+    {
+        return IsValidUserId(userId) &&
+               IsUsernameAllowed(username) &&
+               IsValidUserDate(actionTimestamp);
     }
 
     /// <summary>
@@ -355,33 +372,33 @@ public static partial class UserValidationHelper
     #region Private Helper Methods
 
     /// <summary>
-    /// Validates user name format using comprehensive rules.
+    /// Validates username format using comprehensive rules.
     /// </summary>
-    /// <param name="userName">The user name to validate (must be trimmed).</param>
+    /// <param name="username">The username to validate (must be trimmed).</param>
     /// <returns>True if format is valid; otherwise, false.</returns>
-    private static bool IsValidUserNameFormat(string userName)
+    private static bool IsValidUsernameFormat(string username)
     {
-        switch (userName.Length)
+        switch (username.Length)
         {
             case 0:
                 return false;
             case 1:
-                return char.IsLetterOrDigit(userName[0]);
+                return char.IsLetterOrDigit(username[0]);
         }
 
         // Check character set
-        if (!UserNameCharacterRegex().IsMatch(userName))
+        if (!UsernameCharacterRegex().IsMatch(username))
             return false;
 
         // Check start and end characters
-        if (!char.IsLetterOrDigit(userName[0]) || !char.IsLetterOrDigit(userName[^1]))
+        if (!char.IsLetterOrDigit(username[0]) || !char.IsLetterOrDigit(username[^1]))
             return false;
 
         // Check for consecutive special characters
-        for (var i = 0; i < userName.Length - 1; i++)
+        for (var i = 0; i < username.Length - 1; i++)
         {
-            var current = userName[i];
-            var next = userName[i + 1];
+            var current = username[i];
+            var next = username[i + 1];
 
             // Prevent consecutive special characters or spaces
             if (IsSpecialCharacter(current) && (current == next || IsSpecialCharacter(next)))
@@ -394,7 +411,7 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Determines if a character is a special character allowed in user names.
+    /// Determines if a character is a special character allowed in usernames.
     /// </summary>
     /// <param name="c">The character to check.</param>
     /// <returns>True if special character; otherwise, false.</returns>
@@ -421,7 +438,7 @@ public static partial class UserValidationHelper
         if (value.Contains("..") || value.Contains("__") || value.Contains("--"))
             return $"{propertyName} cannot contain consecutive special characters.";
 
-        if (!UserNameCharacterRegex().IsMatch(value))
+        if (!UsernameCharacterRegex().IsMatch(value))
             return $"{propertyName} can only contain letters, numbers, spaces, periods, hyphens, and underscores.";
 
         return $"{propertyName} contains invalid format.";
@@ -432,10 +449,10 @@ public static partial class UserValidationHelper
     #region Compiled Regex Patterns
 
     /// <summary>
-    /// Compiled regex for validating user name characters.
+    /// Compiled regex for validating username characters.
     /// </summary>
     [GeneratedRegex(@"^[a-zA-Z0-9._\s-]+$", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
-    private static partial Regex UserNameCharacterRegex();
+    private static partial Regex UsernameCharacterRegex();
 
     /// <summary>
     /// Compiled regex for collapsing multiple spaces.
