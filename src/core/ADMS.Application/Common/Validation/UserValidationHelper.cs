@@ -67,25 +67,25 @@ public static partial class UserValidationHelper
     [
         // System accounts
         "admin", "administrator", "system", "root", "sa", "sysadmin",
-        
+    
         // Service accounts  
         "service", "daemon", "process", "worker", "scheduler",
-        
+    
         // Common roles
         "user", "guest", "anonymous", "public", "default",
-        
+    
         // API terms
         "api", "rest", "json", "xml", "http", "https",
-        
+    
         // ADMS specific
         "adms", "matter", "document", "revision", "activity",
-        
+    
         // Security terms
         "security", "auth", "authentication", "token", "session",
-        
+    
         // Common internet names
         "support", "help", "info", "contact", "webmaster",
-        
+    
         // Potentially confusing
         "null", "undefined", "none", "empty", "void", "test"
     ];
@@ -545,4 +545,400 @@ public static partial class UserValidationHelper
     private static partial Regex MultipleSpacesRegex();
 
     #endregion Compiled Regex Patterns
+
+    #region Activity Record Validation
+
+    /// <summary>
+    /// Valid activity types for each entity category in the system.
+    /// </summary>
+    private static readonly Dictionary<string, string[]> _validActivityTypes = new()
+    {
+        ["MATTER"] = ["CREATED", "ARCHIVED", "DELETED", "RESTORED", "UNARCHIVED", "VIEWED"],
+        ["DOCUMENT"] = ["CREATED", "SAVED", "DELETED", "RESTORED", "CHECKED_IN", "CHECKED_OUT"],
+        ["REVISION"] = ["CREATED", "SAVED", "DELETED", "RESTORED"],
+        ["MATTER_DOCUMENT"] = ["MOVED", "COPIED"]
+    };
+
+    private static readonly FrozenSet<string> _allValidActivityTypes =
+        _validActivityTypes.Values.SelectMany(x => x).ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Maximum time gap between related activities (prevents backdating).
+    /// </summary>
+    public const int MaxActivityBackdateHours = 24;
+
+    /// <summary>
+    /// Maximum activity burst count (activities within short timeframe).
+    /// </summary>
+    public const int MaxActivityBurstCount = 10;
+
+    /// <summary>
+    /// Activity burst window in minutes.
+    /// </summary>
+    public const int ActivityBurstWindowMinutes = 5;
+
+    /// <summary>
+    /// Validates a complete user activity record for integrity and business rules.
+    /// </summary>
+    /// <param name="userId">The user ID performing the activity.</param>
+    /// <param name="username">The username for display purposes.</param>
+    /// <param name="entityId">The ID of the entity being acted upon.</param>
+    /// <param name="entityType">The type of entity (MATTER, DOCUMENT, REVISION, etc.).</param>
+    /// <param name="activityType">The type of activity being performed.</param>
+    /// <param name="activityTimestamp">The timestamp when the activity occurred.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    /// <remarks>
+    /// Comprehensive validation ensuring activity record integrity, business rule compliance,
+    /// and audit trail accuracy for the document management system.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateActivityRecord(
+        Guid userId,
+        string? username,
+        Guid entityId,
+        string? entityType,
+        string? activityType,
+        DateTime activityTimestamp,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        // Core user attribution validation
+        foreach (var result in ValidateUserAttribution(userId, username, activityTimestamp, propertyName))
+            yield return result;
+
+        // Entity ID validation
+        if (entityId == Guid.Empty)
+        {
+            yield return new ValidationResult(
+                $"{propertyName}.EntityId must be a valid non-empty GUID.",
+                [$"{propertyName}.EntityId"]);
+        }
+
+        // Entity type validation
+        foreach (var result in ValidateEntityType(entityType, $"{propertyName}.EntityType"))
+            yield return result;
+
+        // Activity type validation
+        foreach (var result in ValidateActivityType(activityType, entityType, $"{propertyName}.ActivityType"))
+            yield return result;
+
+        // Timestamp business rules
+        foreach (var result in ValidateActivityTimestampBusinessRules(activityTimestamp, $"{propertyName}.Timestamp"))
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates entity type for activity records.
+    /// </summary>
+    /// <param name="entityType">The entity type to validate.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    public static IEnumerable<ValidationResult> ValidateEntityType(string? entityType, [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        if (string.IsNullOrWhiteSpace(entityType))
+        {
+            yield return new ValidationResult(
+                $"{propertyName} is required for activity classification.",
+                [propertyName]);
+            yield break;
+        }
+
+        var normalizedType = entityType.Trim().ToUpperInvariant();
+
+        if (!_validActivityTypes.ContainsKey(normalizedType))
+        {
+            var validTypes = string.Join(", ", _validActivityTypes.Keys);
+            yield return new ValidationResult(
+                $"{propertyName} must be one of: {validTypes}.",
+                [propertyName]);
+        }
+    }
+
+    /// <summary>
+    /// Validates activity type for the given entity type.
+    /// </summary>
+    /// <param name="activityType">The activity type to validate.</param>
+    /// <param name="entityType">The entity type context.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    public static IEnumerable<ValidationResult> ValidateActivityType(
+        string? activityType,
+        string? entityType,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        if (string.IsNullOrWhiteSpace(activityType))
+        {
+            yield return new ValidationResult(
+                $"{propertyName} is required for activity identification.",
+                [propertyName]);
+            yield break;
+        }
+
+        var normalizedActivity = activityType.Trim().ToUpperInvariant();
+        var normalizedEntity = entityType?.Trim().ToUpperInvariant();
+
+        // Check if activity type is valid overall
+        if (!_allValidActivityTypes.Contains(normalizedActivity))
+        {
+            var validActivities = string.Join(", ", _allValidActivityTypes);
+            yield return new ValidationResult(
+                $"{propertyName} must be one of: {validActivities}.",
+                [propertyName]);
+            yield break;
+        }
+
+        // Check if activity type is valid for the specific entity type
+        if (normalizedEntity != null &&
+            _validActivityTypes.TryGetValue(normalizedEntity, out var validActivitiesForEntity) &&
+            !validActivitiesForEntity.Contains(normalizedActivity, StringComparer.OrdinalIgnoreCase))
+        {
+            var validForEntity = string.Join(", ", validActivitiesForEntity);
+            yield return new ValidationResult(
+                $"{propertyName} '{normalizedActivity}' is not valid for entity type '{normalizedEntity}'. Valid activities: {validForEntity}.",
+                [propertyName]);
+        }
+    }
+
+    /// <summary>
+    /// Validates activity timestamp against business rules for integrity.
+    /// </summary>
+    /// <param name="timestamp">The timestamp to validate.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    /// <remarks>
+    /// Applies business rules to prevent backdating, future dating, and other timestamp anomalies
+    /// that could compromise audit trail integrity.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateActivityTimestampBusinessRules(
+        DateTime timestamp,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        var utcTimestamp = timestamp.Kind != DateTimeKind.Utc ? timestamp.ToUniversalTime() : timestamp;
+        var now = DateTime.UtcNow;
+
+        // Basic timestamp validation
+        foreach (var result in ValidateActivityTimestamp(timestamp, propertyName))
+            yield return result;
+
+        // Business rule: prevent excessive backdating
+        if (utcTimestamp < now.AddHours(-MaxActivityBackdateHours))
+        {
+            yield return new ValidationResult(
+                $"{propertyName} cannot be more than {MaxActivityBackdateHours} hours in the past. This helps maintain audit trail integrity.",
+                [propertyName]);
+        }
+
+        // Business rule: check for suspicious precision (microsecond precision might indicate automation)
+        if (timestamp.Millisecond == 0 && timestamp.Second == 0 && timestamp.Minute % 5 == 0)
+        {
+            // This is just a warning-level validation - exact times on 5-minute boundaries might indicate automation
+            // In a real system, you might want to log this for investigation rather than fail validation
+        }
+    }
+
+    /// <summary>
+    /// Validates activity sequence to detect rapid-fire or suspicious patterns.
+    /// </summary>
+    /// <param name="activityTimestamps">Collection of recent activity timestamps for the user.</param>
+    /// <param name="newActivityTimestamp">The new activity timestamp being validated.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    /// <remarks>
+    /// Helps detect suspicious activity patterns that might indicate automation, system abuse,
+    /// or data integrity issues in the audit trail.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateActivitySequence(
+        IEnumerable<DateTime>? activityTimestamps,
+        DateTime newActivityTimestamp,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        if (activityTimestamps == null)
+            yield break;
+
+        var timestamps = activityTimestamps.ToList();
+        if (timestamps.Count == 0)
+            yield break;
+
+        var utcNewTimestamp = newActivityTimestamp.Kind != DateTimeKind.Utc
+            ? newActivityTimestamp.ToUniversalTime()
+            : newActivityTimestamp;
+
+        // Check for activity bursts (too many activities in short timeframe)
+        var burstWindow = TimeSpan.FromMinutes(ActivityBurstWindowMinutes);
+        var burstStart = utcNewTimestamp.Subtract(burstWindow);
+
+        var activitiesInBurstWindow = timestamps.Count(t =>
+        {
+            var utcT = t.Kind != DateTimeKind.Utc ? t.ToUniversalTime() : t;
+            return utcT >= burstStart && utcT <= utcNewTimestamp;
+        });
+
+        if (activitiesInBurstWindow >= MaxActivityBurstCount)
+        {
+            yield return new ValidationResult(
+                $"{propertyName} indicates suspicious activity burst: {activitiesInBurstWindow} activities within {ActivityBurstWindowMinutes} minutes. Maximum allowed: {MaxActivityBurstCount}.",
+                [propertyName]);
+        }
+
+        // Check for duplicate timestamps (exact duplicates are suspicious)
+        var duplicateCount = timestamps.Count(t =>
+        {
+            var utcT = t.Kind != DateTimeKind.Utc ? t.ToUniversalTime() : t;
+            return Math.Abs((utcT - utcNewTimestamp).TotalMilliseconds) < 100; // Within 100ms
+        });
+
+        if (duplicateCount > 0)
+        {
+            yield return new ValidationResult(
+                $"{propertyName} has timestamp very close to existing activity ({duplicateCount} activities within 100ms). This may indicate data duplication.",
+                [propertyName]);
+        }
+    }
+
+    /// <summary>
+    /// Validates activity consistency for related entity operations.
+    /// </summary>
+    /// <param name="userId">The user performing the activity.</param>
+    /// <param name="entityId">The entity being acted upon.</param>
+    /// <param name="activityType">The activity type.</param>
+    /// <param name="relatedEntityId">Related entity ID (for transfer operations).</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    /// <remarks>
+    /// Validates consistency rules for operations that span multiple entities,
+    /// such as document transfers between matters.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateActivityConsistency(
+        Guid userId,
+        Guid entityId,
+        string? activityType,
+        Guid? relatedEntityId,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        if (string.IsNullOrWhiteSpace(activityType))
+            yield break;
+
+        var normalizedActivity = activityType.Trim().ToUpperInvariant();
+
+        // Transfer operations require related entity
+        if (normalizedActivity is "MOVED" or "COPIED")
+        {
+            if (!relatedEntityId.HasValue || relatedEntityId.Value == Guid.Empty)
+            {
+                yield return new ValidationResult(
+                    $"{propertyName}: {normalizedActivity} operations require a valid related entity ID.",
+                    [propertyName]);
+            }
+            else if (entityId == relatedEntityId.Value)
+            {
+                yield return new ValidationResult(
+                    $"{propertyName}: Cannot {normalizedActivity.ToLowerInvariant()} entity to itself.",
+                    [propertyName]);
+            }
+        }
+
+        // User validation
+        if (userId == Guid.Empty)
+        {
+            yield return new ValidationResult(
+                $"{propertyName}: Activity must be attributed to a valid user.",
+                [propertyName]);
+        }
+    }
+
+    #endregion Activity Record Validation
+
+    #region Activity Type Utilities
+
+    /// <summary>
+    /// Gets valid activity types for a specific entity type.
+    /// </summary>
+    /// <param name="entityType">The entity type.</param>
+    /// <returns>Array of valid activity types for the entity.</returns>
+    public static string[] GetValidActivityTypes(string? entityType)
+    {
+        if (string.IsNullOrWhiteSpace(entityType))
+            return [];
+
+        var normalizedType = entityType.Trim().ToUpperInvariant();
+        return _validActivityTypes.TryGetValue(normalizedType, out var activities)
+            ? activities
+            : [];
+    }
+
+    /// <summary>
+    /// Determines if an activity type is valid for a specific entity type.
+    /// </summary>
+    /// <param name="activityType">The activity type to check.</param>
+    /// <param name="entityType">The entity type context.</param>
+    /// <returns>True if the activity is valid for the entity type; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsActivityValidForEntity(string? activityType, string? entityType)
+    {
+        if (string.IsNullOrWhiteSpace(activityType) || string.IsNullOrWhiteSpace(entityType))
+            return false;
+
+        var normalizedActivity = activityType.Trim().ToUpperInvariant();
+        var normalizedEntity = entityType.Trim().ToUpperInvariant();
+
+        return _validActivityTypes.TryGetValue(normalizedEntity, out var validActivities) &&
+               validActivities.Contains(normalizedActivity, StringComparer.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    /// Determines if an activity type requires a related entity (like transfers).
+    /// </summary>
+    /// <param name="activityType">The activity type to check.</param>
+    /// <returns>True if the activity requires a related entity; otherwise, false.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool RequiresRelatedEntity(string? activityType)
+    {
+        if (string.IsNullOrWhiteSpace(activityType))
+            return false;
+
+        var normalized = activityType.Trim().ToUpperInvariant();
+        return normalized is "MOVED" or "COPIED";
+    }
+
+    /// <summary>
+    /// Gets activity category for classification and reporting.
+    /// </summary>
+    /// <param name="activityType">The activity type.</param>
+    /// <returns>Activity category string.</returns>
+    public static string GetActivityCategory(string? activityType)
+    {
+        if (string.IsNullOrWhiteSpace(activityType))
+            return "Unknown";
+
+        return activityType.Trim().ToUpperInvariant() switch
+        {
+            "CREATED" => "Creation",
+            "DELETED" or "RESTORED" => "Lifecycle",
+            "ARCHIVED" or "UNARCHIVED" => "Archive",
+            "SAVED" => "Modification",
+            "VIEWED" => "Access",
+            "CHECKED_IN" or "CHECKED_OUT" => "Version Control",
+            "MOVED" or "COPIED" => "Transfer",
+            _ => "Unknown"
+        };
+    }
+
+    #endregion Activity Type Utilities
 }
