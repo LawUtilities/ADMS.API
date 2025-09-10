@@ -2,6 +2,8 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Diagnostics.CodeAnalysis;
 
+using static System.Net.Mime.MediaTypeNames;
+
 namespace ADMS.Domain.Entities;
 
 /// <summary>
@@ -506,4 +508,23 @@ public class User : IEquatable<User>
     public override string ToString() => $"{Name} ({Id})";
 
     #endregion String Representation
+
+    #region Validation Methods
+
+    /// <summary>
+    /// Validates the current User instance using UserValidationHelper.
+    /// </summary>
+    /// <returns>Validation results (empty if valid).</returns>
+    public IEnumerable<ValidationResult> Validate()
+    {
+        var results = new List<ValidationResult>();
+
+        // Use the centralized validation helper
+        results.AddRange(ADMS.Common.Validation.UserValidationHelper.ValidateUserId(Id, nameof(Id)));
+        results.AddRange(ADMS.Common.Validation.UserValidationHelper.ValidateUsername(Name, nameof(Name)));
+
+        return results;
+    }
+
+    #endregion Validation Methods
 }
