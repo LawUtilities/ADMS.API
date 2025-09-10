@@ -8,22 +8,23 @@ using System.Text.RegularExpressions;
 namespace ADMS.Application.Common.Validation;
 
 /// <summary>
-/// Provides validation helper methods for user-related data within the ADMS Clean Architecture solution.
+/// Provides validation helper methods for user-related data within the ADMS document management solution.
 /// </summary>
 /// <remarks>
-/// This validation helper follows Clean Architecture principles by:
+/// This validation helper follows Clean Architecture principles and supports the core User entity requirements:
 /// <list type="bullet">
-/// <item>Residing in the Application layer for cross-cutting validation concerns</item>
-/// <item>Being independent of external frameworks and infrastructure</item>
-/// <item>Supporting domain validation requirements without domain dependencies</item>
-/// <item>Providing consistent validation across DTOs and commands/queries</item>
+/// <item><strong>ID Validation:</strong> Ensures valid GUID identifiers for database operations</item>
+/// <item><strong>Username Validation:</strong> Validates display names for human users performing actions</item>
+/// <item><strong>Activity Context Validation:</strong> Supports audit trail requirements for user actions</item>
 /// </list>
 /// 
-/// <para><strong>User Entity Focus:</strong></para>
-/// Validates the core User entity requirements:
+/// <para><strong>User Context in ADMS:</strong></para>
+/// Users in this system represent individual human beings performing actions like:
 /// <list type="bullet">
-/// <item><strong>ID:</strong> Database identifier (GUID) validation</item>
-/// <item><strong>Username:</strong> Display name validation with professional standards</item>
+/// <item>Creating and managing matters</item>
+/// <item>Uploading and managing documents</item>
+/// <item>Creating document revisions</item>
+/// <item>Moving/copying documents between matters</item>
 /// </list>
 /// </remarks>
 public static partial class UserValidationHelper
@@ -49,6 +50,11 @@ public static partial class UserValidationHelper
     /// Tolerance in minutes for future dates (accounts for clock skew).
     /// </summary>
     public const int FutureDateToleranceMinutes = 5;
+
+    /// <summary>
+    /// Maximum reasonable daily activity count for monitoring.
+    /// </summary>
+    public const int MaxDailyActivityCount = 200;
 
     #endregion Core Constants
 
@@ -100,7 +106,7 @@ public static partial class UserValidationHelper
     #region Core Validation Methods
 
     /// <summary>
-    /// Validates a user ID according to Clean Architecture business rules.
+    /// Validates a user ID according to business rules.
     /// </summary>
     /// <param name="userId">The user ID to validate.</param>
     /// <param name="propertyName">The property name for validation messages.</param>
@@ -119,15 +125,15 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Validates a username according to Clean Architecture business rules.
+    /// Validates a username according to business rules.
     /// </summary>
     /// <param name="username">The username to validate.</param>
     /// <param name="propertyName">The property name for validation messages.</param>
     /// <returns>Validation results (empty if valid).</returns>
     /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
     /// <remarks>
-    /// Validates the username for use as a display name in the system.
-    /// Supports professional naming conventions without email or phone requirements.
+    /// Validates the username for display purposes, supporting human-readable names
+    /// for individuals performing actions in the document management system.
     /// </remarks>
     public static IEnumerable<ValidationResult> ValidateUsername(string? username, [NotNull] string propertyName)
     {
@@ -144,19 +150,19 @@ public static partial class UserValidationHelper
 
         var trimmed = username.Trim();
 
-        // Length validation
-        if (trimmed.Length < MinUserNameLength)
+        switch (trimmed.Length)
         {
-            yield return new ValidationResult(
-                $"{propertyName} must be at least {MinUserNameLength} characters long.",
-                [propertyName]);
-        }
-
-        if (trimmed.Length > MaxUserNameLength)
-        {
-            yield return new ValidationResult(
-                $"{propertyName} cannot exceed {MaxUserNameLength} characters.",
-                [propertyName]);
+            // Length validation
+            case < MinUserNameLength:
+                yield return new ValidationResult(
+                    $"{propertyName} must be at least {MinUserNameLength} characters long.",
+                    [propertyName]);
+                break;
+            case > MaxUserNameLength:
+                yield return new ValidationResult(
+                    $"{propertyName} cannot exceed {MaxUserNameLength} characters.",
+                    [propertyName]);
+                break;
         }
 
         // Reserved name validation
@@ -177,29 +183,29 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Validates a user-related date according to Clean Architecture business rules.
+    /// Validates a user activity timestamp according to business rules.
     /// </summary>
-    /// <param name="date">The date to validate.</param>
+    /// <param name="timestamp">The timestamp to validate.</param>
     /// <param name="propertyName">The property name for validation messages.</param>
     /// <returns>Validation results (empty if valid).</returns>
     /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
-    public static IEnumerable<ValidationResult> ValidateDate(DateTime date, [NotNull] string propertyName)
+    public static IEnumerable<ValidationResult> ValidateActivityTimestamp(DateTime timestamp, [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
-        if (date <= DateTime.MinValue)
+        if (timestamp <= DateTime.MinValue)
         {
             yield return new ValidationResult(
                 $"{propertyName} must be a valid date.",
                 [propertyName]);
         }
-        else if (date < MinAllowedUserDate)
+        else if (timestamp < MinAllowedUserDate)
         {
             yield return new ValidationResult(
                 $"{propertyName} cannot be earlier than {MinAllowedUserDate:yyyy-MM-dd}.",
                 [propertyName]);
         }
-        else if (date > DateTime.UtcNow.AddMinutes(FutureDateToleranceMinutes))
+        else if (timestamp > DateTime.UtcNow.AddMinutes(FutureDateToleranceMinutes))
         {
             yield return new ValidationResult(
                 $"{propertyName} cannot be in the future.",
@@ -238,14 +244,14 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Quick validation check for user date (optimized for performance).
+    /// Quick validation check for activity timestamp (optimized for performance).
     /// </summary>
-    /// <param name="date">The date to validate.</param>
+    /// <param name="timestamp">The timestamp to validate.</param>
     /// <returns>True if valid; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsValidUserDate(DateTime date)
+    public static bool IsValidActivityTimestamp(DateTime timestamp)
     {
-        var utcDate = date.Kind != DateTimeKind.Utc ? date.ToUniversalTime() : date;
+        var utcDate = timestamp.Kind != DateTimeKind.Utc ? timestamp.ToUniversalTime() : timestamp;
 
         return utcDate > MinAllowedUserDate &&
                utcDate <= DateTime.UtcNow.AddMinutes(FutureDateToleranceMinutes);
@@ -264,6 +270,86 @@ public static partial class UserValidationHelper
 
     #endregion Quick Validation Methods
 
+    #region Activity Context Validation
+
+    /// <summary>
+    /// Validates user attribution for activities (document operations, matter actions, etc.).
+    /// </summary>
+    /// <param name="userId">The user ID performing the action.</param>
+    /// <param name="username">The username for display purposes.</param>
+    /// <param name="activityTimestamp">The timestamp when the activity occurred.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    /// <remarks>
+    /// Validates the complete user attribution context required for audit trails
+    /// in the document management system.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateUserAttribution(
+        Guid userId,
+        string? username,
+        DateTime activityTimestamp,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        // Validate user ID
+        foreach (var result in ValidateUserId(userId, $"{propertyName}.UserId"))
+            yield return result;
+
+        // Validate username
+        foreach (var result in ValidateUsername(username, $"{propertyName}.Username"))
+            yield return result;
+
+        // Validate timestamp
+        foreach (var result in ValidateActivityTimestamp(activityTimestamp, $"{propertyName}.Timestamp"))
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates user activity metrics to detect unusual patterns.
+    /// </summary>
+    /// <param name="activityCount">The activity count to validate.</param>
+    /// <param name="timeFrameHours">The time frame in hours for the activity count.</param>
+    /// <param name="propertyName">The property name for validation messages.</param>
+    /// <returns>Validation results (empty if valid).</returns>
+    /// <exception cref="ArgumentException">Thrown when propertyName is null or whitespace.</exception>
+    /// <remarks>
+    /// Helps identify potential issues like automated behavior or system problems
+    /// by validating activity levels are within reasonable human ranges.
+    /// </remarks>
+    public static IEnumerable<ValidationResult> ValidateActivityMetrics(
+        int activityCount,
+        double timeFrameHours,
+        [NotNull] string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        if (activityCount < 0)
+        {
+            yield return new ValidationResult(
+                $"{propertyName} cannot be negative.",
+                [propertyName]);
+        }
+
+        if (timeFrameHours <= 0)
+        {
+            yield return new ValidationResult(
+                "Time frame must be positive.",
+                [propertyName]);
+        }
+
+        // Check for excessive activity
+        if (timeFrameHours <= 24 && activityCount > MaxDailyActivityCount)
+        {
+            yield return new ValidationResult(
+                $"{propertyName} exceeds reasonable daily activity limit ({MaxDailyActivityCount}). Please verify user behavior.",
+                [propertyName]);
+        }
+    }
+
+    #endregion Activity Context Validation
+
     #region Normalization Methods
 
     /// <summary>
@@ -276,7 +362,7 @@ public static partial class UserValidationHelper
     /// <list type="bullet">
     /// <item>Trimming whitespace</item>
     /// <item>Collapsing multiple spaces to single spaces</item>
-    /// <item>Preserving case for professional appearance</item>
+    /// <item>Preserving case for proper display</item>
     /// </list>
     /// </remarks>
     [return: NotNullIfNotNull(nameof(username))]
@@ -290,21 +376,21 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Normalizes a date to UTC for consistent storage.
+    /// Normalizes a timestamp to UTC for consistent storage.
     /// </summary>
-    /// <param name="date">The date to normalize.</param>
-    /// <returns>UTC date or null if invalid.</returns>
-    public static DateTime? NormalizeDateToUtc(DateTime date)
+    /// <param name="timestamp">The timestamp to normalize.</param>
+    /// <returns>UTC timestamp or null if invalid.</returns>
+    public static DateTime? NormalizeTimestampToUtc(DateTime timestamp)
     {
-        if (!IsValidUserDate(date))
+        if (!IsValidActivityTimestamp(timestamp))
             return null;
 
-        return date.Kind switch
+        return timestamp.Kind switch
         {
-            DateTimeKind.Utc => date,
-            DateTimeKind.Local => date.ToUniversalTime(),
-            DateTimeKind.Unspecified => DateTime.SpecifyKind(date, DateTimeKind.Utc),
-            _ => DateTime.SpecifyKind(date, DateTimeKind.Utc)
+            DateTimeKind.Utc => timestamp,
+            DateTimeKind.Local => timestamp.ToUniversalTime(),
+            DateTimeKind.Unspecified => DateTime.SpecifyKind(timestamp, DateTimeKind.Utc),
+            _ => DateTime.SpecifyKind(timestamp, DateTimeKind.Utc)
         };
     }
 
@@ -329,18 +415,18 @@ public static partial class UserValidationHelper
     }
 
     /// <summary>
-    /// Determines if user context is sufficient for basic audit requirements.
+    /// Determines if user context is sufficient for audit requirements.
     /// </summary>
     /// <param name="userId">The user ID.</param>
     /// <param name="username">The username.</param>
-    /// <param name="actionTimestamp">The action timestamp.</param>
+    /// <param name="activityTimestamp">The activity timestamp.</param>
     /// <returns>True if context is sufficient; otherwise, false.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsSufficientUserContext(Guid userId, string? username, DateTime actionTimestamp)
+    public static bool IsSufficientUserContext(Guid userId, string? username, DateTime activityTimestamp)
     {
         return IsValidUserId(userId) &&
                IsUsernameAllowed(username) &&
-               IsValidUserDate(actionTimestamp);
+               IsValidActivityTimestamp(activityTimestamp);
     }
 
     /// <summary>
@@ -356,6 +442,7 @@ public static partial class UserValidationHelper
             ["ReservedNamesCount"] = ReservedNames.Count,
             ["MinAllowedDate"] = MinAllowedUserDate,
             ["FutureDateToleranceMinutes"] = FutureDateToleranceMinutes,
+            ["MaxDailyActivityCount"] = MaxDailyActivityCount,
             ["ValidationRules"] = new Dictionary<string, string>
             {
                 ["NameLength"] = $"Between {MinUserNameLength} and {MaxUserNameLength} characters",
@@ -438,10 +525,7 @@ public static partial class UserValidationHelper
         if (value.Contains("..") || value.Contains("__") || value.Contains("--"))
             return $"{propertyName} cannot contain consecutive special characters.";
 
-        if (!UsernameCharacterRegex().IsMatch(value))
-            return $"{propertyName} can only contain letters, numbers, spaces, periods, hyphens, and underscores.";
-
-        return $"{propertyName} contains invalid format.";
+        return !UsernameCharacterRegex().IsMatch(value) ? $"{propertyName} can only contain letters, numbers, spaces, periods, hyphens, and underscores." : $"{propertyName} contains invalid format.";
     }
 
     #endregion Private Helper Methods
