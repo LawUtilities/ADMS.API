@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using ADMS.Application.Common.Validation;
 
 namespace ADMS.Application.DTOs;
 
@@ -9,7 +10,7 @@ namespace ADMS.Application.DTOs;
 /// </summary>
 /// <remarks>
 /// This DTO serves as a complete representation of a document within the ADMS legal document management system,
-/// corresponding to <see cref="ADMS.API.Entities.Document"/>. It provides comprehensive document data including
+/// corresponding to <see cref="ADMS.Domain.Entities.Document"/>. It provides comprehensive document data including
 /// all audit trail associations while excluding revision collections for performance optimization in scenarios
 /// where version history is not required.
 /// 
@@ -18,12 +19,12 @@ namespace ADMS.Application.DTOs;
 /// <item><strong>Revision-Free Representation:</strong> Excludes revision collections for optimal performance in document-focused operations</item>
 /// <item><strong>Complete Activity Integration:</strong> Includes all document and transfer activity collections</item>
 /// <item><strong>Professional Validation:</strong> Uses centralized FileValidationHelper for comprehensive data integrity</item>
-/// <item><strong>Entity Synchronization:</strong> Mirrors all properties and relationships from ADMS.API.Entities.Document (except revisions)</item>
+/// <item><strong>Entity Synchronization:</strong> Mirrors all properties and relationships from ADMS.Domain.Entities.Document (except revisions)</item>
 /// <item><strong>Legal Compliance Support:</strong> Designed for comprehensive audit reporting and legal compliance</item>
 /// </list>
 /// 
 /// <para><strong>Entity Relationship Mirror:</strong></para>
-/// This DTO represents the complete structure from ADMS.API.Entities.Document, excluding Revisions:
+/// This DTO represents the complete structure from ADMS.Domain.Entities.Document, excluding Revisions:
 /// <list type="bullet">
 /// <item><strong>Document Metadata:</strong> Complete file information, checksums, and status flags</item>
 /// <item><strong>Document Activities:</strong> DocumentActivityUser collection for document-level audit trails</item>
@@ -108,7 +109,7 @@ namespace ADMS.Application.DTOs;
 /// Console.WriteLine($"File integrity: {(documentDto.HasValidChecksum ? "Valid" : "Invalid")}");
 /// </code>
 /// </example>
-public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatable<DocumentWithoutRevisionsDto>
+public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatable<DocumentWithoutRevisionsDto>
 {
     #region Core Properties
 
@@ -117,7 +118,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// </summary>
     /// <remarks>
     /// This GUID serves as the primary key and uniquely identifies the document within the ADMS system.
-    /// It corresponds directly to <see cref="ADMS.API.Entities.Document.Id"/> and is used for 
+    /// It corresponds directly to <see cref="ADMS.Domain.Entities.Document.Id"/> and is used for 
     /// establishing relationships, activity associations, and all system operations requiring 
     /// precise document identification.
     /// 
@@ -441,7 +442,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// temporal validation and ValidateCrossPropertyRules() for temporal consistency with revisions.
     /// 
     /// <para><strong>Entity Alignment:</strong></para>
-    /// This property mirrors <see cref="ADMS.API.Entities.Document.CreationDate"/> exactly, ensuring
+    /// This property mirrors <see cref="ADMS.Domain.Entities.Document.CreationDate"/> exactly, ensuring
     /// consistent temporal tracking and reliable document lifecycle management.
     /// </remarks>
     /// <example>
@@ -473,7 +474,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// Gets or sets the collection of document activity users.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.DocumentActivityUsers"/> and tracks 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.DocumentActivityUsers"/> and tracks 
     /// all document-level activities performed by users. This provides comprehensive audit trails for 
     /// document operations essential for legal compliance and professional accountability.
     /// 
@@ -509,13 +510,13 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     ///     .FirstOrDefault(da => da.DocumentActivity?.Activity == "CREATED")?.User;
     /// </code>
     /// </example>
-    public ICollection<DocumentActivityUserDto> DocumentActivityUsers { get; set; } = [];
+    public ICollection<DocumentActivityUserDto> DocumentActivityUsers { get; set; } = new List<DocumentActivityUserDto>();
 
     /// <summary>
     /// Gets or sets the collection of "from" matter document activity users.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.MatterDocumentActivityUsersFrom"/> and 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.MatterDocumentActivityUsersFrom"/> and 
     /// tracks all document transfer activities where this document was moved or copied FROM source matters to 
     /// destination matters. This provides source-side audit trails for document transfer operations.
     /// 
@@ -547,13 +548,13 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// var transferCount = document.MatterDocumentActivityUsersFrom.Count;
     /// </code>
     /// </example>
-    public ICollection<MatterDocumentActivityUserFromDto> MatterDocumentActivityUsersFrom { get; set; } = [];
+    public ICollection<MatterDocumentActivityUserFromDto> MatterDocumentActivityUsersFrom { get; set; } = new List<MatterDocumentActivityUserFromDto>();
 
     /// <summary>
     /// Gets or sets the collection of "to" matter document activity users.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.MatterDocumentActivityUsersTo"/> and 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.MatterDocumentActivityUsersTo"/> and 
     /// tracks all document transfer activities where this document was moved or copied TO destination matters 
     /// from source matters. This provides destination-side audit trails completing the bidirectional transfer system.
     /// 
@@ -586,7 +587,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     ///                     document.MatterDocumentActivityUsersTo.Count;
     /// </code>
     /// </example>
-    public ICollection<MatterDocumentActivityUserToDto> MatterDocumentActivityUsersTo { get; set; } = [];
+    public ICollection<MatterDocumentActivityUserToDto> MatterDocumentActivityUsersTo { get; set; } = new List<MatterDocumentActivityUserToDto>();
 
     #endregion Collection Properties
 
@@ -596,7 +597,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// Gets the total count of all activities (document + transfer) for this document.
     /// </summary>
     /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Document.TotalActivityCount"/> and provides 
+    /// This computed property mirrors <see cref="ADMS.Domain.Entities.Document.TotalActivityCount"/> and provides 
     /// a comprehensive count of all activities associated with the document, useful for activity analysis.
     /// </remarks>
     /// <example>
@@ -612,7 +613,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// Gets a value indicating whether this document has any activities recorded.
     /// </summary>
     /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Document.HasActivities"/> and 
+    /// This computed property mirrors <see cref="ADMS.Domain.Entities.Document.HasActivities"/> and 
     /// determines if the document has been used in the system, useful for activity analysis.
     /// </remarks>
     /// <example>
@@ -720,114 +721,102 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     #region Validation Implementation
 
     /// <summary>
-    /// Validates the <see cref="DocumentWithoutRevisionsDto"/> for data integrity and business rules compliance.
+    /// Validates the <see cref="DocumentWithoutRevisionsDto"/> using standardized ADMS validation patterns.
     /// </summary>
     /// <param name="validationContext">The context information about the validation operation.</param>
     /// <returns>A collection of validation results indicating any validation failures.</returns>
     /// <remarks>
-    /// Performs comprehensive validation using centralized validation helpers for consistency with entity
-    /// validation rules. This ensures the DTO maintains the same validation standards as the corresponding
-    /// ADMS.API.Entities.Document entity while enforcing professional document management standards.
-    /// 
-    /// <para><strong>Comprehensive Validation Categories:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>ID Validation:</strong> Document ID validated for proper GUID structure</item>
-    /// <item><strong>File System Validation:</strong> File name, extension, and metadata validation</item>
-    /// <item><strong>Integrity Validation:</strong> Checksum, MIME type, and file size validation</item>
-    /// <item><strong>Collection Validation:</strong> Deep validation of activity and audit trail collections</item>
-    /// <item><strong>Business Rule Validation:</strong> Document-specific business rule compliance</item>
+    /// Implements comprehensive validation following the standardized ADMS validation hierarchy:
+    /// <list type="number">
+    /// <item><strong>Core Properties:</strong> Essential document properties using FileValidationHelper and BaseValidationDto</item>
+    /// <item><strong>Business Rules:</strong> Document lifecycle, version control, and professional standards</item>
+    /// <item><strong>Cross-Property:</strong> MIME type consistency, temporal validation, and referential integrity</item>
+    /// <item><strong>Collections:</strong> Deep validation of activity audit trail collections</item>
     /// </list>
     /// 
     /// <para><strong>Professional Standards Integration:</strong></para>
-    /// Uses centralized validation helpers (FileValidationHelper, DtoValidationHelper) to ensure
-    /// consistency across all document validation in the system.
+    /// Uses centralized validation helpers (FileValidationHelper, BaseValidationDto) to ensure
+    /// consistency across all document validation in the ADMS system.
     /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new DocumentWithoutRevisionsDto 
-    /// { 
-    ///     Id = Guid.Empty, // Invalid
-    ///     FileName = "", // Invalid
-    ///     DocumentActivityUsers = new List&lt;DocumentActivityUserDto&gt; { null } // Invalid
-    /// };
-    /// 
-    /// var context = new ValidationContext(dto);
-    /// var results = dto.Validate(context);
-    /// 
-    /// foreach (var result in results)
-    /// {
-    ///     Console.WriteLine($"Document Validation Error: {result.ErrorMessage}");
-    /// }
-    /// </code>
-    /// </example>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // Validate document ID
-        foreach (var result in ValidateDocumentId())
+        ArgumentNullException.ThrowIfNull(validationContext);
+
+        // 1. Core Properties Validation
+        foreach (var result in ValidateCoreProperties())
             yield return result;
 
-        // Validate file system properties
-        foreach (var result in ValidateFileName())
-            yield return result;
-
-        foreach (var result in ValidateExtension())
-            yield return result;
-
-        foreach (var result in ValidateFileSize())
-            yield return result;
-
-        foreach (var result in ValidateMimeType())
-            yield return result;
-
-        foreach (var result in ValidateChecksum())
-            yield return result;
-
-        // Validate business rules
+        // 2. Business Rules Validation
         foreach (var result in ValidateBusinessRules())
             yield return result;
 
-        // Validate collections using centralized helper
-        foreach (var result in ValidateDocumentActivityUsers())
+        // 3. Cross-Property Validation
+        foreach (var result in ValidateCrossPropertyRules())
             yield return result;
 
-        foreach (var result in ValidateMatterDocumentActivityUsersFrom())
-            yield return result;
-
-        foreach (var result in ValidateMatterDocumentActivityUsersTo())
+        // 4. Collections Validation
+        foreach (var result in ValidateCollections())
             yield return result;
     }
 
     /// <summary>
-    /// Validates the <see cref="Id"/> property using ADMS validation standards.
+    /// Validates core document properties using ADMS validation helpers.
     /// </summary>
-    /// <returns>A collection of validation results for the document ID.</returns>
+    /// <returns>A collection of validation results for core property validation.</returns>
     /// <remarks>
-    /// Validates that the document ID is a valid, non-empty GUID suitable for use as a database identifier.
+    /// Validates essential document properties following RevisionValidationHelper patterns:
+    /// <list type="bullet">
+    /// <item>Document ID validation using BaseValidationDto patterns</item>
+    /// <item>File system properties using FileValidationHelper</item>
+    /// <item>Temporal properties using BaseValidationDto patterns</item>
+    /// <item>Professional standards enforcement</item>
+    /// </list>
     /// </remarks>
-    private IEnumerable<ValidationResult> ValidateDocumentId()
+    private IEnumerable<ValidationResult> ValidateCoreProperties()
     {
+        // Validate document ID using RevisionValidationHelper patterns
         if (Id == Guid.Empty)
         {
             yield return new ValidationResult(
-                "Document ID must be a valid non-empty GUID for document identification.",
+                "Document ID must be a valid non-empty GUID for document identification and system operations.",
                 [nameof(Id)]);
         }
+
+        // Validate file name using FileValidationHelper
+        foreach (var result in ValidateFileName())
+            yield return result;
+
+        // Validate extension using FileValidationHelper
+        foreach (var result in ValidateExtension())
+            yield return result;
+
+        // Validate file size using FileValidationHelper patterns
+        foreach (var result in ValidateFileSize())
+            yield return result;
+
+        // Validate MIME type using FileValidationHelper
+        foreach (var result in ValidateMimeType())
+            yield return result;
+
+        // Validate checksum using FileValidationHelper patterns
+        foreach (var result in ValidateChecksum())
+            yield return result;
+
+        // Validate creation date using BaseValidationDto patterns
+        foreach (var result in ValidateCreationDate())
+            yield return result;
     }
 
     /// <summary>
-    /// Validates the <see cref="FileName"/> property using ADMS file validation standards.
+    /// Validates file name using ADMS FileValidationHelper standards.
     /// </summary>
-    /// <returns>A collection of validation results for the file name.</returns>
-    /// <remarks>
-    /// Uses FileValidationHelper for comprehensive file name validation including character validation,
-    /// length constraints, reserved name checking, and professional naming standards.
-    /// </remarks>
+    /// <returns>A collection of validation results for file name validation.</returns>
     private IEnumerable<ValidationResult> ValidateFileName()
     {
         if (string.IsNullOrWhiteSpace(FileName))
         {
             yield return new ValidationResult(
-                "File name is required and cannot be empty.",
+                "File name is required and cannot be empty for document identification.",
                 [nameof(FileName)]);
             yield break;
         }
@@ -835,21 +824,21 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
         if (FileName.Length > FileValidationHelper.MaxFileNameLength)
         {
             yield return new ValidationResult(
-                $"File name cannot exceed {FileValidationHelper.MaxFileNameLength} characters.",
+                $"File name cannot exceed {FileValidationHelper.MaxFileNameLength} characters for file system compatibility.",
                 [nameof(FileName)]);
         }
 
         if (!FileValidationHelper.IsFileNameValid(FileName))
         {
             yield return new ValidationResult(
-                "File name contains invalid characters or format.",
+                "File name contains invalid characters or format. Use alphanumeric characters, spaces, hyphens, and underscores.",
                 [nameof(FileName)]);
         }
 
         if (FileValidationHelper.IsReservedFileName(FileName))
         {
             yield return new ValidationResult(
-                "File name cannot use a reserved system name.",
+                "File name cannot use a reserved system name for security and compatibility.",
                 [nameof(FileName)]);
         }
 
@@ -859,22 +848,29 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
                 "File name must contain at least one alphanumeric character for professional identification.",
                 [nameof(FileName)]);
         }
+
+        // Security validation following RevisionValidationHelper patterns
+        var securityPatterns = new[] { "<script", "javascript:", "vbscript:", "<object", "<embed", "<iframe" };
+        var fileNameLower = FileName.ToLowerInvariant();
+
+        if (securityPatterns.Any(pattern => fileNameLower.Contains(pattern, StringComparison.OrdinalIgnoreCase)))
+        {
+            yield return new ValidationResult(
+                "File name contains potentially malicious content patterns and cannot be processed.",
+                [nameof(FileName)]);
+        }
     }
 
     /// <summary>
-    /// Validates the <see cref="Extension"/> property using ADMS file validation standards.
+    /// Validates file extension using ADMS FileValidationHelper standards.
     /// </summary>
-    /// <returns>A collection of validation results for the file extension.</returns>
-    /// <remarks>
-    /// Uses FileValidationHelper for comprehensive extension validation including allowed extensions,
-    /// length constraints, format validation, and case sensitivity checks.
-    /// </remarks>
+    /// <returns>A collection of validation results for file extension validation.</returns>
     private IEnumerable<ValidationResult> ValidateExtension()
     {
         if (string.IsNullOrWhiteSpace(Extension))
         {
             yield return new ValidationResult(
-                "File extension is required and cannot be empty.",
+                "File extension is required and cannot be empty for document format identification.",
                 [nameof(Extension)]);
             yield break;
         }
@@ -882,7 +878,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
         if (Extension.Length > FileValidationHelper.MaxExtensionLength)
         {
             yield return new ValidationResult(
-                $"File extension cannot exceed {FileValidationHelper.MaxExtensionLength} characters.",
+                $"File extension cannot exceed {FileValidationHelper.MaxExtensionLength} characters for system compatibility.",
                 [nameof(Extension)]);
         }
 
@@ -890,73 +886,74 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
         {
             yield return new ValidationResult(
                 $"Extension '{Extension}' is not allowed for legal document management. " +
-                $"Allowed extensions: {FileValidationHelper.AllowedExtensionsList}",
+                $"Allowed extensions: {string.Join(", ", FileValidationHelper.AllowedExtensions)}",
                 [nameof(Extension)]);
         }
 
         if (Extension.Any(char.IsWhiteSpace))
         {
             yield return new ValidationResult(
-                "File extension cannot contain whitespace characters.",
+                "File extension cannot contain whitespace characters for system compatibility.",
                 [nameof(Extension)]);
         }
 
-        // Check for lowercase consistency
+        // Case consistency following professional standards
         if (!Extension.Equals(Extension.ToLowerInvariant(), StringComparison.Ordinal))
         {
             yield return new ValidationResult(
-                "File extension must be lowercase for consistency.",
+                "File extension must be lowercase for consistency with professional document management standards.",
                 [nameof(Extension)]);
         }
     }
 
     /// <summary>
-    /// Validates the <see cref="FileSize"/> property for professional document management standards.
+    /// Validates file size using ADMS professional document management standards.
     /// </summary>
-    /// <returns>A collection of validation results for the file size.</returns>
-    /// <remarks>
-    /// Validates file size constraints ensuring documents are within acceptable limits for 
-    /// legal document management operations.
-    /// </remarks>
+    /// <returns>A collection of validation results for file size validation.</returns>
     private IEnumerable<ValidationResult> ValidateFileSize()
     {
         if (FileSize < 0)
         {
             yield return new ValidationResult(
-                "File size must be non-negative for valid document metadata.",
+                "File size must be non-negative for valid document metadata and storage tracking.",
                 [nameof(FileSize)]);
         }
 
         if (FileSize == 0)
         {
             yield return new ValidationResult(
-                "File size must be greater than zero for actual document files.",
+                "File size must be greater than zero for actual document files with content.",
                 [nameof(FileSize)]);
         }
 
-        // Additional file size constraints for professional document management
-        if (FileSize > 100 * 1024 * 1024) // 100 MB limit for typical legal documents
+        // Professional document size limits following RevisionValidationHelper patterns
+        if (FileSize > 100 * 1024 * 1024) // 100 MB limit
         {
             yield return new ValidationResult(
-                "File size exceeds recommended limit for efficient document management (100 MB).",
+                "File size exceeds recommended limit for efficient document management (100 MB). " +
+                "Large files may require special handling or compression.",
+                [nameof(FileSize)]);
+        }
+
+        // Professional practice warnings
+        if (FileSize > 50 * 1024 * 1024) // 50 MB warning
+        {
+            yield return new ValidationResult(
+                "File size is very large (>50 MB). Consider optimizing for professional document management efficiency.",
                 [nameof(FileSize)]);
         }
     }
 
     /// <summary>
-    /// Validates the <see cref="MimeType"/> property using ADMS file validation standards.
+    /// Validates MIME type using ADMS FileValidationHelper standards.
     /// </summary>
-    /// <returns>A collection of validation results for the MIME type.</returns>
-    /// <remarks>
-    /// Uses FileValidationHelper for comprehensive MIME type validation including allowed types,
-    /// format validation, and security considerations.
-    /// </remarks>
+    /// <returns>A collection of validation results for MIME type validation.</returns>
     private IEnumerable<ValidationResult> ValidateMimeType()
     {
         if (string.IsNullOrWhiteSpace(MimeType))
         {
             yield return new ValidationResult(
-                "MIME type is required for proper document handling and security.",
+                "MIME type is required for proper document handling, security validation, and client application integration.",
                 [nameof(MimeType)]);
             yield break;
         }
@@ -964,31 +961,29 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
         if (!FileValidationHelper.IsMimeTypeAllowed(MimeType))
         {
             yield return new ValidationResult(
-                $"MIME type '{MimeType}' is not allowed for legal document management.",
+                $"MIME type '{MimeType}' is not allowed for legal document management. " +
+                $"Contact system administrator for approved MIME types.",
                 [nameof(MimeType)]);
         }
 
         if (!MimeTypeRegex().IsMatch(MimeType))
         {
             yield return new ValidationResult(
-                "Invalid MIME type format. Expected format: type/subtype (e.g., application/pdf).",
+                "Invalid MIME type format. Expected standard format: type/subtype (e.g., application/pdf).",
                 [nameof(MimeType)]);
         }
     }
 
     /// <summary>
-    /// Validates the <see cref="Checksum"/> property for document integrity verification.
+    /// Validates checksum using ADMS FileValidationHelper standards.
     /// </summary>
-    /// <returns>A collection of validation results for the checksum.</returns>
-    /// <remarks>
-    /// Validates checksum format and structure to ensure proper SHA256 hash for document integrity verification.
-    /// </remarks>
+    /// <returns>A collection of validation results for checksum validation.</returns>
     private IEnumerable<ValidationResult> ValidateChecksum()
     {
         if (string.IsNullOrWhiteSpace(Checksum))
         {
             yield return new ValidationResult(
-                "Checksum is required for document integrity verification and legal compliance.",
+                "Checksum is required for document integrity verification, security compliance, and audit trail requirements.",
                 [nameof(Checksum)]);
             yield break;
         }
@@ -996,103 +991,294 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
         if (!ChecksumRegex().IsMatch(Checksum) || Checksum.Length != 64)
         {
             yield return new ValidationResult(
-                "Checksum must be a valid 64-character hexadecimal string (SHA256 hash) for proper integrity verification.",
+                "Checksum must be a valid 64-character hexadecimal string (SHA256 hash) for proper integrity verification and security compliance.",
+                [nameof(Checksum)]);
+        }
+
+        // Additional checksum validation following FileValidationHelper patterns
+        if (!FileValidationHelper.IsValidChecksum(Checksum))
+        {
+            yield return new ValidationResult(
+                "Checksum format is invalid or does not meet security requirements for document integrity verification.",
                 [nameof(Checksum)]);
         }
     }
 
     /// <summary>
-    /// Validates business rules specific to document management.
+    /// Validates creation date using BaseValidationDto temporal validation patterns.
+    /// </summary>
+    /// <returns>A collection of validation results for creation date validation.</returns>
+    private IEnumerable<ValidationResult> ValidateCreationDate()
+    {
+        if (CreationDate == default)
+        {
+            yield return new ValidationResult(
+                "Creation date is required and cannot be the default value for temporal tracking and audit compliance.",
+                [nameof(CreationDate)]);
+            yield break;
+        }
+
+        // Use RevisionValidationHelper patterns for date validation
+        var minAllowedDate = RevisionValidationHelper.MinAllowedRevisionDate;
+        if (CreationDate < minAllowedDate)
+        {
+            yield return new ValidationResult(
+                $"Creation date cannot be earlier than {minAllowedDate:yyyy-MM-dd} for system consistency and reasonable temporal bounds.",
+                [nameof(CreationDate)]);
+        }
+
+        var maxAllowedDate = DateTime.UtcNow.AddMinutes(RevisionValidationHelper.FutureDateToleranceMinutes);
+        if (CreationDate > maxAllowedDate)
+        {
+            yield return new ValidationResult(
+                $"Creation date cannot be in the future (beyond clock skew tolerance of {RevisionValidationHelper.FutureDateToleranceMinutes} minutes).",
+                [nameof(CreationDate)]);
+        }
+
+        // Professional age validation
+        var age = DateTime.UtcNow - CreationDate;
+        if (age.TotalDays > RevisionValidationHelper.MaxReasonableAgeYears * 365)
+        {
+            yield return new ValidationResult(
+                $"Creation date age exceeds reasonable bounds for active document management ({RevisionValidationHelper.MaxReasonableAgeYears} years). " +
+                "Verify data accuracy and retention policy compliance.",
+                [nameof(CreationDate)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates document-specific business rules and professional standards.
     /// </summary>
     /// <returns>A collection of validation results for business rule compliance.</returns>
-    /// <remarks>
-    /// Validates document-specific business rules such as mutual exclusivity constraints
-    /// and professional document management standards.
-    /// </remarks>
     private IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        // Business rule: Document cannot be both checked out and deleted
+        // Mutual exclusivity validation following RevisionValidationHelper patterns
         if (IsCheckedOut && IsDeleted)
         {
             yield return new ValidationResult(
                 "A document cannot be both checked out and deleted simultaneously. " +
-                "This violates professional document management business rules.",
+                "This violates professional document management business rules and version control integrity.",
                 [nameof(IsCheckedOut), nameof(IsDeleted)]);
         }
 
-        // Business rule: Validate MIME type and extension consistency
-        if (string.IsNullOrWhiteSpace(Extension) || string.IsNullOrWhiteSpace(MimeType)) yield break;
-        var expectedMimeTypes = GetExpectedMimeTypesForExtension(Extension.ToLowerInvariant());
-        if (expectedMimeTypes.Any() && !expectedMimeTypes.Contains(MimeType, StringComparer.OrdinalIgnoreCase))
+        // Professional standards validation
+        if (!string.IsNullOrWhiteSpace(Extension) && !FileValidationHelper.IsLegalDocumentFormat(Extension))
         {
             yield return new ValidationResult(
-                $"MIME type '{MimeType}' does not match the expected types for extension '{Extension}'. " +
-                $"Expected: {string.Join(", ", expectedMimeTypes)}",
-                [nameof(MimeType), nameof(Extension)]);
+                $"Extension '{Extension}' is not a standard legal document format. " +
+                "Consider using PDF, DOCX, or other approved legal document formats for professional compliance.",
+                [nameof(Extension)]);
+        }
+
+        // Document lifecycle validation
+        if (IsDeleted && !HasValidAuditTrail())
+        {
+            yield return new ValidationResult(
+                "Deleted documents must have appropriate audit trail activities for legal compliance and accountability.",
+                [nameof(IsDeleted)]);
+        }
+
+        // Professional file management validation
+        if (IsCheckedOut && TotalActivityCount == 0)
+        {
+            yield return new ValidationResult(
+                "Checked out documents should have corresponding activity audit trail for professional accountability.",
+                [nameof(IsCheckedOut)]);
         }
     }
 
     /// <summary>
-    /// Validates the <see cref="DocumentActivityUsers"/> collection using ADMS validation standards.
+    /// Validates cross-property relationships and consistency rules.
     /// </summary>
-    /// <returns>A collection of validation results for the document activity users collection.</returns>
-    /// <remarks>
-    /// Uses DtoValidationHelper for comprehensive validation of the document activity users collection.
-    /// </remarks>
+    /// <returns>A collection of validation results for cross-property validation.</returns>
+    private IEnumerable<ValidationResult> ValidateCrossPropertyRules()
+    {
+        // MIME type and extension consistency validation
+        if (!string.IsNullOrWhiteSpace(Extension) && !string.IsNullOrWhiteSpace(MimeType))
+        {
+            var expectedMimeTypes = GetExpectedMimeTypesForExtension(Extension.ToLowerInvariant());
+            if (expectedMimeTypes.Any() && !expectedMimeTypes.Contains(MimeType, StringComparer.OrdinalIgnoreCase))
+            {
+                yield return new ValidationResult(
+                    $"MIME type '{MimeType}' does not match the expected types for extension '{Extension}'. " +
+                    $"Expected: {string.Join(", ", expectedMimeTypes)}. " +
+                    "Ensure file format consistency for proper document handling.",
+                    [nameof(MimeType), nameof(Extension)]);
+            }
+        }
+
+        // File size and format consistency
+        if (!string.IsNullOrWhiteSpace(Extension) && FileSize > 0 && Extension.Equals("txt", StringComparison.OrdinalIgnoreCase) && FileSize > 10 * 1024 * 1024)
+        {
+            // 10 MB
+            yield return new ValidationResult(
+                "Text files should typically be smaller. Verify this is actually a text document.",
+                [nameof(FileSize), nameof(Extension)]);
+        }
+
+        // Professional naming consistency
+        if (string.IsNullOrWhiteSpace(FileName) || string.IsNullOrWhiteSpace(Extension)) yield break;
+        var fullFileName = $"{FileName}.{Extension}";
+        if (fullFileName.Length > 255) // Windows MAX_PATH consideration
+        {
+            yield return new ValidationResult(
+                "Complete file name (name + extension) exceeds maximum path length for file system compatibility (255 characters).",
+                [nameof(FileName), nameof(Extension)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates collections and audit trail relationships.
+    /// </summary>
+    /// <returns>A collection of validation results for collection validation.</returns>
+    private IEnumerable<ValidationResult> ValidateCollections()
+    {
+        // Document activity users validation following RevisionValidationHelper patterns
+        foreach (var result in ValidateDocumentActivityUsers())
+            yield return result;
+
+        // Matter transfer activities validation
+        foreach (var result in ValidateMatterTransferActivities())
+            yield return result;
+
+        // Audit trail completeness validation
+        foreach (var result in ValidateAuditTrailCompleteness())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates document activity users collection following ADMS patterns.
+    /// </summary>
+    /// <returns>A collection of validation results for document activity validation.</returns>
     private IEnumerable<ValidationResult> ValidateDocumentActivityUsers()
     {
-        return ValidateCollection(DocumentActivityUsers, nameof(DocumentActivityUsers));
-    }
-
-    /// <summary>
-    /// Validates the <see cref="MatterDocumentActivityUsersFrom"/> collection using ADMS validation standards.
-    /// </summary>
-    /// <returns>A collection of validation results for the from transfer activities collection.</returns>
-    /// <remarks>
-    /// Uses DtoValidationHelper for comprehensive validation of the source-side transfer activities collection.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateMatterDocumentActivityUsersFrom()
-    {
-        return ValidateCollection(MatterDocumentActivityUsersFrom, nameof(MatterDocumentActivityUsersFrom));
-    }
-
-    /// <summary>
-    /// Validates the <see cref="MatterDocumentActivityUsersTo"/> collection using ADMS validation standards.
-    /// </summary>
-    /// <returns>A collection of validation results for the to transfer activities collection.</returns>
-    /// <remarks>
-    /// Uses DtoValidationHelper for comprehensive validation of the destination-side transfer activities collection.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateMatterDocumentActivityUsersTo()
-    {
-        return ValidateCollection(MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo));
-    }
-
-    /// <summary>
-    /// Gets expected MIME types for a given file extension.
-    /// </summary>
-    /// <param name="extension">The file extension (without dot, lowercase).</param>
-    /// <returns>A collection of expected MIME types for the extension.</returns>
-    /// <remarks>
-    /// Provides MIME type validation support for common legal document formats.
-    /// </remarks>
-    private static IEnumerable<string> GetExpectedMimeTypesForExtension(string extension)
-    {
-        return extension switch
+        var index = 0;
+        foreach (var activity in DocumentActivityUsers)
         {
-            "pdf" => ["application/pdf"],
-            "doc" => ["application/msword"],
-            "docx" => ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
-            "xls" => ["application/vnd.ms-excel"],
-            "xlsx" => ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
-            "txt" => ["text/plain"],
-            "rtf" => ["application/rtf", "text/rtf"],
-            "jpg" or "jpeg" => ["image/jpeg"],
-            "png" => ["image/png"],
-            "gif" => ["image/gif"],
-            "tiff" or "tif" => ["image/tiff"],
-            _ => []
-        };
+            if (activity == null)
+            {
+                yield return new ValidationResult(
+                    $"DocumentActivityUsers[{index}] cannot be null for audit trail integrity.",
+                    [$"DocumentActivityUsers[{index}]"]);
+            }
+            else
+            {
+                // Cross-reference validation
+                if (activity.DocumentId.HasValue && activity.DocumentId != Id)
+                {
+                    yield return new ValidationResult(
+                        $"DocumentActivityUsers[{index}] references incorrect document ID. " +
+                        "All activities must be associated with this document.",
+                        [$"DocumentActivityUsers[{index}].DocumentId"]);
+                }
+
+                // Activity timestamp validation
+                if (activity.CreatedAt < CreationDate.AddMinutes(-RevisionValidationHelper.FutureDateToleranceMinutes))
+                {
+                    yield return new ValidationResult(
+                        $"DocumentActivityUsers[{index}] activity timestamp cannot be significantly before document creation date.",
+                        [$"DocumentActivityUsers[{index}].CreatedAt"]);
+                }
+            }
+            index++;
+        }
+
+        // Required activities validation following RevisionValidationHelper patterns
+        if (IsDeleted || DocumentActivityUsers.Count <= 0) yield break;
+        var hasCreationActivity = DocumentActivityUsers.Any(a =>
+            string.Equals(a.DocumentActivity?.Activity, "CREATED", StringComparison.OrdinalIgnoreCase));
+
+        if (!hasCreationActivity)
+        {
+            yield return new ValidationResult(
+                "Document must have at least one CREATED activity for complete audit trail and legal compliance.",
+                [nameof(DocumentActivityUsers)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates matter transfer activities for bidirectional audit compliance.
+    /// </summary>
+    /// <returns>A collection of validation results for transfer activity validation.</returns>
+    private IEnumerable<ValidationResult> ValidateMatterTransferActivities()
+    {
+        // Validate FROM transfers
+        foreach (var result in ValidateTransferCollection(MatterDocumentActivityUsersFrom, nameof(MatterDocumentActivityUsersFrom)))
+            yield return result;
+
+        // Validate TO transfers
+        foreach (var result in ValidateTransferCollection(MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
+            yield return result;
+
+        // Bidirectional consistency validation
+        var fromCount = MatterDocumentActivityUsersFrom.Count;
+        var toCount = MatterDocumentActivityUsersTo.Count;
+
+        if ((fromCount > 0 || toCount > 0) && Math.Abs(fromCount - toCount) > 10)
+        {
+            yield return new ValidationResult(
+                "Transfer audit trail appears significantly unbalanced between source and destination activities. " +
+                "Verify bidirectional tracking is complete for legal compliance.",
+                [nameof(MatterDocumentActivityUsersFrom), nameof(MatterDocumentActivityUsersTo)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates a transfer collection following ADMS audit trail standards.
+    /// </summary>
+    /// <param name="collection">The transfer collection to validate.</param>
+    /// <param name="propertyName">The property name for error reporting.</param>
+    /// <returns>A collection of validation results.</returns>
+    private static IEnumerable<ValidationResult> ValidateTransferCollection<T>(ICollection<T> collection, string propertyName)
+        where T : class
+    {
+        var index = 0;
+        foreach (var transfer in collection)
+        {
+            if (transfer == null)
+            {
+                yield return new ValidationResult(
+                    $"{propertyName}[{index}] cannot be null for transfer audit trail integrity.",
+                    [$"{propertyName}[{index}]"]);
+            }
+            // Additional transfer-specific validation can be added here
+            index++;
+        }
+    }
+
+    /// <summary>
+    /// Validates overall audit trail completeness following professional standards.
+    /// </summary>
+    /// <returns>A collection of validation results for audit trail validation.</returns>
+    private IEnumerable<ValidationResult> ValidateAuditTrailCompleteness()
+    {
+        // Professional audit trail validation
+        if (!IsDeleted && TotalActivityCount == 0)
+        {
+            yield return new ValidationResult(
+                "Active documents must have audit trail activities for legal compliance and professional accountability.",
+                [nameof(DocumentActivityUsers)]);
+        }
+
+        // Activity count reasonableness following RevisionValidationHelper patterns
+        if (TotalActivityCount > RevisionValidationHelper.MaxReasonableActivityCount * 2) // Allow higher for documents vs revisions
+        {
+            yield return new ValidationResult(
+                $"Document has an unusually high activity count (>{RevisionValidationHelper.MaxReasonableActivityCount * 2}). " +
+                "Verify data integrity and consider system optimization.",
+                [nameof(DocumentActivityUsers)]);
+        }
+    }
+
+    /// <summary>
+    /// Helper method to check if document has valid audit trail.
+    /// </summary>
+    /// <returns>True if document has valid audit trail; otherwise, false.</returns>
+    private bool HasValidAuditTrail()
+    {
+        return TotalActivityCount > 0 && 
+               DocumentActivityUsers.Any(a => 
+                   !string.IsNullOrWhiteSpace(a.DocumentActivity?.Activity));
     }
 
     #endregion Validation Implementation
@@ -1157,7 +1343,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     }
 
     /// <summary>
-    /// Creates a DocumentWithoutRevisionsDto from ADMS.API.Entities.Document entity with validation.
+    /// Creates a DocumentWithoutRevisionsDto from ADMS.Domain.Entities.Document entity with validation.
     /// </summary>
     /// <param name="entity">The Document entity to convert. Cannot be null.</param>
     /// <param name="includeActivityUsers">Whether to include activity user collections in the conversion.</param>
@@ -1166,7 +1352,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// <exception cref="ValidationException">Thrown when the resulting DTO fails validation.</exception>
     /// <remarks>
     /// This factory method provides a safe way to create DocumentWithoutRevisionsDto instances from
-    /// ADMS.API.Entities.Document entities with automatic validation and comprehensive error handling.
+    /// ADMS.Domain.Entities.Document entities with automatic validation and comprehensive error handling.
     /// 
     /// <para><strong>Entity Mapping:</strong></para>
     /// Maps all core properties and conditionally includes related collections based on parameters.
@@ -1178,7 +1364,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// <example>
     /// <code>
     /// // Create from entity with activity collections
-    /// var entity = new ADMS.API.Entities.Document 
+    /// var entity = new ADMS.Domain.Entities.Document 
     /// { 
     ///     Id = Guid.NewGuid(),
     ///     FileName = "Contract.pdf",
@@ -1191,7 +1377,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// var dto = DocumentWithoutRevisionsDto.FromEntity(entity, includeActivityUsers: true);
     /// </code>
     /// </example>
-    public static DocumentWithoutRevisionsDto FromEntity([NotNull] Entities.Document entity,
+    public static DocumentWithoutRevisionsDto FromEntity([NotNull] Domain.Entities.Document entity,
                                                        bool includeActivityUsers = false)
     {
         ArgumentNullException.ThrowIfNull(entity);
@@ -1206,6 +1392,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
             Checksum = entity.Checksum,
             IsCheckedOut = entity.IsCheckedOut,
             IsDeleted = entity.IsDeleted,
+            CreationDate = entity.CreatedDate,
             DocumentActivityUsers = includeActivityUsers
                 ? entity.DocumentActivityUsers.Select(dau => new DocumentActivityUserDto
                 {
@@ -1285,7 +1472,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// }
     /// </code>
     /// </example>
-    public static IList<DocumentWithoutRevisionsDto> FromEntities([NotNull] IEnumerable<Entities.Document> entities,
+    public static IList<DocumentWithoutRevisionsDto> FromEntities([NotNull] IEnumerable<Domain.Entities.Document> entities,
                                                                 bool includeActivityUsers = false)
     {
         ArgumentNullException.ThrowIfNull(entities);
@@ -1406,7 +1593,7 @@ public partial class DocumentWithoutRevisionsDto : IValidatableObject, IEquatabl
     /// <returns>true if the specified DocumentWithoutRevisionsDto is equal to the current DocumentWithoutRevisionsDto; otherwise, false.</returns>
     /// <remarks>
     /// Equality is determined by comparing the Id property, as each document has a unique identifier.
-    /// This follows the same equality pattern as ADMS.API.Entities.Document for consistency.
+    /// This follows the same equality pattern as ADMS.Domain.Entities.Document for consistency.
     /// </remarks>
     public bool Equals(DocumentWithoutRevisionsDto? other)
     {
