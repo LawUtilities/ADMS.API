@@ -344,6 +344,7 @@ public static partial class FileValidationHelper
 
     #region MIME Type Validation
 
+    // Primary MIME type validation method
     /// <summary>
     /// Validates a MIME type according to content type and security requirements.
     /// </summary>
@@ -361,7 +362,9 @@ public static partial class FileValidationHelper
     /// <item>Content type consistency</item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<ValidationResult> ValidateMimeType(string? mimeType, [NotNull] string propertyName)
+    public static IEnumerable<ValidationResult> ValidateMimeType(
+        string? mimeType,
+        [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
@@ -711,6 +714,34 @@ public static partial class FileValidationHelper
     }
 
     /// <summary>
+    /// Normalizes a MIME type to a standard format.
+    /// </summary>
+    /// <param name="mimeType">The MIME type to normalize.</param>
+    /// <returns>Normalized MIME type or null if invalid.</returns>
+    /// <remarks>
+    /// Normalization includes:
+    /// <list type="bullet">
+    /// <item>Trimming whitespace</item>
+    /// <item>Lowercasing</item>
+    /// <item>Collapsing multiple slashes</item>
+    /// </list>
+    /// </remarks>
+    [return: NotNullIfNotNull(nameof(mimeType))]
+    public static string? NormalizeMimeType(string? mimeType)
+    {
+        if (string.IsNullOrWhiteSpace(mimeType))
+            return null;
+
+        var trimmed = mimeType.Trim();
+        if (trimmed.Length == 0) return string.Empty;
+
+        // Collapse multiple slashes
+        trimmed = SlashesRegex().Replace(trimmed, "/");
+
+        return trimmed.ToLowerInvariant();
+    }
+
+    /// <summary>
     /// Determines if a file extension represents a legal document format.
     /// </summary>
     /// <param name="extension">The file extension to check.</param>
@@ -887,6 +918,12 @@ public static partial class FileValidationHelper
     /// </summary>
     [GeneratedRegex(@"\.+", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
     private static partial Regex DotsRegex();
+
+    /// <summary>
+    /// Compiled regex for collapsing multiple slashes.
+    /// </summary>
+    [GeneratedRegex(@"//+", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex SlashesRegex();
 
     #endregion Compiled Regex Patterns
 }
