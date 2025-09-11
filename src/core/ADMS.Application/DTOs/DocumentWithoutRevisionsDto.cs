@@ -1415,4 +1415,16 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     private static partial Regex ChecksumRegex();
 
     #endregion Compiled Regular Expressions
+
+    /// <summary>
+    /// Gets a value indicating whether this DTO is valid using quick validation.
+    /// </summary>
+    public bool IsValid =>
+        Id != Guid.Empty &&
+        FileValidationHelper.IsFileNameValid(FileName) &&
+        FileValidationHelper.IsExtensionAllowed(Extension) &&
+        FileValidationHelper.IsFileSizeValid(FileSize) &&
+        FileValidationHelper.IsMimeTypeAllowed(MimeType) &&
+        FileValidationHelper.IsValidChecksum(Checksum) &&
+        CreationDate > FileValidationHelper.MinAllowedRevisionDate;
 }
