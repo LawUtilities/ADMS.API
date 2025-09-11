@@ -679,6 +679,38 @@ public static partial class FileValidationHelper
     }
 
     /// <summary>
+    /// Extension normalization
+    /// </summary>
+    /// <param name="extension">The file extension to normalize.</param>
+    /// <returns>Normalized file extension or null if invalid.</returns>
+    /// <remarks>
+    /// Normalization includes:
+    /// <list type="bullet">
+    /// <item>Trimming whitespace</item>
+    /// <item>Ensuring dot prefix</item>
+    /// <item>Collapsing multiple dots</item>
+    /// </list>
+    /// </remarks>
+    [return: NotNullIfNotNull(nameof(extension))]
+    public static string? NormalizeExtension(string? extension)
+    {
+        if (string.IsNullOrWhiteSpace(extension))
+            return null;
+
+        var trimmed = extension.Trim();
+        if (trimmed.Length == 0) return string.Empty;
+
+        // Ensure it starts with a dot
+        if (!trimmed.StartsWith('.'))
+            trimmed = "." + trimmed;
+
+        // Collapse multiple dots
+        trimmed = DotsRegex().Replace(trimmed, ".");
+
+        return trimmed;
+    }
+
+    /// <summary>
     /// Determines if a file extension represents a legal document format.
     /// </summary>
     /// <param name="extension">The file extension to check.</param>
@@ -849,6 +881,12 @@ public static partial class FileValidationHelper
     /// </summary>
     [GeneratedRegex(@"_+", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
     private static partial Regex MultipleUnderscoresRegex();
+
+    /// <summary>
+    /// Compiled regex for collapsing multiple dots.
+    /// </summary>
+    [GeneratedRegex(@"\.+", RegexOptions.Compiled | RegexOptions.CultureInvariant)]
+    private static partial Regex DotsRegex();
 
     #endregion Compiled Regex Patterns
 }
