@@ -156,6 +156,7 @@ public static partial class FileValidationHelper
 
     #region File Name Validation
 
+    // Primary file name validation method
     /// <summary>
     /// Validates a file name according to professional and system requirements.
     /// </summary>
@@ -173,7 +174,9 @@ public static partial class FileValidationHelper
     /// <item>Security considerations (no script injection)</item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<ValidationResult> ValidateFileName(string? fileName, [NotNull] string propertyName)
+    public static IEnumerable<ValidationResult> ValidateFileName(
+        string? fileName,
+        [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
@@ -797,15 +800,14 @@ public static partial class FileValidationHelper
         if (value.Contains("__"))
             return $"{propertyName} cannot contain multiple consecutive underscores.";
 
-        switch (value.Length)
+        return value.Length switch
         {
-            case > 0 when !char.IsLetterOrDigit(value[0]):
-                return $"{propertyName} must start with a letter or number.";
-            case > 0 when !char.IsLetterOrDigit(value[^1]):
-                return $"{propertyName} must end with a letter or number.";
-        }
-
-        return !FileNameCharacterRegex().IsMatch(value) ? $"{propertyName} can only contain letters, numbers, spaces, hyphens, underscores, periods, and parentheses." : $"{propertyName} contains invalid format.";
+            > 0 when !char.IsLetterOrDigit(value[0]) => $"{propertyName} must start with a letter or number.",
+            > 0 when !char.IsLetterOrDigit(value[^1]) => $"{propertyName} must end with a letter or number.",
+            _ => !FileNameCharacterRegex().IsMatch(value)
+                ? $"{propertyName} can only contain letters, numbers, spaces, hyphens, underscores, periods, and parentheses."
+                : $"{propertyName} contains invalid format."
+        };
     }
 
     #endregion Private Helper Methods
