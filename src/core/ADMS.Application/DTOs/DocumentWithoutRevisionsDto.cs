@@ -740,8 +740,31 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     /// </remarks>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        ArgumentNullException.ThrowIfNull(validationContext);
+        ValidateParameters(validationContext);
+        return ValidateIterator();
+    }
 
+    /// <summary>
+    /// Validates the specified <see cref="ValidationContext"/> to ensure it is not null.
+    /// </summary>
+    /// <param name="validationContext">The context to validate. Must not be <see langword="null"/>.</param>
+    private static void ValidateParameters(ValidationContext validationContext)
+    {
+        ArgumentNullException.ThrowIfNull(validationContext);
+    }
+
+    /// <summary>
+    /// Performs validation on the object and yields a sequence of <see cref="ValidationResult"/> objects representing
+    /// validation errors, if any.
+    /// </summary>
+    /// <remarks>This method performs validation in multiple stages: <list type="number"> <item>Core
+    /// properties validation.</item> <item>Business rules validation.</item> <item>Cross-property validation.</item>
+    /// <item>Collections validation.</item> </list> Each stage contributes to the overall validation results. Callers
+    /// can enumerate the returned sequence to process validation errors as they are discovered.</remarks>
+    /// <returns>An <see cref="IEnumerable{T}"/> of <see cref="ValidationResult"/> objects. Each result represents a validation
+    /// error. If the object passes all validation checks, the sequence will be empty.</returns>
+    private IEnumerable<ValidationResult> ValidateIterator()
+    {
         // 1. Core Properties Validation
         foreach (var result in ValidateCoreProperties())
             yield return result;
@@ -975,6 +998,26 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     }
 
     /// <summary>
+    /// Returns the expected MIME types for a given file extension.
+    /// </summary>
+    /// <param name="extension">The file extension (lowercase, without dot).</param>
+    /// <returns>A list of expected MIME types for the extension.</returns>
+    private static string[] GetExpectedMimeTypesForExtension(string extension)
+    {
+        // This mapping should be extended as needed for your application's supported types.
+        return extension switch
+        {
+            "pdf" => ["application/pdf"],
+            "doc" => ["application/msword"],
+            "docx" => ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
+            "xls" => ["application/vnd.ms-excel"],
+            "xlsx" => ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
+            "txt" => ["text/plain"],
+            _ => []
+        };
+    }
+
+    /// <summary>
     /// Validates checksum using ADMS FileValidationHelper standards.
     /// </summary>
     /// <returns>A collection of validation results for checksum validation.</returns>
@@ -1097,7 +1140,7 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
         if (!string.IsNullOrWhiteSpace(Extension) && !string.IsNullOrWhiteSpace(MimeType))
         {
             var expectedMimeTypes = GetExpectedMimeTypesForExtension(Extension.ToLowerInvariant());
-            if (expectedMimeTypes.Any() && !expectedMimeTypes.Contains(MimeType, StringComparer.OrdinalIgnoreCase))
+            if (expectedMimeTypes.Length > 0 && !expectedMimeTypes.Contains(MimeType, StringComparer.OrdinalIgnoreCase))
             {
                 yield return new ValidationResult(
                     $"MIME type '{MimeType}' does not match the expected types for extension '{Extension}'. " +
@@ -1164,12 +1207,19 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
             else
             {
                 // Cross-reference validation
-                if (activity.DocumentId.HasValue && activity.DocumentId != Id)
+                if (activity.DocumentId != Guid.Empty && activity.DocumentId != Id)
                 {
                     yield return new ValidationResult(
                         $"DocumentActivityUsers[{index}] references incorrect document ID. " +
                         "All activities must be associated with this document.",
                         [$"DocumentActivityUsers[{index}].DocumentId"]);
+                }
+
+                if (activity.UserId == Guid.Empty)
+                {
+                    yield return new ValidationResult(
+                        $"DocumentActivityUsers[{index}] must reference a valid user ID for accountability.",
+                        [$"DocumentActivityUsers[{index}].UserId"]);
                 }
 
                 // Activity timestamp validation
@@ -1405,6 +1455,7 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
                         FileSize = dau.Document.FileSize,
                         MimeType = dau.Document.MimeType,
                         Checksum = dau.Document.Checksum,
+                        CreationDate = entity.CreatedDate,
                         IsCheckedOut = dau.Document.IsCheckedOut,
                         IsDeleted = dau.Document.IsDeleted,
                         DocumentActivityUsers = [],
@@ -1537,52 +1588,6 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     }
 
     #endregion Business Logic Methods
-
-    #region Enhanced ValidateCollection Method
-
-    /// <summary>
-    /// Validates a collection of <see cref="IValidatableObject"/> items with enhanced error handling.
-    /// </summary>
-    /// <typeparam name="T">The type of the collection items.</typeparam>
-    /// <param name="collection">The collection to validate.</param>
-    /// <param name="propertyName">The property name for error reporting.</param>
-    /// <returns>A collection of validation results.</returns>
-    /// <remarks>
-    /// This enhanced validation method provides better error handling and follows the patterns
-    /// established in DtoValidationHelper while maintaining backward compatibility.
-    /// </remarks>
-    private static IEnumerable<ValidationResult> ValidateCollection<T>(ICollection<T> collection, string propertyName)
-    {
-        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
-
-        var index = 0;
-        foreach (var item in collection)
-        {
-            switch (item)
-            {
-                case null:
-                    yield return new ValidationResult($"{propertyName}[{index}] is null.", [$"{propertyName}[{index}]"]);
-                    break;
-                case IValidatableObject validatable:
-                    {
-                        var context = new ValidationContext(item);
-                        foreach (var result in validatable.Validate(context))
-                        {
-                            var memberNames = result.MemberNames.Any()
-                                ? result.MemberNames.Select(memberName => $"{propertyName}[{index}].{memberName}")
-                                : [$"{propertyName}[{index}]"];
-
-                            yield return new ValidationResult($"{propertyName}[{index}]: {result.ErrorMessage}", memberNames);
-                        }
-                        break;
-                    }
-            }
-
-            index++;
-        }
-    }
-
-    #endregion Enhanced ValidateCollection Method
 
     #region Equality and Comparison
 
