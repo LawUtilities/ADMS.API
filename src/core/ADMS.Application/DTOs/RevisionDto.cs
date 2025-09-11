@@ -1,1005 +1,672 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
+using ADMS.Application.Common.Validation;
 
 namespace ADMS.Application.DTOs;
 
 /// <summary>
-/// Comprehensive Document Revision Data Transfer Object representing a complete revision with all associated audit trail data.
+/// Comprehensive Document Revision Data Transfer Object with streamlined validation and professional version control capabilities.
 /// </summary>
 /// <remarks>
 /// This DTO serves as the complete representation of a document revision within the ADMS legal document management system,
-/// including all audit trail associations and activity relationships. It mirrors the structure of 
-/// <see cref="ADMS.API.Entities.Revision"/> while providing comprehensive validation and computed properties
-/// for client-side operations and audit trail display.
+/// using the standardized BaseValidationDto validation framework for consistency with other DTOs.
 /// 
-/// <para><strong>Key Characteristics:</strong></para>
+/// <para><strong>Key Features:</strong></para>
 /// <list type="bullet">
-/// <item><strong>Complete Entity Representation:</strong> Mirrors all properties and relationships from ADMS.API.Entities.Revision</item>
-/// <item><strong>Audit Trail Integration:</strong> Includes comprehensive audit trail associations for legal compliance</item>
-/// <item><strong>Professional Validation:</strong> Uses ADMS.API.Common.RevisionValidationHelper for data integrity</item>
-/// <item><strong>Computed Properties:</strong> Client-optimized properties for UI display and business logic</item>
-/// <item><strong>Collection Validation:</strong> Deep validation of audit trail collections using DtoValidationHelper</item>
+/// <item><strong>Streamlined Validation:</strong> Uses BaseValidationDto for consistent validation patterns</item>
+/// <item><strong>Professional Version Control:</strong> Sequential numbering and temporal consistency</item>
+/// <item><strong>Audit Trail Integration:</strong> Complete activity tracking for legal compliance</item>
+/// <item><strong>Document Association:</strong> Optional parent document context for cross-document scenarios</item>
+/// <item><strong>Legal Compliance:</strong> Comprehensive audit trail support for legal requirements</item>
 /// </list>
 /// 
-/// <para><strong>Entity Relationship Mirror:</strong></para>
-/// This DTO maintains the same relationship structure as ADMS.API.Entities.Revision:
-/// <list type="bullet">
-/// <item><strong>RevisionActivityUsers:</strong> Complete audit trail of user activities on this revision</item>
-/// <item><strong>Document Association:</strong> Optional document context when needed for cross-document scenarios</item>
-/// <item><strong>Version Control:</strong> Sequential revision numbering and temporal tracking</item>
-/// </list>
-/// 
-/// <para><strong>Usage Scenarios:</strong></para>
-/// <list type="bullet">
-/// <item><strong>API Responses:</strong> Complete revision data including all audit trail relationships</item>
-/// <item><strong>Revision Management:</strong> Comprehensive revision administration and lifecycle operations</item>
-/// <item><strong>Audit Trail Display:</strong> Full revision activity history and user attribution</item>
-/// <item><strong>Reporting:</strong> Revision-based reporting and analytics with complete context</item>
-/// <item><strong>Version Control:</strong> Complete version control operations and history display</item>
-/// </list>
-/// 
-/// <para><strong>Professional Legal Practice Support:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Version Control Integrity:</strong> Complete revision history with sequential numbering</item>
-/// <item><strong>Audit Compliance:</strong> Comprehensive audit trail relationships for legal compliance</item>
-/// <item><strong>Temporal Tracking:</strong> Precise temporal data for legal document chronology</item>
-/// <item><strong>User Attribution:</strong> Complete user accountability for all revision operations</item>
-/// </list>
-/// 
-/// <para><strong>Performance Considerations:</strong></para>
-/// <list type="bullet">
-/// <item><strong>Lazy Loading Support:</strong> Audit collections can be populated on-demand</item>
-/// <item><strong>Selective Loading:</strong> Individual audit collections can be loaded independently</item>
-/// <item><strong>Computed Properties:</strong> Cached computed values for frequently accessed calculations</item>
-/// <item><strong>Validation Optimization:</strong> Efficient validation using centralized helpers</item>
+/// <para><strong>Validation Hierarchy:</strong></para>
+/// <list type="number">
+/// <item><strong>Core Properties:</strong> Revision number, dates, and GUID validation using helpers</item>
+/// <item><strong>Business Rules:</strong> Version control consistency, professional standards, and audit requirements</item>
+/// <item><strong>Cross-Property:</strong> Date sequence validation and document association consistency</item>
+/// <item><strong>Collections:</strong> Deep validation of audit trail collections with detailed error contexts</item>
 /// </list>
 /// </remarks>
-/// <example>
-/// <code>
-/// // Creating a comprehensive revision DTO
-/// var revisionDto = new RevisionDto
-/// {
-///     Id = Guid.NewGuid(),
-///     RevisionNumber = 2,
-///     DocumentId = documentId,
-///     CreationDate = DateTime.UtcNow,
-///     ModificationDate = DateTime.UtcNow,
-///     IsDeleted = false
-/// };
-/// 
-/// // Validating the complete revision DTO
-/// var validationResults = RevisionDto.ValidateModel(revisionDto);
-/// if (validationResults.Any())
-/// {
-///     foreach (var result in validationResults)
-///     {
-///         Console.WriteLine($"Validation Error: {result.ErrorMessage}");
-///     }
-/// }
-/// 
-/// // Using computed properties
-/// var activityCount = revisionDto.ActivityCount;
-/// var hasAuditTrail = revisionDto.HasActivities;
-/// var displayText = revisionDto.DisplayText;
-/// </code>
-/// </example>
-public class RevisionDto : IValidatableObject, IEquatable<RevisionDto>
+public sealed class RevisionDto : BaseValidationDto, IEquatable<RevisionDto>, IComparable<RevisionDto>
 {
     #region Core Properties
 
     /// <summary>
-    /// Gets or sets the unique identifier for the revision.
+    /// Gets the unique identifier for this revision within the ADMS legal document management system.
     /// </summary>
-    /// <remarks>
-    /// This GUID serves as the primary key and uniquely identifies the revision within the ADMS system.
-    /// The ID corresponds directly to the <see cref="ADMS.API.Entities.Revision.Id"/> property and is
-    /// used for database operations, API calls, and system references.
-    /// 
-    /// <para><strong>Usage Considerations:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Optional for Creation:</strong> Can be null when creating new revisions</item>
-    /// <item><strong>Required for Updates:</strong> Must be provided when updating existing revisions</item>
-    /// <item><strong>Database Operations:</strong> Primary key for revision-related database queries</item>
-    /// <item><strong>API Operations:</strong> Revision identification in REST API operations</item>
-    /// <item><strong>Audit Trail References:</strong> Used in audit trail and activity records</item>
-    /// </list>
-    /// 
-    /// <para><strong>Entity Alignment:</strong></para>
-    /// This property mirrors <see cref="ADMS.API.Entities.Revision.Id"/> with identical behavior,
-    /// ensuring consistency between entity and DTO representations.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // For existing revisions
-    /// var existingRevision = new RevisionDto 
-    /// { 
-    ///     Id = Guid.Parse("12345678-1234-5678-9012-123456789012"),
-    ///     RevisionNumber = 3 
-    /// };
-    /// 
-    /// // For new revisions (ID will be generated by database)
-    /// var newRevision = new RevisionDto 
-    /// { 
-    ///     Id = null,
-    ///     RevisionNumber = 1 
-    /// };
-    /// </code>
-    /// </example>
-    public Guid? Id { get; set; }
+    [Required(ErrorMessage = "Revision ID is required for system identification and operations.")]
+    public required Guid Id { get; init; }
 
     /// <summary>
-    /// Gets or sets the revision number for the document.
+    /// Gets the sequential revision number representing the document version.
     /// </summary>
-    /// <remarks>
-    /// The revision number represents the sequential version of the document, corresponding to
-    /// <see cref="ADMS.API.Entities.Revision.RevisionNumber"/>. This numbering system ensures 
-    /// clear version identification with chronological order and proper sequencing.
-    /// 
-    /// <para><strong>Versioning Rules (via ADMS.API.Common.RevisionValidationHelper):</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Range:</strong> 1 to 999,999 (following legal document versioning standards)</item>
-    /// <item><strong>Sequential:</strong> Must be sequential within document scope</item>
-    /// <item><strong>No Gaps:</strong> Version control maintains continuous numbering</item>
-    /// <item><strong>Unique:</strong> Revision numbers are unique within each document</item>
-    /// </list>
-    /// 
-    /// <para><strong>UI Display Scenarios:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Version History:</strong> "Revision 3" in document version lists</item>
-    /// <item><strong>Comparison Views:</strong> "Compare Revision 2 to Revision 3"</item>
-    /// <item><strong>Rollback Operations:</strong> "Rollback to Revision 2"</item>
-    /// <item><strong>Audit Trails:</strong> "User created Revision 1 at [timestamp]"</item>
-    /// </list>
-    /// 
-    /// <para><strong>Business Logic Integration:</strong></para>
-    /// Used for sorting, ordering, and version comparison operations throughout the system.
-    /// Essential for maintaining proper document version control integrity.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Sequential revision examples
-    /// var revision1 = new RevisionDto { RevisionNumber = 1 }; // First revision
-    /// var revision2 = new RevisionDto { RevisionNumber = 2 }; // Second revision
-    /// var revision3 = new RevisionDto { RevisionNumber = 3 }; // Third revision
-    /// 
-    /// // Version comparison and sorting
-    /// var sortedRevisions = revisions.OrderByDescending(r => r.RevisionNumber);
-    /// </code>
-    /// </example>
-    [Required(ErrorMessage = "Revision number is required.")]
-    [Range(1, 999999,
-        ErrorMessage = "Revision number must be between 1 and 999999.")]
-    public required int RevisionNumber { get; set; }
+    [Required(ErrorMessage = "Revision number is required for version control.")]
+    [Range(RevisionValidationHelper.MinRevisionNumber, RevisionValidationHelper.MaxRevisionNumber,
+        ErrorMessage = "Revision number must be between {1} and {2} for version control consistency.")]
+    public required int RevisionNumber { get; init; }
 
     /// <summary>
-    /// Gets or sets the creation date for the revision (in UTC).
+    /// Gets the creation date for the revision (stored in UTC).
     /// </summary>
-    /// <remarks>
-    /// The creation date represents when the revision was initially created in the system,
-    /// corresponding to <see cref="ADMS.API.Entities.Revision.CreationDate"/>. All dates are 
-    /// stored in UTC to ensure consistency across different time zones and support accurate 
-    /// temporal tracking for legal compliance.
-    /// 
-    /// <para><strong>Date Requirements (via ADMS.API.Common.RevisionValidationHelper):</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>UTC Storage:</strong> Must be stored in UTC format for consistency</item>
-    /// <item><strong>Valid Range:</strong> Between January 1, 1980 and current time (with tolerance)</item>
-    /// <item><strong>Temporal Consistency:</strong> Must precede or equal the ModificationDate</item>
-    /// <item><strong>Legal Compliance:</strong> Supports legal document chronology requirements</item>
-    /// </list>
-    /// 
-    /// <para><strong>Legal Significance:</strong></para>
-    /// The creation date establishes when document versions were created for legal timelines,
-    /// chronological order for audit trails, and evidence for document development history.
-    /// Critical for legal compliance and audit requirements.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Creating revision with UTC timestamps
-    /// var revision = new RevisionDto
-    /// {
-    ///     RevisionNumber = 1,
-    ///     CreationDate = DateTime.UtcNow,
-    ///     ModificationDate = DateTime.UtcNow
-    /// };
-    /// 
-    /// // Display formatting for UI
-    /// var displayText = $"Created: {revision.LocalCreationDateString}";
-    /// </code>
-    /// </example>
-    [Required(ErrorMessage = "Creation date is required.")]
-    public DateTime CreationDate { get; set; } = DateTime.UtcNow;
+    [Required(ErrorMessage = "Creation date is required for temporal tracking and audit compliance.")]
+    public required DateTime CreationDate { get; init; }
 
     /// <summary>
-    /// Gets or sets the modification date for the revision (in UTC).
+    /// Gets the modification date for the revision (stored in UTC).
     /// </summary>
-    /// <remarks>
-    /// The modification date represents when the revision was last modified or updated,
-    /// corresponding to <see cref="ADMS.API.Entities.Revision.ModificationDate"/>. This date 
-    /// must be greater than or equal to the creation date and follows UTC storage requirements.
-    /// 
-    /// <para><strong>Date Requirements (via ADMS.API.Common.RevisionValidationHelper):</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>UTC Storage:</strong> Must be stored in UTC format for consistency</item>
-    /// <item><strong>Chronological Order:</strong> Must be >= CreationDate</item>
-    /// <item><strong>Valid Range:</strong> Between January 1, 1980 and current time (with tolerance)</item>
-    /// <item><strong>Update Tracking:</strong> Updated whenever revision content or metadata changes</item>
-    /// </list>
-    /// 
-    /// <para><strong>Business Logic Integration:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Change Tracking:</strong> Tracks when changes were made to revision content</item>
-    /// <item><strong>Temporal Analysis:</strong> Establishes chronological order for audit purposes</item>
-    /// <item><strong>Version Comparison:</strong> Supports version comparison and change analysis</item>
-    /// <item><strong>Audit Compliance:</strong> Provides timestamps for legal document modification tracking</item>
-    /// </list>
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Revision with modification tracking
-    /// var revision = new RevisionDto
-    /// {
-    ///     RevisionNumber = 2,
-    ///     CreationDate = DateTime.UtcNow.AddHours(-1),
-    ///     ModificationDate = DateTime.UtcNow // Updated later
-    /// };
-    /// 
-    /// // Time span analysis
-    /// var developmentTime = revision.ModificationTimeSpan;
-    /// </code>
-    /// </example>
-    [Required(ErrorMessage = "Modification date is required.")]
-    public DateTime ModificationDate { get; set; } = DateTime.UtcNow;
+    [Required(ErrorMessage = "Modification date is required for change tracking and audit compliance.")]
+    public required DateTime ModificationDate { get; init; }
 
     /// <summary>
-    /// Gets or sets the document ID associated with this revision.
+    /// Gets the document ID associated with this revision for cross-document scenarios.
     /// </summary>
-    /// <remarks>
-    /// This optional property establishes the relationship between the revision and its parent document,
-    /// corresponding to <see cref="ADMS.API.Entities.Revision.DocumentId"/>. While not always needed 
-    /// in all scenarios, it provides essential context when revisions are displayed outside of their 
-    /// document context or when document association is required for operations.
-    /// 
-    /// <para><strong>Usage Scenarios:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Cross-Document Views:</strong> When displaying revisions from multiple documents</item>
-    /// <item><strong>Search Results:</strong> Revision search results showing parent document association</item>
-    /// <item><strong>API Operations:</strong> When document context is needed for revision operations</item>
-    /// <item><strong>Navigation:</strong> Enabling navigation from revision back to parent document</item>
-    /// <item><strong>Audit Reporting:</strong> Document-centric audit reports including revision data</item>
-    /// </list>
-    /// 
-    /// <para><strong>Entity Alignment:</strong></para>
-    /// When provided, this property must reference a valid existing document ID and follows
-    /// the same validation rules as the corresponding entity property.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Revision with document association for cross-document scenarios
-    /// var revisionWithDocument = new RevisionDto
-    /// {
-    ///     Id = Guid.NewGuid(),
-    ///     RevisionNumber = 2,
-    ///     DocumentId = Guid.Parse("87654321-4321-8765-2109-876543210987"),
-    ///     CreationDate = DateTime.UtcNow,
-    ///     ModificationDate = DateTime.UtcNow
-    /// };
-    /// 
-    /// // Navigation usage
-    /// if (revision.DocumentId.HasValue)
-    /// {
-    ///     var document = await documentService.GetByIdAsync(revision.DocumentId.Value);
-    /// }
-    /// </code>
-    /// </example>
-    public Guid? DocumentId { get; set; }
+    public Guid? DocumentId { get; init; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the revision is deleted.
+    /// Gets a value indicating whether the revision has been soft-deleted.
     /// </summary>
-    /// <remarks>
-    /// This property implements soft deletion for the revision, corresponding to
-    /// <see cref="ADMS.API.Entities.Revision.IsDeleted"/>. Soft deletion allows the revision 
-    /// to be marked as deleted while preserving all data for audit trail and legal compliance 
-    /// purposes, which is critical in legal document management.
-    /// 
-    /// <para><strong>Soft Deletion Benefits:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Audit Trail Preservation:</strong> Maintains complete audit trail for legal compliance</item>
-    /// <item><strong>Referential Integrity:</strong> Preserves relationships with audit and activity records</item>
-    /// <item><strong>Recovery Operations:</strong> Enables restoration if deletion was accidental</item>
-    /// <item><strong>Historical Reporting:</strong> Supports historical reporting and analysis</item>
-    /// </list>
-    /// 
-    /// <para><strong>Business Rules:</strong></para>
-    /// <list type="bullet">
-    /// <item>Deleted revisions are typically filtered from normal operations</item>
-    /// <item>Deletion status is tracked through revision activity audit entries</item>
-    /// <item>Restoration operations can reverse soft deletion</item>
-    /// <item>Administrative users may view and manage deleted revisions</item>
-    /// </list>
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Active revision
-    /// var activeRevision = new RevisionDto 
-    /// { 
-    ///     RevisionNumber = 1, 
-    ///     IsDeleted = false 
-    /// };
-    /// 
-    /// // Filtering active revisions
-    /// var activeRevisions = revisions.Where(r => !r.IsDeleted).ToList();
-    /// 
-    /// // Deleted revision for administrative view
-    /// var deletedRevision = new RevisionDto 
-    /// { 
-    ///     RevisionNumber = 2, 
-    ///     IsDeleted = true 
-    /// };
-    /// </code>
-    /// </example>
-    public bool IsDeleted { get; set; }
+    public bool IsDeleted { get; init; }
 
     #endregion Core Properties
 
-    #region Audit Trail Collections
+    #region Navigation Properties
 
     /// <summary>
-    /// Gets or sets the collection of revision activity user associations for this revision.
+    /// Gets the collection of revision activity user associations for this revision.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Revision.RevisionActivityUsers"/> and maintains
-    /// the many-to-many relationship between revisions, activities, and users, providing a comprehensive 
-    /// audit trail of all actions performed on this revision.
-    /// 
-    /// <para><strong>Activity Types Tracked:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>CREATED:</strong> User created this revision</item>
-    /// <item><strong>SAVED:</strong> User saved changes to this revision</item>
-    /// <item><strong>DELETED:</strong> User deleted this revision</item>
-    /// <item><strong>RESTORED:</strong> User restored this deleted revision</item>
-    /// </list>
-    /// 
-    /// <para><strong>Audit Trail Significance:</strong></para>
-    /// Each association provides:
-    /// <list type="bullet">
-    /// <item><strong>User Attribution:</strong> Complete user accountability for revision operations</item>
-    /// <item><strong>Timestamp Tracking:</strong> Precise temporal tracking for audit chronology</item>
-    /// <item><strong>Activity Classification:</strong> Categorization of operations for audit analysis</item>
-    /// <item><strong>Legal Compliance:</strong> Complete audit trail for legal and regulatory requirements</item>
-    /// </list>
-    /// 
-    /// <para><strong>DTO Composition:</strong></para>
-    /// Contains <see cref="RevisionActivityUserDto"/> instances that include complete revision, activity,
-    /// and user information for comprehensive audit trail presentation and analysis.
-    /// 
-    /// <para><strong>Performance Considerations:</strong></para>
-    /// This collection can be populated on-demand or selectively loaded based on specific audit 
-    /// trail display requirements to optimize performance for large revision histories.
+    /// Contains audit trail entries for all activities performed on this revision,
+    /// including CREATED, SAVED, DELETED, and RESTORED operations with user attribution.
     /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Accessing revision audit trail
-    /// foreach (var activity in revision.RevisionActivityUsers)
-    /// {
-    ///     Console.WriteLine($"User {activity.User?.Name} performed {activity.RevisionActivity?.Activity} " +
-    ///                      $"on revision {revision.RevisionNumber} at {activity.CreatedAt}");
-    /// }
-    /// 
-    /// // Finding who created this revision
-    /// var creator = revision.RevisionActivityUsers
-    ///     .FirstOrDefault(ra => ra.RevisionActivity?.Activity == "CREATED")?.User;
-    /// 
-    /// // Getting revision activity timeline
-    /// var timeline = revision.RevisionActivityUsers
-    ///     .OrderBy(ra => ra.CreatedAt)
-    ///     .Select(ra => new { 
-    ///         Timestamp = ra.CreatedAt, 
-    ///         Activity = ra.RevisionActivity?.Activity, 
-    ///         User = ra.User?.Name 
-    ///     });
-    /// </code>
-    /// </example>
-    public ICollection<RevisionActivityUserDto> RevisionActivityUsers { get; set; } = new List<RevisionActivityUserDto>();
+    public ICollection<RevisionActivityUserDto> RevisionActivityUsers { get; init; } = [];
 
-    #endregion Audit Trail Collections
+    #endregion Navigation Properties
 
     #region Computed Properties
 
     /// <summary>
-    /// Gets the creation date formatted as a localized string for UI display.
+    /// Gets the creation date formatted for local display.
     /// </summary>
-    /// <remarks>
-    /// This computed property provides a user-friendly formatted representation of the creation date
-    /// converted to local time, suitable for display in user interfaces and reports.
-    /// 
-    /// <para><strong>Format:</strong></para>
-    /// Uses "dddd, dd MMMM yyyy HH:mm:ss" format (e.g., "Monday, 15 January 2024 14:30:45")
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var revision = new RevisionDto 
-    /// { 
-    ///     CreationDate = new DateTime(2024, 1, 15, 14, 30, 45, DateTimeKind.Utc) 
-    /// };
-    /// 
-    /// // Display in UI
-    /// label.Text = $"Created: {revision.LocalCreationDateString}";
-    /// // Output: "Created: Monday, 15 January 2024 16:30:45" (if local time is UTC+2)
-    /// </code>
-    /// </example>
-    public string LocalCreationDateString => CreationDate.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss");
+    public string LocalCreationDateString => CreationDate.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>
-    /// Gets the modification date formatted as a localized string for UI display.
+    /// Gets the modification date formatted for local display.
     /// </summary>
-    /// <remarks>
-    /// This computed property provides a user-friendly formatted representation of the modification date
-    /// converted to local time, suitable for display in user interfaces and reports.
-    /// 
-    /// <para><strong>Format:</strong></para>
-    /// Uses "dddd, dd MMMM yyyy HH:mm:ss" format (e.g., "Monday, 15 January 2024 14:30:45")
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var revision = new RevisionDto 
-    /// { 
-    ///     ModificationDate = new DateTime(2024, 1, 15, 16, 45, 30, DateTimeKind.Utc) 
-    /// };
-    /// 
-    /// // Display in UI
-    /// label.Text = $"Last Modified: {revision.LocalModificationDateString}";
-    /// // Output: "Last Modified: Monday, 15 January 2024 18:45:30" (if local time is UTC+2)
-    /// </code>
-    /// </example>
-    public string LocalModificationDateString => ModificationDate.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss");
+    public string LocalModificationDateString => ModificationDate.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Gets the time span between creation and modification dates.
     /// </summary>
-    /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Revision.ModificationTimeSpan"/> and
-    /// calculates the duration between when the revision was created and when it was last modified,
-    /// providing insight into revision development time and modification patterns.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (revision.ModificationTimeSpan.TotalMinutes > 30)
-    /// {
-    ///     Console.WriteLine($"Revision {revision.RevisionNumber} was modified " +
-    ///                      $"{revision.ModificationTimeSpan.TotalMinutes:F0} minutes after creation");
-    /// }
-    /// </code>
-    /// </example>
     public TimeSpan ModificationTimeSpan => ModificationDate - CreationDate;
 
     /// <summary>
-    /// Gets a value indicating whether this revision has any recorded activities.
+    /// Gets a value indicating whether this revision has recorded activities.
     /// </summary>
-    /// <remarks>
-    /// This property mirrors <see cref="ADMS.API.Entities.Revision.HasActivities"/> and is useful 
-    /// for determining audit trail completeness and ensuring that revisions have proper activity tracking.
-    /// 
-    /// <para><strong>Usage Scenarios:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>Audit Trail Validation:</strong> Ensuring complete audit trail coverage</item>
-    /// <item><strong>Data Integrity Verification:</strong> Identifying revisions missing activity records</item>
-    /// <item><strong>Reporting:</strong> Activity coverage analysis for compliance reporting</item>
-    /// <item><strong>Administrative Views:</strong> Highlighting revisions requiring audit attention</item>
-    /// </list>
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (!revision.HasActivities)
-    /// {
-    ///     // Log potential audit trail gap
-    ///     logger.LogWarning($"Revision {revision.Id} has no activity records");
-    /// }
-    /// 
-    /// // Filter revisions with complete audit trails
-    /// var auditedRevisions = revisions.Where(r => r.HasActivities).ToList();
-    /// </code>
-    /// </example>
     public bool HasActivities => RevisionActivityUsers.Count > 0;
 
     /// <summary>
     /// Gets the total count of activities recorded for this revision.
     /// </summary>
-    /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Revision.ActivityCount"/> and provides
-    /// insight into the level of activity associated with this revision, useful for activity monitoring,
-    /// audit analysis, and understanding revision lifecycle complexity.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// Console.WriteLine($"Revision {revision.RevisionNumber} has {revision.ActivityCount} recorded activities");
-    /// 
-    /// // Finding most active revisions
-    /// var mostActiveRevisions = revisions
-    ///     .OrderByDescending(r => r.ActivityCount)
-    ///     .Take(10);
-    /// </code>
-    /// </example>
     public int ActivityCount => RevisionActivityUsers.Count;
 
     /// <summary>
-    /// Gets a value indicating whether this revision DTO has valid data for system operations.
+    /// Gets a value indicating whether this revision DTO has valid data using quick validation.
     /// </summary>
-    /// <remarks>
-    /// This property provides a quick validation check without running full validation logic,
-    /// useful for UI scenarios where immediate feedback is needed.
-    /// 
-    /// <para><strong>Validation Checks:</strong></para>
-    /// <list type="bullet">
-    /// <item>Revision number is within valid bounds</item>
-    /// <item>Both creation and modification dates are valid</item>
-    /// <item>Date sequence is chronologically correct</item>
-    /// <item>Document ID is valid (if provided)</item>
-    /// <item>Time span between dates is reasonable</item>
-    /// </list>
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// if (revision.IsValid)
-    /// {
-    ///     // Proceed with business operations
-    ///     ProcessRevision(revision);
-    /// }
-    /// else
-    /// {
-    ///     // Show validation errors to user
-    ///     DisplayValidationErrors(revision);
-    /// }
-    /// </code>
-    /// </example>
     public bool IsValid =>
+        RevisionValidationHelper.IsValidRevisionId(Id) &&
         RevisionValidationHelper.IsValidRevisionNumber(RevisionNumber) &&
         RevisionValidationHelper.IsValidDate(CreationDate) &&
         RevisionValidationHelper.IsValidDate(ModificationDate) &&
         RevisionValidationHelper.IsValidDateSequence(CreationDate, ModificationDate) &&
-        (DocumentId == null || RevisionValidationHelper.IsValidDocumentId(DocumentId.Value)) &&
-        RevisionValidationHelper.IsValidDateTimeSpan(CreationDate, ModificationDate);
+        (DocumentId == null || RevisionValidationHelper.IsValidDocumentId(DocumentId.Value));
 
     /// <summary>
-    /// Gets the display text suitable for UI controls and revision identification.
+    /// Gets the display text for UI controls and revision identification.
     /// </summary>
-    /// <remarks>
-    /// Provides a consistent format for displaying revision information in UI elements,
-    /// combining revision number with creation date for clear identification.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var revision = new RevisionDto { RevisionNumber = 3, CreationDate = DateTime.UtcNow };
-    /// var displayText = revision.DisplayText; // Returns "Revision 3 (Created: [date])"
-    /// 
-    /// // UI usage
-    /// revisionDropdown.Items.Add(new ListItem(revision.DisplayText, revision.Id.ToString()));
-    /// </code>
-    /// </example>
     public string DisplayText => $"Revision {RevisionNumber} (Created: {LocalCreationDateString})";
 
     /// <summary>
-    /// Gets a shorter display text for compact UI scenarios.
+    /// Gets compact display text for space-limited UI scenarios.
     /// </summary>
-    /// <remarks>
-    /// Provides a compact representation for scenarios where space is limited,
-    /// such as dropdown lists or table cells.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var compactText = revision.CompactDisplayText; // Returns "Rev. 3"
-    /// tableCell.Text = compactText;
-    /// </code>
-    /// </example>
     public string CompactDisplayText => $"Rev. {RevisionNumber}";
+
+    /// <summary>
+    /// Gets the age of this revision since creation.
+    /// </summary>
+    public TimeSpan RevisionAge => DateTime.UtcNow - CreationDate;
 
     #endregion Computed Properties
 
-    #region Validation Implementation
+    #region BaseValidationDto Implementation
 
     /// <summary>
-    /// Validates the <see cref="RevisionDto"/> for data integrity and business rules compliance.
+    /// Validates core revision properties using ADMS validation helpers.
     /// </summary>
-    /// <param name="validationContext">The context information about the validation operation.</param>
-    /// <returns>A collection of validation results indicating any validation failures.</returns>
-    /// <remarks>
-    /// Performs comprehensive validation using the ADMS.API.Common.RevisionValidationHelper for consistency 
-    /// with entity validation rules. This ensures the DTO maintains the same validation standards as 
-    /// the corresponding ADMS.API.Entities.Revision entity.
-    /// 
-    /// <para><strong>Validation Categories:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>ID Validation:</strong> Ensures valid revision ID when provided</item>
-    /// <item><strong>Revision Number Validation:</strong> Sequential numbering and bounds checking</item>
-    /// <item><strong>Date Validation:</strong> Individual date validation and temporal consistency</item>
-    /// <item><strong>Business Rules:</strong> Chronological order and business logic compliance</item>
-    /// <item><strong>Collection Validation:</strong> Deep validation of audit trail collections</item>
-    /// </list>
-    /// 
-    /// <para><strong>Integration with Validation Helpers:</strong></para>
-    /// Uses centralized validation helpers (RevisionValidationHelper, DtoValidationHelper) to ensure
-    /// consistency across all revision-related validation in the system.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new RevisionDto 
-    /// { 
-    ///     RevisionNumber = 0, // Invalid
-    ///     CreationDate = DateTime.MinValue // Invalid
-    /// };
-    /// 
-    /// var context = new ValidationContext(dto);
-    /// var results = dto.Validate(context);
-    /// 
-    /// foreach (var result in results)
-    /// {
-    ///     Console.WriteLine($"Validation Error: {result.ErrorMessage}");
-    /// }
-    /// </code>
-    /// </example>
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    protected override IEnumerable<ValidationResult> ValidateCoreProperties()
     {
-        // Validate revision ID if provided
-        foreach (var result in ValidateRevisionId())
+        // Validate revision ID
+        foreach (var result in ValidateGuid(Id, nameof(Id)))
             yield return result;
 
-        // Validate revision number
-        foreach (var result in ValidateRevisionNumber())
+        // Validate revision number using RevisionValidationHelper
+        foreach (var result in RevisionValidationHelper.ValidateRevisionNumber(RevisionNumber, nameof(RevisionNumber)))
             yield return result;
 
-        // Validate document association if provided
-        foreach (var result in ValidateDocumentId())
+        // Validate creation date using RevisionValidationHelper
+        foreach (var result in RevisionValidationHelper.ValidateDate(CreationDate, nameof(CreationDate)))
             yield return result;
 
-        // Validate individual dates
-        foreach (var result in ValidateCreationDate())
+        // Validate modification date using RevisionValidationHelper
+        foreach (var result in RevisionValidationHelper.ValidateDate(ModificationDate, nameof(ModificationDate)))
             yield return result;
 
-        foreach (var result in ValidateModificationDate())
-            yield return result;
-
-        // Validate date sequence and business rules
-        foreach (var result in ValidateDateSequence())
-            yield return result;
-
-        // Validate time span reasonableness
-        foreach (var result in ValidateTimeSpan())
-            yield return result;
-
-        // Validate audit trail collections using centralized helper
-        foreach (var result in DtoValidationHelper.ValidateCollection(RevisionActivityUsers, nameof(RevisionActivityUsers)))
-            yield return result;
-    }
-
-    /// <summary>
-    /// Validates the <see cref="Id"/> property using ADMS validation standards.
-    /// </summary>
-    /// <returns>A collection of validation results for the revision ID.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.RevisionValidationHelper for consistent validation when ID is provided.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateRevisionId()
-    {
-        return Id.HasValue ? RevisionValidationHelper.ValidateRevisionId(Id.Value, nameof(Id)) : [];
-    }
-
-    /// <summary>
-    /// Validates the <see cref="RevisionNumber"/> property using ADMS validation standards.
-    /// </summary>
-    /// <returns>A collection of validation results for the revision number.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.RevisionValidationHelper.ValidateRevisionNumber for consistent validation
-    /// across all revision-related DTOs and entities.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateRevisionNumber()
-    {
-        return RevisionValidationHelper.ValidateRevisionNumber(RevisionNumber, nameof(RevisionNumber));
-    }
-
-    /// <summary>
-    /// Validates the <see cref="DocumentId"/> property if provided.
-    /// </summary>
-    /// <returns>A collection of validation results for the document ID.</returns>
-    /// <remarks>
-    /// When DocumentId is provided, validates it to ensure it represents a valid document identifier.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateDocumentId()
-    {
+        // Validate document ID if provided
         if (!DocumentId.HasValue) yield break;
-        if (DocumentId.Value != Guid.Empty) yield break;
-        yield return new ValidationResult(
-            "DocumentId must be a valid non-empty GUID when provided.",
-            [nameof(DocumentId)]);
+        foreach (var result in RevisionValidationHelper.ValidateDocumentId(DocumentId.Value, nameof(DocumentId)))
+            yield return result;
     }
 
     /// <summary>
-    /// Validates the <see cref="CreationDate"/> property using ADMS validation standards.
+    /// Validates revision business rules and professional standards.
     /// </summary>
-    /// <returns>A collection of validation results for the creation date.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.RevisionValidationHelper.ValidateDate for consistent validation
-    /// across all revision-related DTOs and entities.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateCreationDate()
+    protected override IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        return RevisionValidationHelper.ValidateDate(CreationDate, nameof(CreationDate));
-    }
+        // Comprehensive business rule validation
+        foreach (var result in RevisionValidationHelper.ValidateRevisionBusinessRules(
+            RevisionNumber, CreationDate, ModificationDate, DocumentId, IsDeleted))
+            yield return result;
 
-    /// <summary>
-    /// Validates the <see cref="ModificationDate"/> property using ADMS validation standards.
-    /// </summary>
-    /// <returns>A collection of validation results for the modification date.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.RevisionValidationHelper.ValidateDate for consistent validation
-    /// across all revision-related DTOs and entities.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateModificationDate()
-    {
-        return RevisionValidationHelper.ValidateDate(ModificationDate, nameof(ModificationDate));
-    }
-
-    /// <summary>
-    /// Validates the chronological sequence of creation and modification dates.
-    /// </summary>
-    /// <returns>A collection of validation results for date sequence validation.</returns>
-    /// <remarks>
-    /// Uses ADMS.API.Common.RevisionValidationHelper.ValidateDateSequence to ensure
-    /// modification date is not before creation date.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateDateSequence()
-    {
-        return RevisionValidationHelper.ValidateDateSequence(
-            CreationDate, ModificationDate, nameof(CreationDate), nameof(ModificationDate));
-    }
-
-    /// <summary>
-    /// Validates that the time span between creation and modification dates is reasonable.
-    /// </summary>
-    /// <returns>A collection of validation results for time span validation.</returns>
-    /// <remarks>
-    /// Ensures the time span between creation and modification dates is within reasonable
-    /// bounds to detect potential data corruption or incorrect timestamps.
-    /// </remarks>
-    private IEnumerable<ValidationResult> ValidateTimeSpan()
-    {
-        if (RevisionValidationHelper.IsValidDateTimeSpan(CreationDate, ModificationDate)) yield break;
-        var span = ModificationDate - CreationDate;
-        if (span < TimeSpan.Zero)
+        switch (RevisionNumber)
         {
-            yield return new ValidationResult(
-                "Modification date cannot be earlier than creation date.",
-                [nameof(ModificationDate), nameof(CreationDate)]);
+            // Professional standards validation
+            // 24 hours
+            case 1 when ModificationTimeSpan.TotalMinutes > 1440:
+                yield return CreateValidationResult(
+                    "First revision should typically be created and modified within a reasonable timeframe.",
+                    nameof(CreationDate), nameof(ModificationDate));
+                break;
         }
-        else if (span > RevisionValidationHelper.MaxDateTimeSpan)
+
+        switch (HasActivities)
         {
-            yield return new ValidationResult(
-                $"Time span between creation and modification dates is too large (maximum allowed: {RevisionValidationHelper.MaxDateTimeSpan.TotalDays:F0} days).",
-                [nameof(CreationDate), nameof(ModificationDate)]);
+            // Audit trail completeness validation
+            case false when !IsDeleted:
+                yield return CreateValidationResult(
+                    "Active revisions should have at least one recorded activity for audit trail compliance.",
+                    nameof(RevisionActivityUsers));
+                break;
+        }
+
+        switch (IsDeleted)
+        {
+            // Version control consistency
+            case true when HasActivities:
+            {
+                var hasRestoreActivity = RevisionActivityUsers.Any(a => 
+                    string.Equals(a.RevisionActivity?.Activity, "RESTORED", StringComparison.OrdinalIgnoreCase));
+            
+                switch (hasRestoreActivity)
+                {
+                    case false:
+                        // Note: This is informational - deleted revisions might not always have restore activities
+                        // but it's good to track for audit trail completeness
+                        break;
+                }
+
+                break;
+            }
         }
     }
 
-    #endregion Validation Implementation
-
-    #region Static Methods
-
     /// <summary>
-    /// Validates a <see cref="RevisionDto"/> instance and returns detailed validation results.
+    /// Validates cross-property relationships and constraints.
     /// </summary>
-    /// <param name="dto">The RevisionDto instance to validate. Can be null.</param>
-    /// <returns>A list of validation results indicating any validation failures.</returns>
-    /// <remarks>
-    /// This static helper method provides a convenient way to validate RevisionDto instances
-    /// without requiring a ValidationContext. It performs the same validation as the instance
-    /// Validate method but with null-safety and simplified usage.
-    /// 
-    /// <para><strong>Null Safety:</strong></para>
-    /// Handles null input gracefully by returning appropriate validation errors rather than throwing exceptions.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new RevisionDto 
-    /// { 
-    ///     RevisionNumber = 1, 
-    ///     CreationDate = DateTime.UtcNow,
-    ///     ModificationDate = DateTime.UtcNow
-    /// };
-    /// 
-    /// var results = RevisionDto.ValidateModel(dto);
-    /// if (results.Any())
-    /// {
-    ///     var errorMessages = string.Join(", ", results.Select(r => r.ErrorMessage));
-    ///     throw new ValidationException($"Revision validation failed: {errorMessages}");
-    /// }
-    /// </code>
-    /// </example>
-    public static IList<ValidationResult> ValidateModel([AllowNull] RevisionDto? dto)
+    protected override IEnumerable<ValidationResult> ValidateCrossPropertyRules()
     {
-        var results = new List<ValidationResult>();
+        // Date sequence validation using RevisionValidationHelper
+        foreach (var result in RevisionValidationHelper.ValidateDateSequence(
+            CreationDate, ModificationDate, nameof(CreationDate), nameof(ModificationDate)))
+            yield return result;
 
-        if (dto is null)
+        // Activity timeline consistency
+        if (RevisionActivityUsers.Count > 0)
         {
-            results.Add(new ValidationResult("RevisionDto instance is required and cannot be null."));
-            return results;
+            var earliestActivity = RevisionActivityUsers.Min(a => a.CreatedAt);
+            var latestActivity = RevisionActivityUsers.Max(a => a.CreatedAt);
+
+            if (earliestActivity < CreationDate)
+            {
+                yield return CreateValidationResult(
+                    "Revision activities cannot occur before the revision creation date.",
+                    nameof(RevisionActivityUsers), nameof(CreationDate));
+            }
+
+            if (latestActivity > ModificationDate.AddMinutes(RevisionValidationHelper.FutureDateToleranceMinutes))
+            {
+                yield return CreateValidationResult(
+                    "Revision activities should not occur significantly after the modification date.",
+                    nameof(RevisionActivityUsers), nameof(ModificationDate));
+            }
         }
 
-        var context = new ValidationContext(dto, serviceProvider: null, items: null);
-        Validator.TryValidateObject(dto, context, results, validateAllProperties: true);
+        // Document association consistency
+        if (!DocumentId.HasValue || RevisionActivityUsers.Count <= 0) yield break;
+        var inconsistentActivities = RevisionActivityUsers.Where(a => 
+            a.Revision is { DocumentId: not null } && 
+            a.Revision.DocumentId != DocumentId).ToList();
 
-        return results;
+        if (inconsistentActivities.Count > 0)
+        {
+            yield return CreateValidationResult(
+                "All revision activities must be associated with the same document.",
+                nameof(RevisionActivityUsers), nameof(DocumentId));
+        }
     }
 
     /// <summary>
-    /// Creates a RevisionDto from an ADMS.API.Entities.Revision entity with validation.
+    /// Validates collections and nested objects.
     /// </summary>
-    /// <param name="revision">The Revision entity to convert. Cannot be null.</param>
-    /// <param name="includeDocumentId">Whether to include the document ID in the conversion.</param>
-    /// <param name="includeActivities">Whether to include activity collections in the conversion.</param>
-    /// <returns>A valid RevisionDto instance.</returns>
-    /// <exception cref="ArgumentNullException">Thrown when revision is null.</exception>
-    /// <exception cref="ValidationException">Thrown when the resulting DTO fails validation.</exception>
-    /// <remarks>
-    /// This factory method provides a safe way to create RevisionDto instances from
-    /// ADMS.API.Entities.Revision entities with automatic validation. It ensures the resulting
-    /// DTO is valid before returning it.
-    /// 
-    /// <para><strong>Activity Collection Handling:</strong></para>
-    /// When includeActivities is true, the method will attempt to map activity collections.
-    /// For performance reasons, activity collections should typically be loaded separately
-    /// using projection or explicit loading strategies.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// // Create from entity with document association but without activities for performance
-    /// var revision = new ADMS.API.Entities.Revision 
-    /// { 
-    ///     Id = Guid.NewGuid(),
-    ///     RevisionNumber = 1,
-    ///     CreationDate = DateTime.UtcNow,
-    ///     ModificationDate = DateTime.UtcNow,
-    ///     DocumentId = documentId,
-    ///     IsDeleted = false
-    /// };
-    /// 
-    /// var dto = RevisionDto.FromEntity(revision, includeDocumentId: true, includeActivities: false);
-    /// // Returns validated RevisionDto instance
-    /// </code>
-    /// </example>
-    public static RevisionDto FromEntity([NotNull] Entities.Revision revision, bool includeDocumentId = false, bool includeActivities = false)
+    protected override IEnumerable<ValidationResult> ValidateCollections()
     {
-        ArgumentNullException.ThrowIfNull(revision, nameof(revision));
+        // Validate revision activity users collection
+        if (RevisionActivityUsers.Count == 0) yield break;
+        var index = 0;
+        foreach (var activity in RevisionActivityUsers)
+        {
+            switch (activity)
+            {
+                case null:
+                    yield return CreateContextualValidationResult(
+                        "Revision activity user entry cannot be null.",
+                        $"{nameof(RevisionActivityUsers)}[{index}]");
+                    break;
+                default:
+                {
+                    // Validate that all activities reference this revision
+                    if (activity.RevisionId != Id)
+                    {
+                        yield return CreateContextualValidationResult(
+                            "Activity must be associated with this revision.",
+                            $"{nameof(RevisionActivityUsers)}[{index}].{nameof(activity.RevisionId)}");
+                    }
+
+                    // Validate activity type appropriateness
+                    if (activity.RevisionActivity != null)
+                    {
+                        var activityType = activity.RevisionActivity.Activity;
+                        var isAppropriate = ValidateActivityTypeForRevisionState(activityType, IsDeleted);
+                        
+                        switch (isAppropriate)
+                        {
+                            case false:
+                                yield return CreateContextualValidationResult(
+                                    $"Activity type '{activityType}' is not appropriate for current revision state.",
+                                    $"{nameof(RevisionActivityUsers)}[{index}].{nameof(activity.RevisionActivity)}.{nameof(activity.RevisionActivity.Activity)}");
+                                break;
+                        }
+                    }
+
+                    break;
+                }
+            }
+
+            index++;
+        }
+
+        switch (RevisionActivityUsers.Count)
+        {
+            // Validate activity sequence logic
+            case > 1:
+            {
+                var activitiesByTime = RevisionActivityUsers
+                    .Where(a => a.RevisionActivity != null)
+                    .OrderBy(a => a.CreatedAt)
+                    .ToList();
+
+                for (var i = 1; i < activitiesByTime.Count; i++)
+                {
+                    var previousActivity = activitiesByTime[i - 1].RevisionActivity?.Activity;
+                    var currentActivity = activitiesByTime[i].RevisionActivity?.Activity;
+
+                    if (!IsValidActivitySequence(previousActivity, currentActivity))
+                    {
+                        yield return CreateValidationResult(
+                            $"Activity sequence from '{previousActivity}' to '{currentActivity}' may not be valid for professional version control.",
+                            nameof(RevisionActivityUsers));
+                    }
+                }
+
+                break;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Validates custom revision-specific rules.
+    /// </summary>
+    protected override IEnumerable<ValidationResult> ValidateCustomRules()
+    {
+        switch (RevisionNumber)
+        {
+            // Professional practice validation
+            case > 100:
+                yield return CreateValidationResult(
+                    "Revision has unusually high version number (>100). Consider document consolidation for professional practice.",
+                    nameof(RevisionNumber));
+                break;
+        }
+
+        switch (HasActivities)
+        {
+            // Audit trail completeness for legal compliance
+            case true:
+            {
+                var hasCreationActivity = RevisionActivityUsers.Any(a => 
+                    string.Equals(a.RevisionActivity?.Activity, "CREATED", StringComparison.OrdinalIgnoreCase));
+
+                switch (hasCreationActivity)
+                {
+                    case false when RevisionNumber == 1:
+                        yield return CreateValidationResult(
+                            "First revision should have a CREATED activity for complete audit trail.",
+                            nameof(RevisionActivityUsers));
+                        break;
+                }
+
+                break;
+            }
+        }
+
+        switch (ModificationTimeSpan.TotalDays)
+        {
+            // Temporal consistency validation
+            // Modified more than a year after creation
+            case > 365:
+                yield return CreateValidationResult(
+                    "Revision has been in development for over a year. Verify this is correct for professional practice.",
+                    nameof(CreationDate), nameof(ModificationDate));
+                break;
+        }
+
+        switch (ActivityCount)
+        {
+            // Activity density validation (prevent audit trail spam)
+            case > 50:
+                yield return CreateValidationResult(
+                    "Revision has unusually high activity count (>50). Verify audit trail integrity.",
+                    nameof(RevisionActivityUsers));
+                break;
+        }
+    }
+
+    #endregion BaseValidationDto Implementation
+
+    #region Business Logic Methods
+
+    /// <summary>
+    /// Determines whether this revision can be deleted based on business rules.
+    /// </summary>
+    public bool CanBeDeleted() => !IsDeleted && IsValid;
+
+    /// <summary>
+    /// Determines whether this revision can be restored from deleted state.
+    /// </summary>
+    public bool CanBeRestored() => IsDeleted && IsValid;
+
+    /// <summary>
+    /// Determines whether the revision represents a legal document version.
+    /// </summary>
+    public bool IsLegalDocumentRevision() => RevisionNumber >= 1 && HasActivities;
+
+    /// <summary>
+    /// Gets activities of a specific type performed on this revision.
+    /// </summary>
+    public IEnumerable<RevisionActivityUserDto> GetActivitiesByType([NotNull] string activityType)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(activityType);
+
+        return RevisionActivityUsers?
+            .Where(a => string.Equals(a.RevisionActivity?.Activity, activityType, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(a => a.CreatedAt) ?? Enumerable.Empty<RevisionActivityUserDto>();
+    }
+
+    /// <summary>
+    /// Gets the most recent activity performed on this revision.
+    /// </summary>
+    public RevisionActivityUserDto? GetMostRecentActivity()
+    {
+        return RevisionActivityUsers?
+            .OrderByDescending(a => a.CreatedAt)
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Gets comprehensive revision metrics for reporting and analysis.
+    /// </summary>
+    public object GetRevisionMetrics() => new
+    {
+        VersionInfo = new { RevisionNumber, IsDeleted, RevisionAge.TotalDays },
+        ActivityInfo = new { ActivityCount, HasActivities },
+        TemporalInfo = new { CreationDate, ModificationDate, ModificationTimeSpan.TotalMinutes },
+        ValidationInfo = new { IsValid }
+    };
+
+    #endregion Business Logic Methods
+
+    #region Static Factory Methods
+
+    /// <summary>
+    /// Creates a RevisionDto from a Domain entity with enhanced validation.
+    /// </summary>
+    public static RevisionDto FromEntity(
+        [NotNull] Domain.Entities.Revision entity,
+        bool includeDocumentId = false,
+        bool includeActivities = true)
+    {
+        ArgumentNullException.ThrowIfNull(entity);
 
         var dto = new RevisionDto
         {
-            Id = revision.Id,
-            RevisionNumber = revision.RevisionNumber,
-            CreationDate = revision.CreationDate,
-            ModificationDate = revision.ModificationDate,
-            IsDeleted = revision.IsDeleted,
-            DocumentId = includeDocumentId ? revision.DocumentId : null
+            Id = entity.Id,
+            RevisionNumber = entity.RevisionNumber,
+            CreationDate = entity.CreationDate,
+            ModificationDate = entity.ModificationDate,
+            DocumentId = includeDocumentId ? entity.DocumentId : null,
+            IsDeleted = entity.IsDeleted,
+            RevisionActivityUsers = includeActivities && entity.RevisionActivityUsers?.Count > 0
+                ? entity.RevisionActivityUsers.Select(ra => RevisionActivityUserDto.FromEntity(ra)).ToList()
+                : []
         };
 
-        // Optionally include activity collections
-        // Note: In practice, these would typically be mapped using a mapping framework
-        // like AutoMapper or Mapster for better performance and maintainability
-        if (includeActivities)
-        {
-            // Activity collections would be mapped here if needed
-            // This is a placeholder for actual mapping logic
-        }
-
-        // Validate the created DTO
         var validationResults = ValidateModel(dto);
-        if (!validationResults.Any()) return dto;
-        var errorMessages = string.Join(", ", validationResults.Select(r => r.ErrorMessage));
-        throw new ValidationException($"Failed to create valid RevisionDto from entity: {errorMessages}");
-
+        if (!HasValidationErrors(validationResults)) return dto;
+        var summary = GetValidationSummary(validationResults);
+        var entityInfo = $"Rev. {entity.RevisionNumber}";
+        throw new ValidationException($"RevisionDto creation failed for '{entityInfo}' ({entity.Id}): {summary}");
     }
 
-    #endregion Static Methods
+    #endregion Static Factory Methods
 
-    #region Equality Implementation
+    #region Private Helper Methods
 
     /// <summary>
-    /// Determines whether the specified RevisionDto is equal to the current RevisionDto.
+    /// Validates if an activity type is appropriate for the current revision state.
     /// </summary>
-    /// <param name="other">The RevisionDto to compare with the current RevisionDto.</param>
-    /// <returns>true if the specified RevisionDto is equal to the current RevisionDto; otherwise, false.</returns>
-    /// <remarks>
-    /// Equality is determined by comparing the Id property when both have values, or by comparing
-    /// revision number and key properties when IDs are not available. This follows the same equality 
-    /// pattern as ADMS.API.Entities.Revision for consistency.
-    /// </remarks>
+    private static bool ValidateActivityTypeForRevisionState(string? activityType, bool isDeleted)
+    {
+        if (string.IsNullOrWhiteSpace(activityType))
+            return false;
+
+        var normalizedActivity = activityType.Trim().ToUpperInvariant();
+
+        return normalizedActivity switch
+        {
+            "RESTORED" => isDeleted, // Can only restore deleted revisions
+            "DELETED" => !isDeleted, // Can only delete non-deleted revisions
+            "CREATED" or "SAVED" => !isDeleted, // Can only create/save non-deleted revisions
+            _ => true // Other activities are generally valid
+        };
+    }
+
+    /// <summary>
+    /// Validates if an activity sequence is professionally appropriate.
+    /// </summary>
+    private static bool IsValidActivitySequence(string? previousActivity, string? currentActivity)
+    {
+        if (string.IsNullOrWhiteSpace(previousActivity) || string.IsNullOrWhiteSpace(currentActivity))
+            return true; // Can't validate without both activities
+
+        var prev = previousActivity.Trim().ToUpperInvariant();
+        var curr = currentActivity.Trim().ToUpperInvariant();
+
+        // Define professional activity sequences
+        return (prev == "CREATED" && curr == "SAVED") ||
+               (prev == "SAVED" && curr == "SAVED") ||
+               (prev == "CREATED" && curr == "DELETED") ||
+               (prev == "SAVED" && curr == "DELETED") ||
+               (prev == "DELETED" && curr == "RESTORED") ||
+               (prev == "RESTORED" && curr == "SAVED") ||
+               (prev == "RESTORED" && curr == "DELETED");
+        // For other sequences, could log for review, but do not always return true
+    }
+
+    #endregion Private Helper Methods
+
+    #region Equality and Comparison
+
+    /// <summary>
+    /// Determines whether the specified RevisionDto is equal to the current instance.
+    /// </summary>
     public bool Equals(RevisionDto? other)
     {
-        if (other is null) return false;
-        if (ReferenceEquals(this, other)) return true;
-
-        // If both have IDs, compare by ID
-        if (Id.HasValue && other.Id.HasValue)
+        switch (other)
         {
-            return Id.Value.Equals(other.Id.Value) && Id.Value != Guid.Empty;
+            case null:
+                return false;
         }
-
-        // If neither has ID or one is missing, compare by content
-        return RevisionNumber == other.RevisionNumber &&
-               CreationDate == other.CreationDate &&
-               ModificationDate == other.ModificationDate &&
-               IsDeleted == other.IsDeleted &&
-               DocumentId == other.DocumentId;
+        if (ReferenceEquals(this, other)) return true;
+        return Id.Equals(other.Id) && Id != Guid.Empty;
     }
 
     /// <summary>
     /// Determines whether the specified object is equal to the current RevisionDto.
     /// </summary>
-    /// <param name="obj">The object to compare with the current RevisionDto.</param>
-    /// <returns>true if the specified object is equal to the current RevisionDto; otherwise, false.</returns>
     public override bool Equals(object? obj) => Equals(obj as RevisionDto);
 
     /// <summary>
-    /// Serves as the default hash function.
+    /// Returns a hash code for the current RevisionDto.
     /// </summary>
-    /// <returns>A hash code for the current RevisionDto.</returns>
-    /// <remarks>
-    /// The hash code is based on the Id property when available, or on content properties
-    /// when ID is not available, ensuring consistent hashing behavior.
-    /// </remarks>
-    public override int GetHashCode()
-    {
-        if (Id.HasValue && Id.Value != Guid.Empty)
-        {
-            return Id.Value.GetHashCode();
-        }
+    public override int GetHashCode() => Id.GetHashCode();
 
-        return HashCode.Combine(RevisionNumber, CreationDate, ModificationDate, IsDeleted, DocumentId);
+    /// <summary>
+    /// Compares the current RevisionDto with another RevisionDto for ordering.
+    /// </summary>
+    public int CompareTo(RevisionDto? other)
+    {
+        switch (other)
+        {
+            case null:
+                return 1;
+        }
+        if (ReferenceEquals(this, other)) return 0;
+
+        // Primary sort by revision number
+        var revisionComparison = RevisionNumber.CompareTo(other.RevisionNumber);
+        if (revisionComparison != 0) return revisionComparison;
+
+        // Secondary sort by creation date
+        var dateComparison = CreationDate.CompareTo(other.CreationDate);
+        return dateComparison != 0 ? dateComparison : Id.CompareTo(other.Id);
     }
 
     /// <summary>
-    /// Determines whether two RevisionDto instances are equal.
+    /// Returns a string representation of the revision.
     /// </summary>
-    /// <param name="left">The first RevisionDto to compare.</param>
-    /// <param name="right">The second RevisionDto to compare.</param>
-    /// <returns>true if the RevisionDtos are equal; otherwise, false.</returns>
-    public static bool operator ==(RevisionDto? left, RevisionDto? right) =>
-        EqualityComparer<RevisionDto>.Default.Equals(left, right);
+    public override string ToString() =>
+        $"Revision {RevisionNumber} ({Id}) - Created: {CreationDate:yyyy-MM-dd HH:mm:ss} UTC";
 
     /// <summary>
-    /// Determines whether two RevisionDto instances are not equal.
+    /// Determines whether two <see cref="RevisionDto"/> instances are equal.
     /// </summary>
-    /// <param name="left">The first RevisionDto to compare.</param>
-    /// <param name="right">The second RevisionDto to compare.</param>
-    /// <returns>true if the RevisionDtos are not equal; otherwise, false.</returns>
+    /// <param name="left">The first <see cref="RevisionDto"/> instance to compare, or <see langword="null"/>.</param>
+    /// <param name="right">The second <see cref="RevisionDto"/> instance to compare, or <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the specified <see cref="RevisionDto"/> instances are equal; otherwise, <see
+    /// langword="false"/>.</returns>
+    public static bool operator ==(RevisionDto? left, RevisionDto? right)
+    {
+        if (ReferenceEquals(left, right)) return true;
+        if (left is null || right is null) return false;
+        return left.Equals(right);
+    }
+
+    /// <summary>
+    /// Determines whether two <see cref="RevisionDto"/> instances are not equal.
+    /// </summary>
+    /// <param name="left">The first <see cref="RevisionDto"/> instance to compare, or <see langword="null"/>.</param>
+    /// <param name="right">The second <see cref="RevisionDto"/> instance to compare, or <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if the specified <see cref="RevisionDto"/> instances are not equal; otherwise, <see
+    /// langword="false"/>.</returns>
     public static bool operator !=(RevisionDto? left, RevisionDto? right) => !(left == right);
 
-    #endregion Equality Implementation
-
-    #region String Representation
+    /// <summary>
+    /// Determines whether one <see cref="RevisionDto"/> instance is less than another.
+    /// </summary>
+    /// <remarks>If <paramref name="left"/> is <see langword="null"/> and <paramref name="right"/> is not <see
+    /// langword="null"/>, the operator returns <see langword="true"/>. If both are <see langword="null"/>, the operator
+    /// returns <see langword="false"/>.</remarks>
+    /// <param name="left">The first <see cref="RevisionDto"/> instance to compare. Can be <see langword="null"/>.</param>
+    /// <param name="right">The second <see cref="RevisionDto"/> instance to compare. Can be <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is less than <paramref name="right"/>; otherwise, <see
+    /// langword="false"/>.</returns>
+    public static bool operator <(RevisionDto? left, RevisionDto? right)
+    {
+        if (left is null) return right is not null;
+        return left.CompareTo(right) < 0;
+    }
 
     /// <summary>
-    /// Returns a string representation of the RevisionDto.
+    /// Determines whether one <see cref="RevisionDto"/> instance is less than or equal to another.
     /// </summary>
-    /// <returns>A string that represents the current RevisionDto.</returns>
-    /// <remarks>
-    /// The string representation includes key identifying information about the revision,
-    /// following the same pattern as ADMS.API.Entities.Revision.ToString() for consistency.
-    /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new RevisionDto 
-    /// { 
-    ///     Id = Guid.Parse("12345678-1234-5678-9012-123456789012"),
-    ///     RevisionNumber = 3,
-    ///     CreationDate = new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc)
-    /// };
-    /// 
-    /// Console.WriteLine(dto);
-    /// // Output: "Revision 3 (12345678-1234-5678-9012-123456789012) - Created: 2024-01-15 10:30:00 UTC"
-    /// </code>
-    /// </example>
-    public override string ToString() =>
-        Id.HasValue
-            ? $"Revision {RevisionNumber} ({Id}) - Created: {CreationDate:yyyy-MM-dd HH:mm:ss} UTC"
-            : $"Revision {RevisionNumber} - Created: {CreationDate:yyyy-MM-dd HH:mm:ss} UTC";
+    /// <param name="left">The first <see cref="RevisionDto"/> instance to compare. Can be <see langword="null"/>.</param>
+    /// <param name="right">The second <see cref="RevisionDto"/> instance to compare. Can be <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is less than or equal to <paramref name="right"/>; otherwise,
+    /// <see langword="false"/>. If <paramref name="left"/> is <see langword="null"/>, the result is always <see
+    /// langword="true"/>.</returns>
+    public static bool operator <=(RevisionDto? left, RevisionDto? right)
+    {
+        if (left is null) return true;
+        return left.CompareTo(right) <= 0;
+    }
 
-    #endregion String Representation
+    /// <summary>
+    /// Determines whether one <see cref="RevisionDto"/> instance is greater than another.
+    /// </summary>
+    /// <param name="left">The first <see cref="RevisionDto"/> instance to compare. Can be <see langword="null"/>.</param>
+    /// <param name="right">The second <see cref="RevisionDto"/> instance to compare. Can be <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is greater than <paramref name="right"/>; otherwise, <see
+    /// langword="false"/>. If <paramref name="left"/> is <see langword="null"/>, the result is always <see
+    /// langword="false"/>.</returns>
+    public static bool operator >(RevisionDto? left, RevisionDto? right)
+    {
+        if (left is null) return false;
+        return left.CompareTo(right) > 0;
+    }
+
+    /// <summary>
+    /// Determines whether the left <see cref="RevisionDto"/> is greater than or equal to the right <see
+    /// cref="RevisionDto"/>.
+    /// </summary>
+    /// <param name="left">The first <see cref="RevisionDto"/> to compare. Can be <see langword="null"/>.</param>
+    /// <param name="right">The second <see cref="RevisionDto"/> to compare. Can be <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> if <paramref name="left"/> is greater than or equal to <paramref name="right"/>; 
+    /// otherwise, <see langword="false"/>. If <paramref name="right"/> is <see langword="null"/>, the result is always
+    /// <see langword="true"/>.</returns>
+    public static bool operator >=(RevisionDto? left, RevisionDto? right)
+    {
+        if (right is null) return true;
+        return left?.CompareTo(right) >= 0;
+    }
+
+    #endregion Equality and Comparison
 }

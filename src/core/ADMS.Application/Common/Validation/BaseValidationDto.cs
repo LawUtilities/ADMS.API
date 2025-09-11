@@ -356,6 +356,40 @@ public abstract class BaseValidationDto : IValidatableObject
     }
 
     /// <summary>
+    /// Creates a contextual ValidationResult with property path information.
+    /// </summary>
+    /// <param name="errorMessage">The error message for the validation result.</param>
+    /// <param name="propertyPath">The hierarchical property path (e.g., "Documents[0].FileName").</param>
+    /// <returns>A ValidationResult with proper property path context.</returns>
+    /// <remarks>
+    /// This helper method is useful for nested object validation where the error location
+    /// needs to be precisely identified in complex object hierarchies.
+    /// </remarks>
+    /// <example>
+    /// <code>
+    /// // Nested property error
+    /// yield return CreateContextualValidationResult(
+    ///     "File name is invalid.", 
+    ///     "Documents[0].FileName");
+    /// 
+    /// // Collection item error
+    /// yield return CreateContextualValidationResult(
+    ///     "User name is required.", 
+    ///     $"Users[{index}].Name");
+    /// </code>
+    /// </example>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    protected static ValidationResult CreateContextualValidationResult(
+        [NotNull] string errorMessage,
+        [NotNull] string propertyPath)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(errorMessage);
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyPath);
+
+        return new ValidationResult($"{propertyPath}: {errorMessage}", [propertyPath]);
+    }
+
+    /// <summary>
     /// Validates a GUID property using ADMS standards.
     /// </summary>
     /// <param name="guidValue">The GUID value to validate.</param>
