@@ -460,7 +460,9 @@ public static partial class FileValidationHelper
     /// <item>Professional standards for file integrity</item>
     /// </list>
     /// </remarks>
-    public static IEnumerable<ValidationResult> ValidateChecksum(string? checksum, [NotNull] string propertyName)
+    public static IEnumerable<ValidationResult> ValidateChecksum(
+        string? checksum,
+        [NotNull] string propertyName)
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
