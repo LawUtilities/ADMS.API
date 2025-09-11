@@ -797,7 +797,7 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     /// </remarks>
     private IEnumerable<ValidationResult> ValidateCoreProperties()
     {
-        // Validate document ID using RevisionValidationHelper patterns
+        // Validate document ID
         if (Id == Guid.Empty)
         {
             yield return new ValidationResult(
@@ -806,23 +806,23 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
         }
 
         // Validate file name using FileValidationHelper
-        foreach (var result in ValidateFileName())
+        foreach (var result in FileValidationHelper.ValidateFileName(FileName, nameof(FileName)))
             yield return result;
 
-        // Validate extension using FileValidationHelper
-        foreach (var result in ValidateExtension())
+        // Validate extension using FileValidationHelper  
+        foreach (var result in FileValidationHelper.ValidateExtension(Extension, nameof(Extension)))
             yield return result;
 
-        // Validate file size using FileValidationHelper patterns
-        foreach (var result in ValidateFileSize())
+        // Validate file size using FileValidationHelper
+        foreach (var result in FileValidationHelper.ValidateFileSize(FileSize, nameof(FileSize)))
             yield return result;
 
         // Validate MIME type using FileValidationHelper
-        foreach (var result in ValidateMimeType())
+        foreach (var result in FileValidationHelper.ValidateMimeType(MimeType, nameof(MimeType)))
             yield return result;
 
-        // Validate checksum using FileValidationHelper patterns
-        foreach (var result in ValidateChecksum())
+        // Validate checksum using FileValidationHelper
+        foreach (var result in FileValidationHelper.ValidateChecksum(Checksum, nameof(Checksum)))
             yield return result;
 
         // Validate creation date using BaseValidationDto patterns
@@ -831,276 +831,30 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     }
 
     /// <summary>
-    /// Validates file name using ADMS FileValidationHelper standards.
-    /// </summary>
-    /// <returns>A collection of validation results for file name validation.</returns>
-    private IEnumerable<ValidationResult> ValidateFileName()
-    {
-        if (string.IsNullOrWhiteSpace(FileName))
-        {
-            yield return new ValidationResult(
-                "File name is required and cannot be empty for document identification.",
-                [nameof(FileName)]);
-            yield break;
-        }
-
-        if (FileName.Length > FileValidationHelper.MaxFileNameLength)
-        {
-            yield return new ValidationResult(
-                $"File name cannot exceed {FileValidationHelper.MaxFileNameLength} characters for file system compatibility.",
-                [nameof(FileName)]);
-        }
-
-        if (!FileValidationHelper.IsFileNameValid(FileName))
-        {
-            yield return new ValidationResult(
-                "File name contains invalid characters or format. Use alphanumeric characters, spaces, hyphens, and underscores.",
-                [nameof(FileName)]);
-        }
-
-        if (FileValidationHelper.IsReservedFileName(FileName))
-        {
-            yield return new ValidationResult(
-                "File name cannot use a reserved system name for security and compatibility.",
-                [nameof(FileName)]);
-        }
-
-        if (!FileName.Any(char.IsLetterOrDigit))
-        {
-            yield return new ValidationResult(
-                "File name must contain at least one alphanumeric character for professional identification.",
-                [nameof(FileName)]);
-        }
-
-        // Security validation following RevisionValidationHelper patterns
-        var securityPatterns = new[] { "<script", "javascript:", "vbscript:", "<object", "<embed", "<iframe" };
-        var fileNameLower = FileName.ToLowerInvariant();
-
-        if (securityPatterns.Any(pattern => fileNameLower.Contains(pattern, StringComparison.OrdinalIgnoreCase)))
-        {
-            yield return new ValidationResult(
-                "File name contains potentially malicious content patterns and cannot be processed.",
-                [nameof(FileName)]);
-        }
-    }
-
-    /// <summary>
-    /// Validates file extension using ADMS FileValidationHelper standards.
-    /// </summary>
-    /// <returns>A collection of validation results for file extension validation.</returns>
-    private IEnumerable<ValidationResult> ValidateExtension()
-    {
-        if (string.IsNullOrWhiteSpace(Extension))
-        {
-            yield return new ValidationResult(
-                "File extension is required and cannot be empty for document format identification.",
-                [nameof(Extension)]);
-            yield break;
-        }
-
-        if (Extension.Length > FileValidationHelper.MaxExtensionLength)
-        {
-            yield return new ValidationResult(
-                $"File extension cannot exceed {FileValidationHelper.MaxExtensionLength} characters for system compatibility.",
-                [nameof(Extension)]);
-        }
-
-        if (!FileValidationHelper.IsExtensionAllowed(Extension))
-        {
-            yield return new ValidationResult(
-                $"Extension '{Extension}' is not allowed for legal document management. " +
-                $"Allowed extensions: {string.Join(", ", FileValidationHelper.AllowedExtensions)}",
-                [nameof(Extension)]);
-        }
-
-        if (Extension.Any(char.IsWhiteSpace))
-        {
-            yield return new ValidationResult(
-                "File extension cannot contain whitespace characters for system compatibility.",
-                [nameof(Extension)]);
-        }
-
-        // Case consistency following professional standards
-        if (!Extension.Equals(Extension.ToLowerInvariant(), StringComparison.Ordinal))
-        {
-            yield return new ValidationResult(
-                "File extension must be lowercase for consistency with professional document management standards.",
-                [nameof(Extension)]);
-        }
-    }
-
-    /// <summary>
-    /// Validates file size using ADMS professional document management standards.
-    /// </summary>
-    /// <returns>A collection of validation results for file size validation.</returns>
-    private IEnumerable<ValidationResult> ValidateFileSize()
-    {
-        if (FileSize < 0)
-        {
-            yield return new ValidationResult(
-                "File size must be non-negative for valid document metadata and storage tracking.",
-                [nameof(FileSize)]);
-        }
-
-        if (FileSize == 0)
-        {
-            yield return new ValidationResult(
-                "File size must be greater than zero for actual document files with content.",
-                [nameof(FileSize)]);
-        }
-
-        // Professional document size limits following RevisionValidationHelper patterns
-        if (FileSize > 100 * 1024 * 1024) // 100 MB limit
-        {
-            yield return new ValidationResult(
-                "File size exceeds recommended limit for efficient document management (100 MB). " +
-                "Large files may require special handling or compression.",
-                [nameof(FileSize)]);
-        }
-
-        // Professional practice warnings
-        if (FileSize > 50 * 1024 * 1024) // 50 MB warning
-        {
-            yield return new ValidationResult(
-                "File size is very large (>50 MB). Consider optimizing for professional document management efficiency.",
-                [nameof(FileSize)]);
-        }
-    }
-
-    /// <summary>
-    /// Validates MIME type using ADMS FileValidationHelper standards.
-    /// </summary>
-    /// <returns>A collection of validation results for MIME type validation.</returns>
-    private IEnumerable<ValidationResult> ValidateMimeType()
-    {
-        if (string.IsNullOrWhiteSpace(MimeType))
-        {
-            yield return new ValidationResult(
-                "MIME type is required for proper document handling, security validation, and client application integration.",
-                [nameof(MimeType)]);
-            yield break;
-        }
-
-        if (!FileValidationHelper.IsMimeTypeAllowed(MimeType))
-        {
-            yield return new ValidationResult(
-                $"MIME type '{MimeType}' is not allowed for legal document management. " +
-                $"Contact system administrator for approved MIME types.",
-                [nameof(MimeType)]);
-        }
-
-        if (!MimeTypeRegex().IsMatch(MimeType))
-        {
-            yield return new ValidationResult(
-                "Invalid MIME type format. Expected standard format: type/subtype (e.g., application/pdf).",
-                [nameof(MimeType)]);
-        }
-    }
-
-    /// <summary>
-    /// Returns the expected MIME types for a given file extension.
-    /// </summary>
-    /// <param name="extension">The file extension (lowercase, without dot).</param>
-    /// <returns>A list of expected MIME types for the extension.</returns>
-    private static string[] GetExpectedMimeTypesForExtension(string extension)
-    {
-        // This mapping should be extended as needed for your application's supported types.
-        return extension switch
-        {
-            "pdf" => ["application/pdf"],
-            "doc" => ["application/msword"],
-            "docx" => ["application/vnd.openxmlformats-officedocument.wordprocessingml.document"],
-            "xls" => ["application/vnd.ms-excel"],
-            "xlsx" => ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"],
-            "txt" => ["text/plain"],
-            _ => []
-        };
-    }
-
-    /// <summary>
-    /// Validates checksum using ADMS FileValidationHelper standards.
-    /// </summary>
-    /// <returns>A collection of validation results for checksum validation.</returns>
-    private IEnumerable<ValidationResult> ValidateChecksum()
-    {
-        if (string.IsNullOrWhiteSpace(Checksum))
-        {
-            yield return new ValidationResult(
-                "Checksum is required for document integrity verification, security compliance, and audit trail requirements.",
-                [nameof(Checksum)]);
-            yield break;
-        }
-
-        if (!ChecksumRegex().IsMatch(Checksum) || Checksum.Length != 64)
-        {
-            yield return new ValidationResult(
-                "Checksum must be a valid 64-character hexadecimal string (SHA256 hash) for proper integrity verification and security compliance.",
-                [nameof(Checksum)]);
-        }
-
-        // Additional checksum validation following FileValidationHelper patterns
-        if (!FileValidationHelper.IsValidChecksum(Checksum))
-        {
-            yield return new ValidationResult(
-                "Checksum format is invalid or does not meet security requirements for document integrity verification.",
-                [nameof(Checksum)]);
-        }
-    }
-
-    /// <summary>
-    /// Validates creation date using BaseValidationDto temporal validation patterns.
-    /// </summary>
-    /// <returns>A collection of validation results for creation date validation.</returns>
-    private IEnumerable<ValidationResult> ValidateCreationDate()
-    {
-        if (CreationDate == default)
-        {
-            yield return new ValidationResult(
-                "Creation date is required and cannot be the default value for temporal tracking and audit compliance.",
-                [nameof(CreationDate)]);
-            yield break;
-        }
-
-        // Use RevisionValidationHelper patterns for date validation
-        var minAllowedDate = RevisionValidationHelper.MinAllowedRevisionDate;
-        if (CreationDate < minAllowedDate)
-        {
-            yield return new ValidationResult(
-                $"Creation date cannot be earlier than {minAllowedDate:yyyy-MM-dd} for system consistency and reasonable temporal bounds.",
-                [nameof(CreationDate)]);
-        }
-
-        var maxAllowedDate = DateTime.UtcNow.AddMinutes(RevisionValidationHelper.FutureDateToleranceMinutes);
-        if (CreationDate > maxAllowedDate)
-        {
-            yield return new ValidationResult(
-                $"Creation date cannot be in the future (beyond clock skew tolerance of {RevisionValidationHelper.FutureDateToleranceMinutes} minutes).",
-                [nameof(CreationDate)]);
-        }
-
-        // Professional age validation
-        var age = DateTime.UtcNow - CreationDate;
-        if (age.TotalDays > RevisionValidationHelper.MaxReasonableAgeYears * 365)
-        {
-            yield return new ValidationResult(
-                $"Creation date age exceeds reasonable bounds for active document management ({RevisionValidationHelper.MaxReasonableAgeYears} years). " +
-                "Verify data accuracy and retention policy compliance.",
-                [nameof(CreationDate)]);
-        }
-    }
-
-    /// <summary>
-    /// Validates document-specific business rules and professional standards.
+    /// Validates business rules and professional standards.
     /// </summary>
     /// <returns>A collection of validation results for business rule compliance.</returns>
+    /// <remarks>
+    /// Validates essential business rules and professional standards for document management:
+    /// <list type="bullet">
+    /// <item><strong>MIME type and extension consistency:</strong> Ensures MIME type matches approved types for the extension</item>
+    /// <item><strong>Checked out and deleted status:</strong> Business rule enforcement - cannot be both checked out and deleted</item>
+    /// <item><strong>Professional standards:</strong> Validates against legal document format standards</item>
+    /// </list>
+    /// </remarks>
     private IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        // Mutual exclusivity validation following RevisionValidationHelper patterns
+        // MIME type and extension consistency validation
+        foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
+            MimeType, Extension, nameof(MimeType)))
+            yield return result;
+
+        // Business rule: Document cannot be both checked out and deleted
         if (IsCheckedOut && IsDeleted)
         {
             yield return new ValidationResult(
                 "A document cannot be both checked out and deleted simultaneously. " +
-                "This violates professional document management business rules and version control integrity.",
+                "This violates professional document management business rules.",
                 [nameof(IsCheckedOut), nameof(IsDeleted)]);
         }
 
@@ -1109,24 +863,8 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
         {
             yield return new ValidationResult(
                 $"Extension '{Extension}' is not a standard legal document format. " +
-                "Consider using PDF, DOCX, or other approved legal document formats for professional compliance.",
+                "Consider using PDF, DOCX, or other approved legal document formats.",
                 [nameof(Extension)]);
-        }
-
-        // Document lifecycle validation
-        if (IsDeleted && !HasValidAuditTrail())
-        {
-            yield return new ValidationResult(
-                "Deleted documents must have appropriate audit trail activities for legal compliance and accountability.",
-                [nameof(IsDeleted)]);
-        }
-
-        // Professional file management validation
-        if (IsCheckedOut && TotalActivityCount == 0)
-        {
-            yield return new ValidationResult(
-                "Checked out documents should have corresponding activity audit trail for professional accountability.",
-                [nameof(IsCheckedOut)]);
         }
     }
 
