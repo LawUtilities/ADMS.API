@@ -811,7 +811,8 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
             yield return result;
 
         // Validate extension using FileValidationHelper  
-        foreach (var result in FileValidationHelper.ValidateExtension(Extension, nameof(Extension)))
+        foreach (var result in FileValidationHelper.ValidateExtension(Extension, nameof(Extension))
+            .Where(r => r != ValidationResult.Success))
             yield return result;
 
         // Validate file size using FileValidationHelper
@@ -842,15 +843,25 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
     /// <item><strong>Checked out and deleted status:</strong> Business rule enforcement - cannot be both checked out and deleted</item>
     /// <item><strong>Professional standards:</strong> Validates against legal document format standards</item>
     /// </list>
+    /// 
+    /// <para><strong>Enhanced business rules validation with additional compliance checks.</strong></para>
+    /// <list type="bullet">
+    /// <item><strong>Client-Attorney Privilege:</strong> Validation for privileged or confidential documents</item>
+    /// <item><strong>Work Product:</strong> Ensures work product documents are not empty</item>
+    /// <item><strong>Retention Compliance:</strong> Validates legal retention requirements</item>
+    /// <item><strong>Forensic Integrity:</strong> Checksums and temporal consistency forensically valid</item>
+    /// <item><strong>Professional Standards:</strong> Adherence to professional naming and versioning standards</item>
+    /// <item><strong>Workflow States:</strong> Validates document check-out and deletion workflows</item>
+    /// <item><strong>Advanced Business Rules:</strong> High activity scrutiny, transfer pattern validation, file format verification</item>
+    /// </list>
     /// </remarks>
     private IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        // MIME type and extension consistency validation
+        // Existing business rules
         foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
             MimeType, Extension, nameof(MimeType)))
             yield return result;
 
-        // Business rule: Document cannot be both checked out and deleted
         if (IsCheckedOut && IsDeleted)
         {
             yield return new ValidationResult(
@@ -859,7 +870,6 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
                 [nameof(IsCheckedOut), nameof(IsDeleted)]);
         }
 
-        // Professional standards validation
         if (!string.IsNullOrWhiteSpace(Extension) && !FileValidationHelper.IsLegalDocumentFormat(Extension))
         {
             yield return new ValidationResult(
@@ -867,6 +877,25 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
                 "Consider using PDF, DOCX, or other approved legal document formats.",
                 [nameof(Extension)]);
         }
+
+        // NEW: Enhanced business rules
+        foreach (var result in ValidateDocumentClassification())
+            yield return result;
+
+        foreach (var result in ValidateRetentionCompliance())
+            yield return result;
+
+        foreach (var result in ValidateForensicIntegrity())
+            yield return result;
+
+        foreach (var result in ValidateProfessionalStandards())
+            yield return result;
+
+        foreach (var result in ValidateWorkflowStates())
+            yield return result;
+
+        foreach (var result in ValidateAdvancedBusinessRules())
+            yield return result;
     }
 
     /// <summary>
@@ -1427,5 +1456,296 @@ public sealed partial class DocumentWithoutRevisionsDto : IValidatableObject, IE
         FileValidationHelper.IsFileSizeValid(FileSize) &&
         FileValidationHelper.IsMimeTypeAllowed(MimeType) &&
         FileValidationHelper.IsValidChecksum(Checksum) &&
-        CreationDate > FileValidationHelper.MinAllowedRevisionDate;
+        CreationDate > DateTime.MinValue &&
+        CreationDate <= DateTime.UtcNow.AddMinutes(RevisionValidationHelper.FutureDateToleranceMinutes) &&
+        !(IsCheckedOut && IsDeleted) && // Business rule check
+        HasValidAuditTrail() && // Audit trail check
+        (!IsDeleted || TotalActivityCount > 0); // Deleted documents must have audit trail
+
+    /// <summary>
+    /// Validates document classification and sensitivity requirements for legal compliance.
+    /// </summary>
+    /// <returns>A collection of validation results for classification validation.</returns>
+    private IEnumerable<ValidationResult> ValidateDocumentClassification()
+    {
+        // Client-Attorney Privilege validation
+        if ((FileName.Contains("privileged", StringComparison.OrdinalIgnoreCase) ||
+             FileName.Contains("confidential", StringComparison.OrdinalIgnoreCase)) && (!HasActivities || !DocumentActivityUsers.Any(a => 
+                string.Equals(a.DocumentActivity?.Activity, "CREATED", StringComparison.OrdinalIgnoreCase))))
+        {
+            yield return new ValidationResult(
+                "Privileged or confidential documents must have complete audit trail for legal compliance.",
+                [nameof(DocumentActivityUsers)]);
+        }
+
+        // Work Product validation
+        if ((FileName.Contains("draft", StringComparison.OrdinalIgnoreCase) ||
+             FileName.Contains("work product", StringComparison.OrdinalIgnoreCase)) && FileSize == 0)
+        {
+            yield return new ValidationResult(
+                "Work product documents cannot be empty for professional responsibility compliance.",
+                [nameof(FileSize)]);
+        }
+
+        // Legal document format validation for court filings
+        if ((FileName.Contains("motion", StringComparison.OrdinalIgnoreCase) ||
+             FileName.Contains("brief", StringComparison.OrdinalIgnoreCase) ||
+             FileName.Contains("pleading", StringComparison.OrdinalIgnoreCase)) && !Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            yield return new ValidationResult(
+                "Court documents should typically be in PDF format for filing compliance.",
+                [nameof(Extension)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates legal retention and compliance requirements.
+    /// </summary>
+    /// <returns>A collection of validation results for retention compliance.</returns>
+    private IEnumerable<ValidationResult> ValidateRetentionCompliance()
+    {
+        var documentAge = DateTime.UtcNow - CreationDate;
+        
+        // Legal document retention validation
+        if (documentAge.TotalDays > (7 * 365) && IsDeleted && !HasValidAuditTrail())
+        {
+            // 7 years typical legal retention
+            yield return new ValidationResult(
+                "Documents subject to legal retention (>7 years) must maintain complete audit trails even when deleted.",
+                [nameof(IsDeleted), nameof(DocumentActivityUsers)]);
+        }
+
+        // Active litigation hold validation
+        if ((FileName.Contains("litigation", StringComparison.OrdinalIgnoreCase) ||
+             FileName.Contains("discovery", StringComparison.OrdinalIgnoreCase)) && IsDeleted)
+        {
+            yield return new ValidationResult(
+                "Documents related to active litigation cannot be deleted due to litigation hold requirements.",
+                [nameof(IsDeleted)]);
+        }
+
+        // Professional responsibility validation
+        if (TotalActivityCount <= 0) yield break;
+        var hasUserAttribution = DocumentActivityUsers.All(a => a.UserId != Guid.Empty);
+        if (!hasUserAttribution)
+        {
+            yield return new ValidationResult(
+                "All document activities must have proper user attribution for professional responsibility compliance.",
+                [nameof(DocumentActivityUsers)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates data integrity and forensic requirements for legal documents.
+    /// </summary>
+    /// <returns>A collection of validation results for forensic compliance.</returns>
+    private IEnumerable<ValidationResult> ValidateForensicIntegrity()
+    {
+        // Checksum consistency validation
+        if (!string.IsNullOrWhiteSpace(Checksum) && FileSize > 100 * 1024 * 1024 && Checksum.Length != 64)
+        {
+            // Validate checksum matches expected file size patterns
+            // Large files should have SHA256
+            yield return new ValidationResult(
+                "Large files (>100MB) require SHA256 checksums (64 characters) for forensic integrity.",
+                [nameof(Checksum), nameof(FileSize)]);
+        }
+
+        // Temporal consistency validation for legal discovery
+        if (DocumentActivityUsers.Count > 1)
+        {
+            var activities = DocumentActivityUsers.OrderBy(a => a.CreatedAt).ToList();
+
+            for (var i = 1; i < activities.Count; i++)
+            {
+                var timeDiff = activities[i].CreatedAt - activities[i - 1].CreatedAt;
+                if (timeDiff.TotalMilliseconds >= 0) continue;
+                yield return new ValidationResult(
+                    "Document activity timestamps must be chronologically consistent for legal discovery.",
+                    [nameof(DocumentActivityUsers)]);
+                break;
+            }
+        }
+
+        // Chain of custody validation
+        if (MatterDocumentActivityUsersFrom.Count <= 0 && MatterDocumentActivityUsersTo.Count <= 0) yield break;
+        var transferGap = Math.Abs(MatterDocumentActivityUsersFrom.Count - MatterDocumentActivityUsersTo.Count);
+        if (transferGap > 1) // Allow small variance for system timing
+        {
+            yield return new ValidationResult(
+                "Document transfer chain of custody appears broken. Verify all transfers are properly documented.",
+                [nameof(MatterDocumentActivityUsersFrom), nameof(MatterDocumentActivityUsersTo)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates professional ethics and legal practice standards.
+    /// </summary>
+    /// <returns>A collection of validation results for professional standards.</returns>
+    private IEnumerable<ValidationResult> ValidateProfessionalStandards()
+    {
+        // Professional naming conventions
+        if (!string.IsNullOrWhiteSpace(FileName))
+        {
+            // Check for inappropriate content
+            var inappropriateTerms = new[] { "temp", "test", "delete", "junk", "trash" };
+            if (inappropriateTerms.Any(term => FileName.Contains(term, StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return new ValidationResult(
+                    "Document names should follow professional naming conventions for client presentation.",
+                    [nameof(FileName)]);
+            }
+
+            // Version control best practices
+            var versionPatterns = new[] { "_v", "_version", "_rev", "_draft" };
+            var hasVersionIndicator = versionPatterns.Any(pattern => 
+                FileName.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+
+            if (hasVersionIndicator && TotalActivityCount < 2)
+            {
+                yield return new ValidationResult(
+                    "Documents with version indicators should have corresponding activity history.",
+                    [nameof(FileName), nameof(TotalActivityCount)]);
+            }
+        }
+
+        // Client communication standards
+        if (FileSize > 25 * 1024 * 1024) // 25MB threshold for email attachments
+        {
+            yield return new ValidationResult(
+                "Large documents (>25MB) may require special handling for client communication. " +
+                "Consider document optimization or secure transfer methods.",
+                [nameof(FileSize)]);
+        }
+
+        // Professional document completeness
+        if (!IsDeleted && FileSize < 1024) // Very small files
+        {
+            yield return new ValidationResult(
+                "Very small documents (<1KB) may indicate incomplete content. " +
+                "Verify document completeness before client delivery.",
+                [nameof(FileSize)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates document workflow and state transitions for professional practice.
+    /// </summary>
+    /// <returns>A collection of validation results for workflow validation.</returns>
+    private IEnumerable<ValidationResult> ValidateWorkflowStates()
+    {
+        // Check-out workflow validation
+        if (IsCheckedOut)
+        {
+            var checkoutActivities = DocumentActivityUsers.Where(a => 
+                string.Equals(a.DocumentActivity?.Activity, "CHECKED_OUT", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(a => a.CreatedAt);
+
+            if (!checkoutActivities.Any())
+            {
+                yield return new ValidationResult(
+                    "Checked out documents must have corresponding CHECKED_OUT activity for audit compliance.",
+                    [nameof(IsCheckedOut), nameof(DocumentActivityUsers)]);
+            }
+            else
+            {
+                var latestCheckout = checkoutActivities.First();
+                var checkInAfterCheckout = DocumentActivityUsers.Any(a => 
+                    string.Equals(a.DocumentActivity?.Activity, "CHECKED_IN", StringComparison.OrdinalIgnoreCase) &&
+                    a.CreatedAt > latestCheckout.CreatedAt);
+
+                if (checkInAfterCheckout)
+                {
+                    yield return new ValidationResult(
+                        "Document marked as checked out but has check-in activity after latest check-out. " +
+                        "Verify document state consistency.",
+                        [nameof(IsCheckedOut)]);
+                }
+            }
+        }
+
+        // Deletion workflow validation
+        if (!IsDeleted) yield break;
+        var deletionActivities = DocumentActivityUsers.Where(a => 
+            string.Equals(a.DocumentActivity?.Activity, "DELETED", StringComparison.OrdinalIgnoreCase));
+
+        if (!deletionActivities.Any())
+        {
+            yield return new ValidationResult(
+                "Deleted documents must have corresponding DELETED activity for audit compliance.",
+                [nameof(IsDeleted), nameof(DocumentActivityUsers)]);
+        }
+
+        // Check for activities after deletion
+        var latestDeletion = deletionActivities.OrderByDescending(a => a.CreatedAt).FirstOrDefault();
+        if (latestDeletion == null) yield break;
+        var activitiesAfterDeletion = DocumentActivityUsers.Where(a => 
+            a.CreatedAt > latestDeletion.CreatedAt &&
+            !string.Equals(a.DocumentActivity?.Activity, "RESTORED", StringComparison.OrdinalIgnoreCase));
+
+        if (activitiesAfterDeletion.Any())
+        {
+            yield return new ValidationResult(
+                "Document has activities after deletion without restoration. Verify audit trail integrity.",
+                [nameof(DocumentActivityUsers)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates advanced cross-property business rules for enhanced integrity.
+    /// </summary>
+    /// <returns>A collection of validation results for advanced business rules.</returns>
+    private IEnumerable<ValidationResult> ValidateAdvancedBusinessRules()
+    {
+        // Document-Activity correlation validation
+        if (TotalActivityCount > 0)
+        {
+            var uniqueUsers = DocumentActivityUsers.Select(a => a.UserId).Distinct().Count();
+            if (TotalActivityCount > 50 && uniqueUsers == 1)
+            {
+                yield return new ValidationResult(
+                    "High activity count with single user may indicate automated processing. " +
+                    "Verify appropriate user attribution for professional accountability.",
+                    [nameof(DocumentActivityUsers)]);
+            }
+        }
+
+        // Transfer pattern validation
+        var transferFromCount = MatterDocumentActivityUsersFrom.Count;
+        var transferToCount = MatterDocumentActivityUsersTo.Count;
+        
+        if (transferFromCount > 5 || transferToCount > 5)
+        {
+            yield return new ValidationResult(
+                "Frequent document transfers (>5) may indicate organizational issues. " +
+                "Review matter structure and document organization strategy.",
+                [nameof(MatterDocumentActivityUsersFrom), nameof(MatterDocumentActivityUsersTo)]);
+        }
+
+        // File format and content correlation
+        if (string.IsNullOrWhiteSpace(Extension) || string.IsNullOrWhiteSpace(MimeType)) yield break;
+        // Specific validations for legal document types
+        if (Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase) && FileSize > 50 * 1024 * 1024)
+        {
+            // 50MB
+            yield return new ValidationResult(
+                "Large PDF files may contain embedded content that affects legal admissibility. " +
+                "Verify content appropriateness and consider optimization.",
+                [nameof(FileSize), nameof(Extension)]);
+        }
+
+        if (!Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase) || !IsCheckedOut) yield break;
+        // Word documents should typically not remain checked out for extended periods
+        var checkoutActivities = DocumentActivityUsers.Where(a => 
+            string.Equals(a.DocumentActivity?.Activity, "CHECKED_OUT", StringComparison.OrdinalIgnoreCase));
+                
+        var latestCheckout = checkoutActivities.OrderByDescending(a => a.CreatedAt).FirstOrDefault();
+        if (latestCheckout != null && (DateTime.UtcNow - latestCheckout.CreatedAt).TotalDays > 7)
+        {
+            yield return new ValidationResult(
+                "Word documents checked out for extended periods (>7 days) may indicate workflow issues. " +
+                "Verify document is not abandoned in editing state.",
+                [nameof(IsCheckedOut)]);
+        }
+    }
 }
