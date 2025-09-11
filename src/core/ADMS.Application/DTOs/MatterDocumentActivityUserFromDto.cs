@@ -268,6 +268,27 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
             CreatedAt = entity.CreatedAt
         };
 
+        switch (includeNavigationProperties)
+        {
+            case false:
+                return dto;
+            case true:
+            {
+                if (entity.MatterDocumentActivity != null)
+                    dto = dto with
+                    {
+                        MatterDocumentActivity = MatterDocumentActivityDto.FromEntity(entity.MatterDocumentActivity)
+                    };
+                if (entity.Document != null)
+                    dto = dto with { Document = DocumentWithoutRevisionsDto.FromEntity(entity.Document) };
+                if (entity.User != null)
+                    dto = dto with { User = UserDto.FromEntity(entity.User) };
+                if (entity.Matter != null)
+                    dto = dto with { Matter = MatterWithoutDocumentsDto.FromEntity(entity.Matter) };
+                break;
+            }
+        }
+
         // Navigation properties can be set separately if needed for performance
         // dto.Matter = entity.Matter != null ? MatterWithoutDocumentsDto.FromEntity(entity.Matter) : null;
         // dto.Document = entity.Document != null ? DocumentWithoutRevisionsDto.FromEntity(entity.Document) : null;
