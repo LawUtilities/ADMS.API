@@ -1,7 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ADMS.Application.Common.Validation;
+
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using ADMS.Application.Common.Validation;
 
 namespace ADMS.Application.DTOs;
 
