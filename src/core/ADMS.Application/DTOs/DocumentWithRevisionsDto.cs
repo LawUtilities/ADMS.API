@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using ADMS.Application.Common;
+using ADMS.Domain.Entities;
 
 namespace ADMS.Application.DTOs;
 
@@ -417,6 +418,58 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// </example>
     public bool IsDeleted { get; set; }
 
+    /// <summary>
+    /// Gets or sets the creation date and time of the document in UTC.
+    /// </summary>
+    /// <remarks>
+    /// The creation date establishes the temporal foundation for the document lifecycle and must be accurately
+    /// maintained for legal audit trail compliance and professional document management standards.
+    /// </remarks>
+    [Required(ErrorMessage = "Creation date is required for temporal tracking and audit compliance.")]
+    public required DateTime CreationDate { get; init; }
+
+    /// <summary>
+    /// Validates creation date using BaseValidationDto patterns.
+    /// </summary>
+    /// <returns>A collection of validation results for creation date validation.</returns>
+    private IEnumerable<ValidationResult> ValidateCreationDate()
+    {
+        if (CreationDate == default)
+        {
+            yield return new ValidationResult(
+                "Creation date is required and cannot be the default value for temporal tracking and audit compliance.",
+                [nameof(CreationDate)]);
+            yield break;
+        }
+
+        // Use RevisionValidationHelper patterns for date validation
+        var minAllowedDate = RevisionValidationHelper.MinAllowedRevisionDate;
+        if (CreationDate < minAllowedDate)
+        {
+            yield return new ValidationResult(
+                $"Creation date cannot be earlier than {minAllowedDate:yyyy-MM-dd} for system consistency and reasonable temporal bounds.",
+                [nameof(CreationDate)]);
+        }
+
+        var maxAllowedDate = DateTime.UtcNow.AddMinutes(RevisionValidationHelper.FutureDateToleranceMinutes);
+        if (CreationDate > maxAllowedDate)
+        {
+            yield return new ValidationResult(
+                $"Creation date cannot be in the future (beyond clock skew tolerance of {RevisionValidationHelper.FutureDateToleranceMinutes} minutes).",
+                [nameof(CreationDate)]);
+        }
+
+        // Professional age validation
+        var age = DateTime.UtcNow - CreationDate;
+        if (age.TotalDays > RevisionValidationHelper.MaxReasonableAgeYears * 365)
+        {
+            yield return new ValidationResult(
+                $"Creation date age exceeds reasonable bounds for active document management ({RevisionValidationHelper.MaxReasonableAgeYears} years). " +
+                "Verify data accuracy and retention policy compliance.",
+                [nameof(CreationDate)]);
+        }
+    }
+
     #endregion Core Properties
 
     #region Collection Properties
@@ -829,6 +882,10 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
 
         // 5. Revision-Specific Validation (unique to DocumentWithRevisionsDto)
         foreach (var result in ValidateRevisionIntegrity())
+            yield return result;
+
+        // 6. Document Classification Validation
+        foreach (var result in ValidateDocumentClassification())
             yield return result;
     }
 
@@ -1329,7 +1386,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
                 ? entity.MatterDocumentActivityUsersFrom.Select(mdauf => MatterDocumentActivityUserFromDto.FromEntity(mdauf)).ToList()
                 : [],
             MatterDocumentActivityUsersTo = includeActivityUsers
-                ? entity.MatterDocumentActivityUsersTo.Select(mdaut => MatterDocumentActivityUserToDto.FromEntity(mdaut)).ToList()
+                ? entity.MatterDocumentActivityUsersTo.Select(mdaut => MatterDocumentActivityUserTo.FromEntity(mdaut)).ToList()
                 : []
         };
 
@@ -1802,5 +1859,138 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         }
     }
 
+    /// <summary>
+    /// Validates document classification and sensitivity requirements for legal compliance.
+    /// </summary>
+    /// <returns>A collection of validation results for classification validation.</returns>
+    private IEnumerable<ValidationResult> ValidateDocumentClassification()
+    {
+        // Privileged/Confidential document validation
+        if (FileName.Contains("privileged", StringComparison.OrdinalIgnoreCase) ||
+            FileName.Contains("confidential", StringComparison.OrdinalIgnoreCase) ||
+            FileName.Contains("attorney-client", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!HasActivities || !DocumentActivityUsers.Any(a => 
+                string.Equals(a.DocumentActivity?.Activity, "CREATED", StringComparison.OrdinalIgnoreCase)))
+            {
+                yield return new ValidationResult(
+                    "Privileged or confidential documents must have complete audit trail for legal compliance.",
+                    [nameof(DocumentActivityUsers)]);
+            }
+
+            // Privileged documents should have revisions for proper version control
+            if (Revisions.Count == 0)
+            {
+                yield return new ValidationResult(
+                    "Privileged documents must have at least one revision for complete version control integrity.",
+                    [nameof(Revisions)]);
+            }
+        }
+
+        // Work Product validation
+        if (FileName.Contains("draft", StringComparison.OrdinalIgnoreCase) ||
+            FileName.Contains("work product", StringComparison.OrdinalIgnoreCase))
+        {
+            if (FileSize == 0)
+            {
+                yield return new ValidationResult(
+                    "Work product documents cannot be empty for professional responsibility compliance.",
+                    [nameof(FileSize)]);
+            }
+
+            // Work product should have revision history to show development
+            if (Revisions.Count == 1 && TotalActivityCount < 2)
+            {
+                yield return new ValidationResult(
+                    "Work product documents should show development history through multiple activities or revisions.",
+                    [nameof(Revisions), nameof(TotalActivityCount)]);
+            }
+        }
+
+        // Court filing validation
+        if (!FileName.Contains("motion", StringComparison.OrdinalIgnoreCase) &&
+            !FileName.Contains("brief", StringComparison.OrdinalIgnoreCase) &&
+            !FileName.Contains("pleading", StringComparison.OrdinalIgnoreCase) &&
+            !FileName.Contains("filing", StringComparison.OrdinalIgnoreCase)) yield break;
+        if (!Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+        {
+            yield return new ValidationResult(
+                "Court documents should typically be in PDF format for filing compliance and court requirements.",
+                [nameof(Extension)]);
+        }
+
+        // Court documents should be finalized (not checked out)
+        if (IsCheckedOut)
+        {
+            yield return new ValidationResult(
+                "Court documents should not remain checked out as they represent final filings.",
+                [nameof(IsCheckedOut)]);
+        }
+    }
+
     #endregion Private Methods
+
+    #region Validation Helpers
+
+    /// <summary>
+    /// Validates advanced version control integrity and professional practices.
+    /// </summary>
+    /// <returns>A collection of validation results for version control validation.</returns>
+    private IEnumerable<ValidationResult> ValidateAdvancedVersionControl()
+    {
+        if (Revisions.Count == 0) yield break;
+
+        // Validate revision-to-activity correlation
+        var totalRevisionActivities = Revisions.Sum(r => r.ActivityCount);
+        var documentActivities = DocumentActivityUsers.Count;
+        
+        if (totalRevisionActivities == 0 && documentActivities > 0)
+        {
+            yield return new ValidationResult(
+                "Document has activities but revisions lack corresponding activity audit trails. " +
+                "Verify audit trail completeness for legal compliance.",
+                [nameof(Revisions), nameof(DocumentActivityUsers)]);
+        }
+
+        // Professional version control patterns
+        var revisionDates = Revisions.OrderBy(r => r.RevisionNumber).Select(r => r.CreationDate).ToList();
+        for (var i = 1; i < revisionDates.Count; i++)
+        {
+            var timeBetweenRevisions = revisionDates[i] - revisionDates[i - 1];
+            
+            // Check for rapid-fire revisions (potential data quality issue)
+            if (timeBetweenRevisions.TotalMinutes < 1)
+            {
+                yield return new ValidationResult(
+                    $"Revisions {i} and {i + 1} were created less than 1 minute apart. " +
+                    "This may indicate automated processing or data quality issues.",
+                    [nameof(Revisions)]);
+            }
+        }
+
+        // Version control best practices
+        var largeFileThreshold = 25 * 1024 * 1024; // 25MB
+        if (FileSize > largeFileThreshold && Revisions.Count > 10)
+        {
+            yield return new ValidationResult(
+                $"Large document ({FormattedFileSize}) with many revisions ({Revisions.Count}) may impact system performance. " +
+                "Verify data integrity and consider system optimization or archival.",
+                [nameof(FileSize), nameof(Revisions)]);
+        }
+
+        // Check for abandoned check-outs in version control
+        if (!IsCheckedOut || Revisions.Count <= 1) yield break;
+        var latestRevision = Revisions.OrderByDescending(r => r.RevisionNumber).First();
+        var timeSinceLastRevision = DateTime.UtcNow - latestRevision.ModificationDate;
+            
+        if (timeSinceLastRevision.TotalDays > 7)
+        {
+            yield return new ValidationResult(
+                "Document has been checked out for an extended period without new revisions. " +
+                "This may indicate an abandoned editing session.",
+                [nameof(IsCheckedOut), nameof(Revisions)]);
+        }
+    }
+
+    #endregion Validation Helpers
 }
