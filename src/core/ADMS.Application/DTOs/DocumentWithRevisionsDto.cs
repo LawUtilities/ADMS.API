@@ -2054,10 +2054,90 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
                 [nameof(DocumentActivityUsers)]);
         }
     }
-    
+
     #endregion Validation Helpers
 
     #region Validation Extensions
+
+    /// <summary>
+    /// Enhanced core properties validation.
+    /// </summary>
+    private IEnumerable<ValidationResult> ValidateCoreProperties()
+    {
+        // Existing validations...
+        foreach (var result in ValidateDocumentId())
+            yield return result;
+
+        foreach (var result in ValidateFileName())
+            yield return result;
+
+        foreach (var result in ValidateExtension())
+            yield return result;
+
+        foreach (var result in ValidateFileSize())
+            yield return result;
+
+        foreach (var result in ValidateMimeType())
+            yield return result;
+
+        foreach (var result in ValidateChecksum())
+            yield return result;
+
+        // NEW: Enhanced validations
+        foreach (var result in ValidateCreationDate())
+            yield return result;
+
+        foreach (var result in ValidateFileIntegrityAndConsistency())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Enhanced business rules validation.
+    /// </summary>
+    private IEnumerable<ValidationResult> ValidateBusinessRules()
+    {
+        // Existing business rules...
+        foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
+            MimeType, Extension, nameof(MimeType)))
+            yield return result;
+
+        if (IsCheckedOut && IsDeleted)
+        {
+            yield return new ValidationResult(
+                "A document cannot be both checked out and deleted simultaneously.",
+                [nameof(IsCheckedOut), nameof(IsDeleted)]);
+        }
+
+        // NEW: Enhanced business rules
+        foreach (var result in ValidateDocumentClassification())
+            yield return result;
+
+        foreach (var result in ValidateAdvancedVersionControl())
+            yield return result;
+
+        foreach (var result in ValidateAdvancedBusinessRules())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Enhanced collections validation.
+    /// </summary>
+    private IEnumerable<ValidationResult> ValidateCollections()
+    {
+        // Existing collection validations...
+        foreach (var result in ValidateRevisionsCollection())
+            yield return result;
+
+        foreach (var result in ValidateDocumentActivityUsers())
+            yield return result;
+
+        foreach (var result in ValidateMatterTransferActivities())
+            yield return result;
+
+        // NEW: Enhanced audit trail validation
+        foreach (var result in ValidateAuditTrailCompleteness())
+            yield return result;
+    }
 
     /// <summary>
     /// Validates advanced file integrity and consistency requirements.
