@@ -1748,62 +1748,56 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     {
         if (Revisions.Count == 0) yield break;
 
-        // Chronological consistency validation
-        var chronologicalRevisions = Revisions.OrderBy(r => r.RevisionNumber).ToList();
-        for (var i = 1; i < chronologicalRevisions.Count; i++)
+        // 1. Collection-level validation
+        foreach (var result in RevisionValidationHelper.ValidateRevisionCollection(
+            Revisions, Id, nameof(Revisions)))
+            yield return result;
+
+        // 2. Sequential numbering validation
+        foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionSequence(
+            Revisions, nameof(Revisions)))
+            yield return result;
+
+        // 3. Individual revision validation
+        var index = 0;
+        foreach (var revision in Revisions)
         {
-            var previousRevision = chronologicalRevisions[i - 1];
-            var currentRevision = chronologicalRevisions[i];
+            // Core revision validation
+            foreach (var result in RevisionValidationHelper.ValidateRevisionBusinessRules(
+                revision.RevisionNumber, revision.CreationDate, revision.ModificationDate,
+                revision.DocumentId, revision.IsDeleted, $"Revisions[{index}]."))
+                yield return result;
 
-            if (currentRevision.CreationDate < previousRevision.CreationDate)
-            {
-                yield return new ValidationResult(
-                    $"Revision {currentRevision.RevisionNumber} creation date cannot be before revision {previousRevision.RevisionNumber}.",
-                    [nameof(Revisions)]);
-            }
+            // Activity audit trail validation
+            foreach (var result in RevisionValidationHelper.ValidateActivityAuditTrail(
+                revision.RevisionActivityUsers, revision.RevisionNumber, revision.IsDeleted,
+                $"Revisions[{index}].RevisionActivityUsers"))
+                yield return result;
 
-            // Modification date consistency
-            if (currentRevision.CreationDate < previousRevision.ModificationDate)
-            {
-                yield return new ValidationResult(
-                    $"Revision {currentRevision.RevisionNumber} creation date should not be before previous revision's modification date.",
-                    [nameof(Revisions)]);
-            }
+            // Document-revision date consistency
+            foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionDates(
+                revision.CreationDate, CreationDate, revision.RevisionNumber,
+                $"Revisions[{index}].CreationDate"))
+                yield return result;
+
+            // Professional standards validation
+            var developmentTime = revision.ModificationDate - revision.CreationDate;
+            foreach (var result in RevisionValidationHelper.ValidateProfessionalStandards(
+                revision.RevisionNumber, revision.CreationDate, developmentTime,
+                revision.ActivityCount, $"Revisions[{index}]."))
+                yield return result;
+
+            index++;
         }
 
-        // Current revision validation
-        var actualCurrentRevision = Revisions.OrderByDescending(r => r.RevisionNumber).FirstOrDefault();
-        if (actualCurrentRevision != null && CurrentRevision != null && actualCurrentRevision.RevisionNumber != CurrentRevision.RevisionNumber)
+        // 4. Cross-revision validation
+        var revisionNumbers = Revisions.Select(r => r.RevisionNumber);
+        var sequenceAnalysis = RevisionValidationHelper.AnalyzeRevisionSequence(revisionNumbers);
+        
+        if (!(bool)sequenceAnalysis["IsValid"])
         {
             yield return new ValidationResult(
-                "Current revision must be the revision with the highest revision number.",
-                [nameof(CurrentRevision), nameof(Revisions)]);
-        }
-
-        // Professional version control standards
-        if (Revisions.Count > 1)
-        {
-            // Check for reasonable revision intervals
-            var revisionIntervals = chronologicalRevisions
-                .Zip(chronologicalRevisions.Skip(1), (prev, curr) => curr.CreationDate - prev.CreationDate) // Less than 1 minute between revisions
-                .Count(interval => interval.TotalSeconds < 60);
-
-            if (revisionIntervals > Revisions.Count * 0.5) // More than 50% of revisions are very rapid
-            {
-                yield return new ValidationResult(
-                    "Multiple revisions created within very short intervals may indicate automated processing. " +
-                    "Verify revision creation patterns for professional document management.",
-                    [nameof(Revisions)]);
-            }
-        }
-
-        // Audit trail completeness for revisions
-        var revisionsWithoutActivities = Revisions.Count(r => r.ActivityCount == 0);
-        if (revisionsWithoutActivities > 0)
-        {
-            yield return new ValidationResult(
-                $"{revisionsWithoutActivities} revision(s) lack activity audit trails. " +
-                "All revisions should have corresponding activity records for legal compliance.",
+                "Revision sequence validation failed. Ensure sequential numbering without gaps.",
                 [nameof(Revisions)]);
         }
     }
