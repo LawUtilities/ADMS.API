@@ -1,10 +1,10 @@
-﻿using ADMS.Application.Common.Validation;
+﻿using ADMS.Application.Common;
+using ADMS.Application.Common.Validation;
+using ADMS.Domain.Entities;
 
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
-using ADMS.Application.Common;
-using ADMS.Domain.Entities;
 
 namespace ADMS.Application.DTOs;
 
@@ -2056,4 +2056,170 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     }
     
     #endregion Validation Helpers
+
+    #region Validation Extensions
+
+    /// <summary>
+    /// Validates advanced file integrity and consistency requirements.
+    /// </summary>
+    /// <returns>A collection of validation results for file integrity validation.</returns>
+    private IEnumerable<ValidationResult> ValidateFileIntegrityAndConsistency()
+    {
+        // Enhanced checksum validation
+        if (!string.IsNullOrWhiteSpace(Checksum))
+        {
+            // Validate checksum format matches file size expectations
+            if (FileSize > 100 * 1024 * 1024 && Checksum.Length != 64) // Large files should have SHA256
+            {
+                yield return new ValidationResult(
+                    "Large files (>100MB) require SHA256 checksums (64 characters) for enhanced security and forensic integrity.",
+                    [nameof(Checksum), nameof(FileSize)]);
+            }
+
+            // Check for common weak checksums
+            if (Checksum.Length == 32)
+            {
+                yield return new ValidationResult(
+                    "MD5 checksums (32 characters) are deprecated for legal documents. Consider upgrading to SHA256 for enhanced security.",
+                    [nameof(Checksum)]);
+            }
+        }
+
+        // File format consistency validation
+        if (!string.IsNullOrWhiteSpace(Extension) && !string.IsNullOrWhiteSpace(MimeType))
+        {
+            // Specific validations for legal document types
+            if (Extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!MimeType.Equals("application/pdf", StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return new ValidationResult(
+                        "PDF files must have 'application/pdf' MIME type for proper handling and security.",
+                        [nameof(MimeType), nameof(Extension)]);
+                }
+
+                // PDF size validation for legal compliance
+                if (FileSize > 50 * 1024 * 1024) // 50MB
+                {
+                    yield return new ValidationResult(
+                        "Large PDF files may contain embedded content that affects legal admissibility. " +
+                        "Verify content appropriateness and consider optimization for court filing systems.",
+                        [nameof(FileSize), nameof(Extension)]);
+                }
+            }
+
+            // Microsoft Office document validation
+            if (Extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
+            {
+                var expectedMimeType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+                if (!MimeType.Equals(expectedMimeType, StringComparison.OrdinalIgnoreCase))
+                {
+                    yield return new ValidationResult(
+                        $"DOCX files must have correct MIME type: {expectedMimeType}",
+                        [nameof(MimeType), nameof(Extension)]);
+                }
+            }
+        }
+
+        // Professional file naming validation
+        if (string.IsNullOrWhiteSpace(FileName)) yield break;
+        // Check for version indicators in filename vs actual revisions
+        var versionPatterns = new[] { "_v", "_version", "_rev", "_draft", "copy", "final" };
+        var hasVersionIndicator = versionPatterns.Any(pattern => 
+            FileName.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+
+        if (hasVersionIndicator && Revisions.Count <= 1)
+        {
+            yield return new ValidationResult(
+                "File name suggests versioning but document has minimal revision history. " +
+                "Consider using proper version control instead of filename versioning.",
+                [nameof(FileName), nameof(Revisions)]);
+        }
+
+        // Professional naming standards
+        if (FileName.Length < 5)
+        {
+            yield return new ValidationResult(
+                "Very short file names may not provide adequate document identification for professional practice.",
+                [nameof(FileName)]);
+        }
+
+        // Check for temporary or inappropriate naming
+        var inappropriateTerms = new[] { "temp", "test", "delete", "junk", "trash", "tmp", "untitled" };
+        if (inappropriateTerms.Any(term => FileName.Contains(term, StringComparison.OrdinalIgnoreCase)))
+        {
+            yield return new ValidationResult(
+                "File name contains temporary or inappropriate terms. Use professional naming conventions for client-facing documents.",
+                [nameof(FileName)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates advanced cross-property business rules for enhanced integrity.
+    /// </summary>
+    /// <returns>A collection of validation results for advanced business rules.</returns>
+    private IEnumerable<ValidationResult> ValidateAdvancedBusinessRules()
+    {
+        // Document state consistency with revisions
+        if (IsDeleted && Revisions.Any(r => !r.IsDeleted))
+        {
+            yield return new ValidationResult(
+                "Deleted documents should not have active revisions. Ensure consistent deletion state across document and revisions.",
+                [nameof(IsDeleted), nameof(Revisions)]);
+        }
+
+        // Check-out consistency with revision activity
+        if (IsCheckedOut && Revisions.Count > 0)
+        {
+            var latestRevision = Revisions.OrderByDescending(r => r.RevisionNumber).First();
+            var recentCheckOutActivity = DocumentActivityUsers
+                .Where(a => string.Equals(a.DocumentActivity?.Activity, "CHECKED_OUT", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(a => a.CreatedAt)
+                .FirstOrDefault();
+
+            if (recentCheckOutActivity != null && recentCheckOutActivity.CreatedAt < latestRevision.ModificationDate)
+            {
+                yield return new ValidationResult(
+                    "Document is marked as checked out but has revisions modified after the latest check-out activity. " +
+                    "Verify document state consistency.",
+                    [nameof(IsCheckedOut), nameof(Revisions)]);
+            }
+        }
+
+        // Transfer activity balance validation
+        var transferFromCount = MatterDocumentActivityUsersFrom.Count;
+        var transferToCount = MatterDocumentActivityUsersTo.Count;
+
+        if (Math.Abs(transferFromCount - transferToCount) > 5) // Allow some variance
+        {
+            yield return new ValidationResult(
+                "Document transfer audit trail appears significantly unbalanced between source and destination activities. " +
+                "Verify bidirectional tracking completeness for legal compliance.",
+                [nameof(MatterDocumentActivityUsersFrom), nameof(MatterDocumentActivityUsersTo)]);
+        }
+
+        // Activity density analysis
+        if (TotalActivityCount > 0 && Revisions.Count > 0)
+        {
+            var documentAge = DateTime.UtcNow - CreationDate;
+            var activitiesPerDay = documentAge.TotalDays > 0 ? TotalActivityCount / documentAge.TotalDays : 0;
+
+            if (activitiesPerDay > 10) // More than 10 activities per day on average
+            {
+                yield return new ValidationResult(
+                    $"High activity density ({activitiesPerDay:F1} activities/day) may indicate automated processing or unusual usage patterns. " +
+                    "Verify data quality and user activity patterns.",
+                    [nameof(DocumentActivityUsers)]);
+            }
+        }
+
+        // Professional document complexity validation
+        if (Revisions.Count > 20 && FileSize < 1024) // Many revisions but tiny file
+        {
+            yield return new ValidationResult(
+                "High revision count with very small file size may indicate data quality issues or inappropriate version control usage.",
+                [nameof(Revisions), nameof(FileSize)]);
+        }
+    }
+    #endregion Validation Extensions
 }
