@@ -1992,5 +1992,68 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         }
     }
 
+    /// <summary>
+    /// Validates comprehensive audit trail completeness for legal compliance.
+    /// </summary>
+    /// <returns>A collection of validation results for audit trail validation.</returns>
+    private IEnumerable<ValidationResult> ValidateAuditTrailCompleteness()
+    {
+        // Enhanced audit trail validation
+        if (!IsDeleted && TotalActivityCount == 0)
+        {
+            yield return new ValidationResult(
+                "Active documents must have audit trail activities for legal compliance and professional accountability.",
+                [nameof(DocumentActivityUsers)]);
+        }
+
+        // Check for audit trail gaps
+        if (Revisions.Count > 0 && DocumentActivityUsers.Count > 0)
+        {
+            var oldestRevision = Revisions.Min(r => r.CreationDate);
+            var oldestActivity = DocumentActivityUsers.Min(a => a.CreatedAt);
+
+            var timeDifference = Math.Abs((oldestRevision - oldestActivity).TotalDays);
+            if (timeDifference > 1) // More than 1 day difference
+            {
+                yield return new ValidationResult(
+                    "Significant time gap between first revision and first activity may indicate incomplete audit trail data.",
+                    [nameof(Revisions), nameof(DocumentActivityUsers)]);
+            }
+        }
+
+        // Validate user attribution completeness
+        var activitiesWithoutUsers = DocumentActivityUsers.Where(a => a.UserId == Guid.Empty).Count();
+        if (activitiesWithoutUsers > 0)
+        {
+            yield return new ValidationResult(
+                $"{activitiesWithoutUsers} document activities lack proper user attribution. " +
+                "All activities must have user accountability for legal compliance.",
+                [nameof(DocumentActivityUsers)]);
+        }
+
+        // Check for required activity types
+        if (Revisions.Count > 0)
+        {
+            var hasCreationActivity = DocumentActivityUsers.Any(a =>
+                string.Equals(a.DocumentActivity?.Activity, "CREATED", StringComparison.OrdinalIgnoreCase));
+
+            if (!hasCreationActivity && !IsDeleted)
+            {
+                yield return new ValidationResult(
+                    "Documents with revisions should have a CREATED activity for complete audit trail.",
+                    [nameof(DocumentActivityUsers)]);
+            }
+        }
+
+        // Professional activity count validation
+        if (TotalActivityCount > RevisionValidationHelper.MaxReasonableActivityCount * 3) // Higher threshold for documents
+        {
+            yield return new ValidationResult(
+                $"Document has an unusually high activity count (>{RevisionValidationHelper.MaxReasonableActivityCount * 3}). " +
+                "Verify data integrity and consider system optimization.",
+                [nameof(DocumentActivityUsers)]);
+        }
+    }
+    
     #endregion Validation Helpers
 }
