@@ -1,6 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ADMS.Application.Common.Validation;
+
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+using ADMS.Application.Common;
 
 namespace ADMS.Application.DTOs;
 
@@ -9,7 +12,7 @@ namespace ADMS.Application.DTOs;
 /// </summary>
 /// <remarks>
 /// This DTO serves as the complete representation of a document within the ADMS legal document management system,
-/// corresponding to <see cref="ADMS.API.Entities.Document"/>. It provides comprehensive document data including
+/// corresponding to <see cref="ADMS.Domain.Entities.Document"/>. It provides comprehensive document data including
 /// complete revision collections and all audit trail associations for legal compliance and professional accountability.
 /// 
 /// <para><strong>Key Characteristics:</strong></para>
@@ -17,12 +20,12 @@ namespace ADMS.Application.DTOs;
 /// <item><strong>Complete Document Representation:</strong> Full representation of document with all relationships</item>
 /// <item><strong>Revision History Inclusion:</strong> Complete revision history for version control and audit trails</item>
 /// <item><strong>Professional Validation:</strong> Uses centralized FileValidationHelper for comprehensive data integrity</item>
-/// <item><strong>Entity Synchronization:</strong> Mirrors all properties and relationships from ADMS.API.Entities.Document</item>
+/// <item><strong>Entity Synchronization:</strong> Mirrors all properties and relationships from ADMS.Domain.Entities.Document</item>
 /// <item><strong>Legal Compliance Support:</strong> Designed for comprehensive audit reporting and legal compliance</item>
 /// </list>
 /// 
 /// <para><strong>Entity Relationship Mirror:</strong></para>
-/// This DTO represents the complete structure from ADMS.API.Entities.Document:
+/// This DTO represents the complete structure from ADMS.Domain.Entities.Document:
 /// <list type="bullet">
 /// <item><strong>Document Metadata:</strong> Complete file information, checksums, and status flags</item>
 /// <item><strong>Revision History:</strong> Complete RevisionDto collection for version control</item>
@@ -120,7 +123,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// </summary>
     /// <remarks>
     /// This GUID serves as the primary key and uniquely identifies the document within the ADMS system.
-    /// It corresponds directly to <see cref="ADMS.API.Entities.Document.Id"/> and is used for 
+    /// It corresponds directly to <see cref="ADMS.Domain.Entities.Document.Id"/> and is used for 
     /// establishing relationships, revision associations, and all system operations requiring 
     /// precise document identification.
     /// 
@@ -422,7 +425,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets or sets the collection of revisions for this document.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.Revisions"/> and maintains the 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.Revisions"/> and maintains the 
     /// complete version control history for the document. Each revision represents a specific version 
     /// with sequential numbering and comprehensive audit trails essential for legal document management.
     /// 
@@ -483,7 +486,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets or sets the collection of document activity users.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.DocumentActivityUsers"/> and tracks 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.DocumentActivityUsers"/> and tracks 
     /// all document-level activities performed by users. This provides comprehensive audit trails for 
     /// document operations essential for legal compliance and professional accountability.
     /// 
@@ -525,7 +528,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets or sets the collection of "from" matter document activity users.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.MatterDocumentActivityUsersFrom"/> and 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.MatterDocumentActivityUsersFrom"/> and 
     /// tracks all document transfer activities where this document was moved or copied FROM source matters to 
     /// destination matters. This provides source-side audit trails for document transfer operations.
     /// 
@@ -563,7 +566,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets or sets the collection of "to" matter document activity users.
     /// </summary>
     /// <remarks>
-    /// This collection mirrors <see cref="ADMS.API.Entities.Document.MatterDocumentActivityUsersTo"/> and 
+    /// This collection mirrors <see cref="ADMS.Domain.Entities.Document.MatterDocumentActivityUsersTo"/> and 
     /// tracks all document transfer activities where this document was moved or copied TO destination matters 
     /// from source matters. This provides destination-side audit trails completing the bidirectional transfer system.
     /// 
@@ -632,7 +635,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets the total count of revisions for this document.
     /// </summary>
     /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Document.RevisionCount"/> and provides 
+    /// This computed property mirrors <see cref="ADMS.Domain.Entities.Document.RevisionCount"/> and provides 
     /// a quick count of document versions, useful for version control analysis and display.
     /// </remarks>
     /// <example>
@@ -666,7 +669,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets the total count of all activities (document + transfer) for this document.
     /// </summary>
     /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Document.TotalActivityCount"/> and provides 
+    /// This computed property mirrors <see cref="ADMS.Domain.Entities.Document.TotalActivityCount"/> and provides 
     /// a comprehensive count of all activities associated with the document, useful for activity analysis.
     /// </remarks>
     /// <example>
@@ -682,7 +685,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Gets a value indicating whether this document has any activities recorded.
     /// </summary>
     /// <remarks>
-    /// This computed property mirrors <see cref="ADMS.API.Entities.Document.HasActivities"/> and 
+    /// This computed property mirrors <see cref="ADMS.Domain.Entities.Document.HasActivities"/> and 
     /// determines if the document has been used in the system, useful for activity analysis.
     /// </remarks>
     /// <example>
@@ -790,83 +793,42 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     #region Validation Implementation
 
     /// <summary>
-    /// Validates the <see cref="DocumentWithRevisionsDto"/> for data integrity and business rules compliance.
+    /// Validates the DocumentWithRevisionsDto using the standardized ADMS validation hierarchy.
     /// </summary>
     /// <param name="validationContext">The context information about the validation operation.</param>
     /// <returns>A collection of validation results indicating any validation failures.</returns>
     /// <remarks>
-    /// Performs comprehensive validation using centralized validation helpers for consistency with entity
-    /// validation rules. This ensures the DTO maintains the same validation standards as the corresponding
-    /// ADMS.API.Entities.Document entity while enforcing professional document management standards.
-    /// 
-    /// <para><strong>Comprehensive Validation Categories:</strong></para>
-    /// <list type="bullet">
-    /// <item><strong>ID Validation:</strong> Document ID validated for proper GUID structure</item>
-    /// <item><strong>File System Validation:</strong> File name, extension, and metadata validation</item>
-    /// <item><strong>Integrity Validation:</strong> Checksum, MIME type, and file size validation</item>
-    /// <item><strong>Collection Validation:</strong> Deep validation of revision and audit trail collections</item>
-    /// <item><strong>Business Rule Validation:</strong> Document-specific business rule compliance</item>
+    /// Implements comprehensive validation following the standardized ADMS validation hierarchy:
+    /// <list type="number">
+    /// <item><strong>Core Properties:</strong> Essential document properties using FileValidationHelper</item>
+    /// <item><strong>Business Rules:</strong> Document lifecycle, version control, and professional standards</item>
+    /// <item><strong>Cross-Property:</strong> MIME type consistency, temporal validation, and referential integrity</item>
+    /// <item><strong>Collections:</strong> Deep validation of revision and activity audit trail collections</item>
+    /// <item><strong>Revision-Specific:</strong> Version control integrity and revision history validation</item>
     /// </list>
-    /// 
-    /// <para><strong>Professional Standards Integration:</strong></para>
-    /// Uses centralized validation helpers (FileValidationHelper, DtoValidationHelper) to ensure
-    /// consistency across all document validation in the system.
     /// </remarks>
-    /// <example>
-    /// <code>
-    /// var dto = new DocumentWithRevisionsDto 
-    /// { 
-    ///     Id = Guid.Empty, // Invalid
-    ///     FileName = "", // Invalid
-    ///     Revisions = new List&lt;RevisionDto&gt; { null } // Invalid
-    /// };
-    /// 
-    /// var context = new ValidationContext(dto);
-    /// var results = dto.Validate(context);
-    /// 
-    /// foreach (var result in results)
-    /// {
-    ///     Console.WriteLine($"Document Validation Error: {result.ErrorMessage}");
-    /// }
-    /// </code>
-    /// </example>
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        // Validate document ID
-        foreach (var result in ValidateDocumentId())
+        ArgumentNullException.ThrowIfNull(validationContext);
+
+        // 1. Core Properties Validation (inherited from DocumentWithoutRevisionsDto)
+        foreach (var result in ValidateCoreProperties())
             yield return result;
 
-        // Validate file system properties
-        foreach (var result in ValidateFileName())
-            yield return result;
-
-        foreach (var result in ValidateExtension())
-            yield return result;
-
-        foreach (var result in ValidateFileSize())
-            yield return result;
-
-        foreach (var result in ValidateMimeType())
-            yield return result;
-
-        foreach (var result in ValidateChecksum())
-            yield return result;
-
-        // Validate business rules
+        // 2. Business Rules Validation (enhanced for revisions)
         foreach (var result in ValidateBusinessRules())
             yield return result;
 
-        // Validate collections using centralized helper
-        foreach (var result in ValidateRevisions())
+        // 3. Cross-Property Validation (enhanced for revisions)
+        foreach (var result in ValidateCrossPropertyRules())
+            yield return result;
+            
+        // 4. Collections Validation (enhanced for revisions)
+        foreach (var result in ValidateCollections())
             yield return result;
 
-        foreach (var result in ValidateDocumentActivityUsers())
-            yield return result;
-
-        foreach (var result in ValidateMatterDocumentActivityUsersFrom())
-            yield return result;
-
-        foreach (var result in ValidateMatterDocumentActivityUsersTo())
+        // 5. Revision-Specific Validation (unique to DocumentWithRevisionsDto)
+        foreach (var result in ValidateRevisionIntegrity())
             yield return result;
     }
 
@@ -952,7 +914,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         {
             yield return new ValidationResult(
                 $"Extension '{Extension}' is not allowed for legal document management. " +
-                $"Allowed extensions: {string.Join(", ", FileValidationHelper.AllowedExtensionsList)}",
+                $"Allowed extensions: {string.Join(", ", FileValidationHelper.AllowedExtensions)}",
                 [nameof(Extension)]);
         }
 
@@ -1056,16 +1018,17 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     }
 
     /// <summary>
-    /// Validates business rules specific to document management.
+    /// Validates business rules specific to documents with revisions.
     /// </summary>
     /// <returns>A collection of validation results for business rule compliance.</returns>
-    /// <remarks>
-    /// Validates document-specific business rules such as mutual exclusivity constraints
-    /// and professional document management standards.
-    /// </remarks>
     private IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        // Business rule: Document cannot be both checked out and deleted
+        // Base business rules from DocumentWithoutRevisionsDto
+        foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
+            MimeType, Extension, nameof(MimeType)))
+            yield return result;
+
+        // Document cannot be both checked out and deleted
         if (IsCheckedOut && IsDeleted)
         {
             yield return new ValidationResult(
@@ -1074,15 +1037,60 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
                 [nameof(IsCheckedOut), nameof(IsDeleted)]);
         }
 
-        // Business rule: Validate MIME type and extension consistency
-        if (string.IsNullOrWhiteSpace(Extension) || string.IsNullOrWhiteSpace(MimeType)) yield break;
-        var expectedMimeTypes = GetExpectedMimeTypesForExtension(Extension.ToLowerInvariant());
-        if (expectedMimeTypes.Any() && !expectedMimeTypes.Contains(MimeType, StringComparer.OrdinalIgnoreCase))
+        // Professional standards validation
+        if (!string.IsNullOrWhiteSpace(Extension) && !FileValidationHelper.IsLegalDocumentFormat(Extension))
         {
             yield return new ValidationResult(
-                $"MIME type '{MimeType}' does not match the expected types for extension '{Extension}'. " +
-                $"Expected: {string.Join(", ", expectedMimeTypes)}",
-                [nameof(MimeType), nameof(Extension)]);
+                $"Extension '{Extension}' is not a standard legal document format. " +
+                "Consider using PDF, DOCX, or other approved legal document formats.",
+                [nameof(Extension)]);
+        }
+
+        // REVISION-SPECIFIC BUSINESS RULES
+        
+        // Documents with revisions must have at least one revision
+        if (Revisions.Count == 0)
+        {
+            yield return new ValidationResult(
+                "Documents must have at least one revision for version control integrity.",
+                [nameof(Revisions)]);
+        }
+
+        // Current revision must exist and be valid
+        if (CurrentRevision == null && Revisions.Count > 0)
+        {
+            yield return new ValidationResult(
+                "Document with revisions must have a valid current revision.",
+                [nameof(Revisions)]);
+        }
+
+        // Version control business rules
+        if (Revisions.Count > 0)
+        {
+            var maxRevisionNumber = Revisions.Max(r => r.RevisionNumber);
+            if (maxRevisionNumber != Revisions.Count)
+            {
+                yield return new ValidationResult(
+                    "Revision numbering must be sequential starting from 1 for version control integrity.",
+                    [nameof(Revisions)]);
+            }
+
+            // Professional version control limits
+            if (Revisions.Count > RevisionValidationHelper.MaxReasonableRevisionCount)
+            {
+                yield return new ValidationResult(
+                    $"Document has an unusually high revision count (>{RevisionValidationHelper.MaxReasonableRevisionCount}). " +
+                    "Verify version control practices and consider consolidation.",
+                    [nameof(Revisions)]);
+            }
+        }
+
+        // Deleted documents with revisions should have deletion audit trail
+        if (IsDeleted && Revisions.Count > 0 && !HasValidAuditTrail())
+        {
+            yield return new ValidationResult(
+                "Deleted documents with revision history must maintain comprehensive audit trails for legal compliance.",
+                [nameof(IsDeleted), nameof(Revisions)]);
         }
     }
 
@@ -1222,7 +1230,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     }
 
     /// <summary>
-    /// Creates a DocumentWithRevisionsDto from ADMS.API.Entities.Document entity with validation.
+    /// Creates a DocumentWithRevisionsDto from ADMS.Domain.Entities.Document entity with validation.
     /// </summary>
     /// <param name="entity">The Document entity to convert. Cannot be null.</param>
     /// <param name="includeRevisions">Whether to include revision collections in the conversion.</param>
@@ -1232,7 +1240,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// <exception cref="ValidationException">Thrown when the resulting DTO fails validation.</exception>
     /// <remarks>
     /// This factory method provides a safe way to create DocumentWithRevisionsDto instances from
-    /// ADMS.API.Entities.Document entities with automatic validation and comprehensive error handling.
+    /// ADMS.Domain.Entities.Document entities with automatic validation and comprehensive error handling.
     /// 
     /// <para><strong>Entity Mapping:</strong></para>
     /// Maps all core properties and conditionally includes related collections based on parameters.
@@ -1243,7 +1251,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// <example>
     /// <code>
     /// // Create from entity with full relationships
-    /// var entity = new ADMS.API.Entities.Document 
+    /// var entity = new ADMS.Domain.Entities.Document 
     /// { 
     ///     Id = Guid.NewGuid(),
     ///     FileName = "Contract.pdf",
@@ -1258,7 +1266,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     ///                                             includeActivityUsers: true);
     /// </code>
     /// </example>
-    public static DocumentWithRevisionsDto FromEntity(Entities.Document entity,
+    public static DocumentWithRevisionsDto FromEntity(ADMS.Domain.Entities.Document entity,
                                                     bool includeRevisions = true,
                                                     bool includeActivityUsers = false)
     {
@@ -1291,6 +1299,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
                         Checksum = dau.Document.Checksum,
                         IsCheckedOut = dau.Document.IsCheckedOut,
                         IsDeleted = dau.Document.IsDeleted,
+                        CreationDate = dau.CreatedAt,
                         DocumentActivityUsers = [],
                         MatterDocumentActivityUsersFrom = [],
                         MatterDocumentActivityUsersTo = []
@@ -1359,7 +1368,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// }
     /// </code>
     /// </example>
-    public static IList<DocumentWithRevisionsDto> FromEntities(IEnumerable<Entities.Document> entities,
+    public static IList<DocumentWithRevisionsDto> FromEntities(IEnumerable<Domain.Entities.Document> entities,
                                                              bool includeRevisions = true,
                                                              bool includeActivityUsers = false)
     {
@@ -1379,7 +1388,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// <returns>true if the specified DocumentWithRevisionsDto is equal to the current DocumentWithRevisionsDto; otherwise, false.</returns>
     /// <remarks>
     /// Equality is determined by comparing the Id property, as each document has a unique identifier.
-    /// This follows the same equality pattern as ADMS.API.Entities.Document for consistency.
+    /// This follows the same equality pattern as ADMS.Domain.Entities.Document for consistency.
     /// </remarks>
     public bool Equals(DocumentWithRevisionsDto? other)
     {
@@ -1510,12 +1519,6 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     {
         ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
 
-        if (collection is null)
-        {
-            yield return new ValidationResult($"{propertyName} collection cannot be null.", [propertyName]);
-            yield break;
-        }
-
         if (requireAtLeastOne && collection.Count == 0)
         {
             yield return new ValidationResult($"{propertyName} must contain at least one item.", [propertyName]);
@@ -1537,7 +1540,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
                         {
                             var memberNames = result.MemberNames.Any()
                                 ? result.MemberNames.Select(memberName => $"{propertyName}[{index}].{memberName}")
-                                : [$"{propertyName}[{index}]"];
+                                : [$"/{propertyName}[{index}"];
 
                             yield return new ValidationResult($"{propertyName}[{index}]: {result.ErrorMessage}", memberNames);
                         }
@@ -1574,4 +1577,236 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     private static partial Regex ChecksumRegex();
 
     #endregion Compiled Regular Expressions
+
+    #region Private Methods
+
+    /// <summary>
+    /// Validates cross-property relationships including revision consistency.
+    /// </summary>
+    /// <returns>A collection of validation results for cross-property validation.</returns>
+    private IEnumerable<ValidationResult> ValidateCrossPropertyRules()
+    {
+        // Base cross-property validation
+        if (!string.IsNullOrWhiteSpace(Extension) && !string.IsNullOrWhiteSpace(MimeType))
+        {
+            var expectedMimeTypes = FileValidationHelper.GetExpectedMimeTypes(Extension.ToLowerInvariant());
+            if (expectedMimeTypes.Length > 0 && !expectedMimeTypes.Contains(MimeType, StringComparer.OrdinalIgnoreCase))
+            {
+                yield return new ValidationResult(
+                    $"MIME type '{MimeType}' does not match the expected types for extension '{Extension}'. " +
+                    $"Expected: {string.Join(", ", expectedMimeTypes)}. " +
+                    "Ensure file format consistency for proper document handling.",
+                    [nameof(MimeType), nameof(Extension)]);
+            }
+        }
+
+        // REVISION-SPECIFIC CROSS-PROPERTY VALIDATION
+
+        // Document creation date consistency with revisions
+        if (Revisions.Count > 0)
+        {
+            var earliestRevision = Revisions.OrderBy(r => r.CreationDate).First();
+            if (earliestRevision.CreationDate < CreationDate)
+            {
+                yield return new ValidationResult(
+                    "Document creation date cannot be after the earliest revision creation date.",
+                    [nameof(CreationDate), nameof(Revisions)]);
+            }
+
+            // Revision document ID consistency
+            var inconsistentRevisions = Revisions.Where(r => 
+                r.DocumentId.HasValue && r.DocumentId.Value != Id).ToList();
+            
+            if (inconsistentRevisions.Count > 0)
+            {
+                yield return new ValidationResult(
+                    $"{inconsistentRevisions.Count} revision(s) reference incorrect document ID. " +
+                    "All revisions must be associated with this document.",
+                    [nameof(Revisions)]);
+            }
+        }
+
+        // Activity timeline consistency with revisions
+        if (DocumentActivityUsers.Count > 0 && Revisions.Count > 0)
+        {
+            var earliestRevision = Revisions.Min(r => r.CreationDate);
+            var activitiesBeforeRevisions = DocumentActivityUsers.Where(a => 
+                a.CreatedAt < earliestRevision.AddMinutes(-RevisionValidationHelper.FutureDateToleranceMinutes));
+
+            if (activitiesBeforeRevisions.Any())
+            {
+                yield return new ValidationResult(
+                    "Document activities cannot occur significantly before the first revision creation date.",
+                    [nameof(DocumentActivityUsers), nameof(Revisions)]);
+            }
+        }
+
+        // Professional naming consistency
+        if (string.IsNullOrWhiteSpace(FileName) || string.IsNullOrWhiteSpace(Extension)) yield break;
+        var fullFileName = $"{FileName}.{Extension}";
+        if (fullFileName.Length > 255) // Windows MAX_PATH consideration
+        {
+            yield return new ValidationResult(
+                "Complete file name (name + extension) exceeds maximum path length for file system compatibility (255 characters).",
+                [nameof(FileName), nameof(Extension)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates collections including revision-specific validation.
+    /// </summary>
+    /// <returns>A collection of validation results for collection validation.</returns>
+    private IEnumerable<ValidationResult> ValidateCollections()
+    {
+        // Revision collection validation (unique to DocumentWithRevisionsDto)
+        foreach (var result in ValidateRevisionsCollection())
+            yield return result;
+
+        // Document activity users validation
+        foreach (var result in ValidateDocumentActivityUsers())
+            yield return result;
+
+        // Matter transfer activities validation
+        foreach (var result in ValidateMatterTransferActivities())
+            yield return result;
+
+        // Audit trail completeness validation
+        foreach (var result in ValidateAuditTrailCompleteness())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates the revisions collection using comprehensive revision validation.
+    /// </summary>
+    /// <returns>A collection of validation results for revision collection validation.</returns>
+    private IEnumerable<ValidationResult> ValidateRevisionsCollection()
+    {
+        var index = 0;
+        foreach (var revision in Revisions)
+        {
+            // Cross-reference validation
+            if (revision.DocumentId.HasValue && revision.DocumentId.Value != Id)
+            {
+                yield return new ValidationResult(
+                    $"Revisions[{index}] references incorrect document ID. " +
+                    "All revisions must be associated with this document.",
+                    [$"Revisions[{index}].DocumentId"]);
+            }
+
+            // Revision temporal validation
+            if (revision.CreationDate < CreationDate.AddMinutes(-RevisionValidationHelper.FutureDateToleranceMinutes))
+            {
+                yield return new ValidationResult(
+                    $"Revisions[{index}] creation date cannot be significantly before document creation date.",
+                    [$"Revisions[{index}].CreationDate"]);
+            }
+
+            // Nested revision validation using RevisionDto validation
+            var revisionContext = new ValidationContext(revision);
+            var revisionErrors = revision.Validate(revisionContext);
+            foreach (var error in revisionErrors)
+            {
+                var memberNames = error.MemberNames.Any()
+                    ? error.MemberNames.Select(memberName => $"Revisions[{index}].{memberName}")
+                    : [$"Revisions[{index}"];
+
+                yield return new ValidationResult(
+                    $"Revisions[{index}]: {error.ErrorMessage}", 
+                    memberNames);
+            }
+            index++;
+        }
+
+        // Revision numbering validation
+        if (Revisions.Count <= 0) yield break;
+        var revisionNumbers = Revisions.Select(r => r.RevisionNumber).OrderBy(n => n).ToList();
+        for (var i = 0; i < revisionNumbers.Count; i++)
+        {
+            var expectedNumber = i + 1;
+            if (revisionNumbers[i] == expectedNumber) continue;
+            yield return new ValidationResult(
+                $"Revision numbering must be sequential starting from 1. Expected {expectedNumber}, found {revisionNumbers[i]}.",
+                [nameof(Revisions)]);
+            break; // Report only the first gap
+        }
+
+        // Check for duplicate revision numbers
+        var duplicates = revisionNumbers.GroupBy(n => n).Where(g => g.Count() > 1).Select(g => g.Key);
+        foreach (var duplicate in duplicates)
+        {
+            yield return new ValidationResult(
+                $"Duplicate revision number {duplicate} found. Revision numbers must be unique.",
+                [nameof(Revisions)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates revision-specific integrity and version control rules.
+    /// </summary>
+    /// <returns>A collection of validation results for revision integrity validation.</returns>
+    private IEnumerable<ValidationResult> ValidateRevisionIntegrity()
+    {
+        if (Revisions.Count == 0) yield break;
+
+        // Chronological consistency validation
+        var chronologicalRevisions = Revisions.OrderBy(r => r.RevisionNumber).ToList();
+        for (var i = 1; i < chronologicalRevisions.Count; i++)
+        {
+            var previousRevision = chronologicalRevisions[i - 1];
+            var currentRevision = chronologicalRevisions[i];
+
+            if (currentRevision.CreationDate < previousRevision.CreationDate)
+            {
+                yield return new ValidationResult(
+                    $"Revision {currentRevision.RevisionNumber} creation date cannot be before revision {previousRevision.RevisionNumber}.",
+                    [nameof(Revisions)]);
+            }
+
+            // Modification date consistency
+            if (currentRevision.CreationDate < previousRevision.ModificationDate)
+            {
+                yield return new ValidationResult(
+                    $"Revision {currentRevision.RevisionNumber} creation date should not be before previous revision's modification date.",
+                    [nameof(Revisions)]);
+            }
+        }
+
+        // Current revision validation
+        var actualCurrentRevision = Revisions.OrderByDescending(r => r.RevisionNumber).FirstOrDefault();
+        if (actualCurrentRevision != null && CurrentRevision != null && actualCurrentRevision.RevisionNumber != CurrentRevision.RevisionNumber)
+        {
+            yield return new ValidationResult(
+                "Current revision must be the revision with the highest revision number.",
+                [nameof(CurrentRevision), nameof(Revisions)]);
+        }
+
+        // Professional version control standards
+        if (Revisions.Count > 1)
+        {
+            // Check for reasonable revision intervals
+            var revisionIntervals = chronologicalRevisions
+                .Zip(chronologicalRevisions.Skip(1), (prev, curr) => curr.CreationDate - prev.CreationDate) // Less than 1 minute between revisions
+                .Count(interval => interval.TotalSeconds < 60);
+
+            if (revisionIntervals > Revisions.Count * 0.5) // More than 50% of revisions are very rapid
+            {
+                yield return new ValidationResult(
+                    "Multiple revisions created within very short intervals may indicate automated processing. " +
+                    "Verify revision creation patterns for professional document management.",
+                    [nameof(Revisions)]);
+            }
+        }
+
+        // Audit trail completeness for revisions
+        var revisionsWithoutActivities = Revisions.Count(r => r.ActivityCount == 0);
+        if (revisionsWithoutActivities > 0)
+        {
+            yield return new ValidationResult(
+                $"{revisionsWithoutActivities} revision(s) lack activity audit trails. " +
+                "All revisions should have corresponding activity records for legal compliance.",
+                [nameof(Revisions)]);
+        }
+    }
+
+    #endregion Private Methods
 }
