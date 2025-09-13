@@ -115,7 +115,7 @@ namespace ADMS.Application.DTOs;
 /// Console.WriteLine($"Document integrity: {(documentDto.HasValidChecksum ? "Valid" : "Invalid")}");
 /// </code>
 /// </example>
-public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<DocumentWithRevisionsDto>
+public sealed partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<DocumentWithRevisionsDto>
 {
     #region Core Properties
 
@@ -1096,11 +1096,6 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
             revision.DocumentId, revision.IsDeleted, $"Revisions[{index}]."))
             yield return result;
 
-        // Use FileValidationHelper for file-related validation
-        foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
-            MimeType, Extension, nameof(MimeType)))
-            yield return result;
-
         // Document cannot be both checked out and deleted
         if (IsCheckedOut && IsDeleted)
         {
@@ -1172,18 +1167,65 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// </summary>
     /// <returns>A collection of validation results for the revisions collection.</returns>
     /// <remarks>
-    /// Uses DtoValidationHelper for comprehensive validation of the revision collection,
-    /// including business rule validation for required revisions.
+    /// Uses RevisionValidationHelper for comprehensive validation of the revision collection,
+    /// including business rule validation for required revisions and professional standards.
     /// </remarks>
     private IEnumerable<ValidationResult> ValidateRevisions()
     {
-        // Business rule: Documents must have at least one revision
-        return DtoValidationHelper.ValidateCollection(
-            Revisions,
-            nameof(Revisions),
-            new ValidationContext(this),
-            allowEmptyCollection: false
-        );
+        // 1. HIGHEST PRIORITY: Collection-level validation
+        foreach (var result in RevisionValidationHelper.ValidateRevisionCollection(
+            Revisions, Id, nameof(Revisions)))
+            yield return result;
+
+        foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionSequence(
+            Revisions, nameof(Revisions)))
+            yield return result;
+
+        // Early termination for empty collections
+        if (Revisions.Count == 0) yield break;
+
+        // PHASE 2: Individual revision business rules
+        var index = 0;
+        foreach (var revision in Revisions)
+        {
+            // Core revision validation
+            foreach (var result in RevisionValidationHelper.ValidateRevisionBusinessRules(
+                revision.RevisionNumber, revision.CreationDate, revision.ModificationDate,
+                revision.DocumentId, revision.IsDeleted, $"Revisions[{index}]."))
+                yield return result;
+
+            // Document-revision consistency
+            foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionDates(
+                revision.CreationDate, CreationDate, revision.RevisionNumber,
+                $"Revisions[{index}].CreationDate"))
+                yield return result;
+
+            // Professional standards (if activity count is available)
+            if (revision.ActivityCount > 0)
+            {
+                var developmentTime = revision.ModificationDate - revision.CreationDate;
+                foreach (var result in RevisionValidationHelper.ValidateProfessionalStandards(
+                    revision.RevisionNumber, revision.CreationDate, developmentTime,
+                    revision.ActivityCount, $"Revisions[{index}]."))
+                    yield return result;
+            }
+
+            index++;
+        }
+
+        // PHASE 3: Collection-wide analysis
+        var revisionNumbers = Revisions.Select(r => r.RevisionNumber);
+        var sequenceAnalysis = RevisionValidationHelper.AnalyzeRevisionSequence(revisionNumbers);
+        
+        if (!(bool)sequenceAnalysis["IsValid"])
+        {
+            var suggestions = (IEnumerable<string>)sequenceAnalysis["Suggestions"];
+            var suggestionText = suggestions.Any() ? $" Suggestions: {string.Join(", ", suggestions)}" : "";
+            
+            yield return new ValidationResult(
+                $"Revision sequence validation failed. Ensure sequential numbering without gaps.{suggestionText}",
+                [nameof(Revisions)]);
+        }
     }
 
     /// <summary>
@@ -1674,38 +1716,6 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     #region Revisions Validation
 
     /// <summary>
-    /// Validates the collections associated with the current object and returns any validation errors.
-    /// </summary>
-    /// <remarks>This method performs validation on specific collections only if they contain items,
-    /// optimizing performance. It validates the <see cref="Revisions"/>, <see cref="DocumentActivityUsers"/>,  <see cref="MatterDocumentActivityUsersFrom"/>, and <see cref="MatterDocumentActivityUsersTo"/> collections.</remarks>
-    /// <returns>An <see cref="IEnumerable{ValidationResult}"/> containing the validation results.  The collection will be empty
-    /// if no validation errors are found.</returns>
-    protected IEnumerable<ValidationResult> ValidateCollections()
-    {
-        // Validate only when collection has items (performance optimization)
-        if (Revisions.Count > 0)
-        {
-            foreach (var result in ValidateRevisionsCollection())
-                yield return result;
-        }
-
-        if (DocumentActivityUsers.Count > 0)
-        {
-            foreach (var result in ValidateDocumentActivityUsers())
-                yield return result;
-        }
-
-        // Use DtoValidationHelper for consistent collection validation
-        foreach (var result in DtoValidationHelper.ValidateCollection(
-                     MatterDocumentActivityUsersFrom, nameof(MatterDocumentActivityUsersFrom)))
-            yield return result;
-
-        foreach (var result in DtoValidationHelper.ValidateCollection(
-                     MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
-            yield return result;
-    }
-
-    /// <summary>
     /// Validates the revisions collection for DocumentWithRevisionsDto using advanced revision validation rules.
     /// </summary>
     /// <remarks>
@@ -1749,21 +1759,45 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         var index = 0;
         foreach (var revision in Revisions)
         {
-            // Document-revision date consistency
-            foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionDates(
-                revision.CreationDate, CreationDate, revision.RevisionNumber,
-                $"Revisions[{index}].CreationDate"))
-                yield return result;
-
-            // Professional standards validation
+            // 4. MEDIUM PRIORITY: Professional standards validation
             var developmentTime = revision.ModificationDate - revision.CreationDate;
             foreach (var result in RevisionValidationHelper.ValidateProfessionalStandards(
                 revision.RevisionNumber, revision.CreationDate, developmentTime,
                 revision.ActivityCount, $"Revisions[{index}]."))
                 yield return result;
 
+            // 5. MEDIUM PRIORITY: Activity audit trail validation
+            foreach (var result in RevisionValidationHelper.ValidateActivityAuditTrail(
+                revision.RevisionActivityUsers, revision.RevisionNumber, revision.IsDeleted,
+                $"Revisions[{index}].RevisionActivityUsers"))
+                yield return result;
+
+            // 6. MEDIUM PRIORITY: Activity timestamp validation
+            foreach (var result in RevisionValidationHelper.ValidateActivityTimestamps(
+                revision.CreationDate, revision.ModificationDate, 
+                revision.RevisionActivityUsers, $"Revisions[{index}].RevisionActivityUsers"))
+                yield return result;
+
             index++;
         }
+
+        // 7. MEDIUM PRIORITY: Collection-wide sequence analysis
+        var revisionNumbers = Revisions.Select(r => r.RevisionNumber);
+        var sequenceAnalysis = RevisionValidationHelper.AnalyzeRevisionSequence(revisionNumbers);
+        
+        if (!(bool)sequenceAnalysis["IsValid"])
+        {
+            yield return new ValidationResult(
+                "Revision sequence validation failed. Ensure sequential numbering without gaps.",
+                [nameof(Revisions)]);
+        }
+
+        // 8. LOW PRIORITY: Workload pattern analysis
+        var developmentTimeTotal = Revisions.Sum(r => r.ModificationDate - r.CreationDate);
+        foreach (var result in RevisionValidationHelper.ValidateRevisionWorkload(
+            Revisions.Select(r => r.ActivityCount).ToArray(), developmentTimeTotal,
+            $"Revisions"))
+            yield return result;
     }
 
     #endregion Revisions Validation
