@@ -774,4 +774,295 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         $"Transfer FROM: Document ({DocumentId}) ← Matter ({MatterId}) by User ({UserId}) at {CreatedAt:yyyy-MM-dd HH:mm:ss}";
 
     #endregion String Representation
+
+    /// <summary>
+    /// Validates bidirectional audit trail completeness and consistency.
+    /// </summary>
+    /// <returns>A collection of validation results for bidirectional audit validation.</returns>
+    private IEnumerable<ValidationResult> ValidateBidirectionalAuditTrailCompleteness()
+    {
+        // This would require service-level integration to verify corresponding TO entries exist
+        if (MatterDocumentActivity?.Activity == "MOVED")
+        {
+            yield return new ValidationResult(
+                "MOVED operations require corresponding destination-side audit trail entries. " +
+                "Verify that MatterDocumentActivityUserToDto exists for complete bidirectional coverage.",
+                [nameof(MatterDocumentActivity)]);
+        }
+
+        // Validate activity timing consistency
+        if (RequiresBidirectionalTracking())
+        {
+            yield return new ValidationResult(
+                "This transfer operation requires bidirectional tracking for legal compliance. " +
+                "Ensure both source and destination audit entries are created.",
+                [nameof(MatterDocumentActivity)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates source matter state integrity for document releases.
+    /// </summary>
+    /// <returns>A collection of validation results for source matter state validation.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceMatterStateIntegrity()
+    {
+        if (Matter == null) yield break;
+
+        // Enhanced source matter validation
+        if (Matter.IsDeleted)
+        {
+            yield return new ValidationResult(
+                "Cannot transfer documents from deleted source matter. " +
+                "Source matter integrity is compromised for document custody operations.",
+                [nameof(Matter)]);
+        }
+
+        // Validate source matter lifecycle state
+        if (Matter.IsArchived && !MatterDocumentActivity?.Activity?.Equals("MOVED", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            yield return new ValidationResult(
+                "Source matter is archived. Only MOVED operations should be performed on archived matters " +
+                "to complete matter closure procedures.",
+                [nameof(Matter)]);
+        }
+
+        // Professional practice validation for matter emptying
+        var matterAge = (DateTime.UtcNow - Matter.CreationDate).TotalDays;
+        if (matterAge < 1 && MatterDocumentActivity?.Activity == "MOVED")
+        {
+            yield return new ValidationResult(
+                "Document being moved from very recently created source matter. " +
+                "Verify proper matter setup and organization before document transfers.",
+                [nameof(Matter), nameof(CreatedAt)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates document chain of custody and professional handling requirements.
+    /// </summary>
+    /// <returns>A collection of validation results for chain of custody validation.</returns>
+    private IEnumerable<ValidationResult> ValidateDocumentChainOfCustody()
+    {
+        if (Document == null) yield break;
+
+        // Document custody integrity validation
+        if (Document.IsCheckedOut && MatterDocumentActivity?.Activity == "MOVED")
+        {
+            yield return new ValidationResult(
+                "Document is checked out and cannot be moved from source matter. " +
+                "Complete check-in process before transferring document custody to maintain version control integrity.",
+                [nameof(Document), nameof(MatterDocumentActivity)]);
+        }
+
+        // Document integrity validation at transfer time
+        if (!Document.HasValidChecksum)
+        {
+            yield return new ValidationResult(
+                "Document checksum validation failed at source transfer time. " +
+                "Document integrity must be verified before releasing from source matter for legal compliance.",
+                [nameof(Document)]);
+        }
+
+        // Professional document handling validation
+        if (Document.FileSize == 0)
+        {
+            yield return new ValidationResult(
+                "Zero-byte document cannot be transferred from source matter. " +
+                "Empty files may indicate corruption or incomplete upload requiring investigation.",
+                [nameof(Document)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates user authorization and professional standards for source-side operations.
+    /// </summary>
+    /// <returns>A collection of validation results for user authorization validation.</returns>
+    private IEnumerable<ValidationResult> ValidateUserAuthorizationForSourceOperations()
+    {
+        if (User == null) yield break;
+
+        // Enhanced user validation using UserValidationHelper methods
+        if (!UserValidationHelper.IsSufficientUserContext(UserId, User.Name, CreatedAt))
+        {
+            yield return new ValidationResult(
+                "Insufficient user context for source-side document transfer operations. " +
+                "Complete user attribution is required for professional accountability.",
+                [nameof(User)]);
+        }
+
+        // Professional responsibility for document release
+        if (MatterDocumentActivity?.Activity == "MOVED")
+        {
+            yield return new ValidationResult(
+                "MOVED operation represents document custody release from source matter. " +
+                "Ensure user has proper authorization and professional oversight for document custody changes.",
+                [nameof(User), nameof(MatterDocumentActivity)];
+        }
+
+        // Validate user activity patterns using UserValidationHelper
+        foreach (var result in UserValidationHelper.ValidateUserAttribution(
+            UserId, User.Name, CreatedAt, nameof(User)))
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates client confidentiality and matter context for source transfers.
+    /// </summary>
+    /// <returns>A collection of validation results for confidentiality validation.</returns>
+    private IEnumerable<ValidationResult> ValidateClientConfidentialityAndMatterContext()
+    {
+        if (Matter == null || Document == null) yield break;
+
+        var matterDescription = Matter.Description?.ToUpperInvariant() ?? "";
+        var documentFileName = Document.FileName?.ToUpperInvariant() ?? "";
+
+        // Enhanced confidentiality validation
+        if (matterDescription.Contains("CONFIDENTIAL") || matterDescription.Contains("PRIVILEGED"))
+        {
+            yield return new ValidationResult(
+                "Document being transferred from confidential or privileged source matter. " +
+                "Ensure proper security clearance and maintain confidentiality protocols during transfer.",
+                [nameof(Matter)]);
+        }
+
+        // Cross-client validation using extracted client references
+        var documentClientRef = ExtractClientReference(documentFileName);
+        var matterClientRef = ExtractClientReference(matterDescription);
+        
+        if (!string.IsNullOrEmpty(documentClientRef) && 
+            !string.IsNullOrEmpty(matterClientRef) && 
+            !documentClientRef.Equals(matterClientRef, StringComparison.OrdinalIgnoreCase))
+        {
+            yield return new ValidationResult(
+                "Potential cross-client document transfer detected from source matter. " +
+                "Verify client confidentiality boundaries and transfer authorization.",
+                [nameof(Matter), nameof(Document)]);
+        }
+
+        // Professional practice validation for sensitive matters
+        if (matterDescription.Contains("LITIGATION") && !documentFileName.Contains("PUBLIC"))
+        {
+            yield return new ValidationResult(
+                "Document being transferred from litigation matter. " +
+                "Verify privilege protection and discovery implications before transfer completion.",
+                [nameof(Matter), nameof(Document)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates transfer patterns for fraud detection and compliance monitoring.
+    /// </summary>
+    /// <returns>A collection of validation results for pattern analysis.</returns>
+    private IEnumerable<ValidationResult> ValidateTransferPatternsAndFraudDetection()
+    {
+        // Temporal pattern analysis
+        var transferTime = CreatedAt;
+        var isWeekend = IsWeekend(transferTime);
+        var isAfterHours = transferTime.Hour is < 6 or > 22;
+
+        if (isWeekend && isAfterHours)
+        {
+            yield return new ValidationResult(
+                "Document transfer from source matter during weekend off-hours. " +
+                "Unusual timing may require additional oversight and authorization verification.",
+                [nameof(CreatedAt)]);
+        }
+
+        // High-frequency pattern detection
+        if (transferTime is { Minute: 0, Second: 0 })
+        {
+            yield return new ValidationResult(
+                "Transfer from source occurred exactly on hour boundary. " +
+                "This timing pattern may indicate automated processing requiring verification.",
+                [nameof(CreatedAt)]);
+        }
+
+        // User pattern validation
+        if (User?.Name.Contains("TEMP", StringComparison.OrdinalIgnoreCase) == true ||
+            User?.Name.Contains("TEST", StringComparison.OrdinalIgnoreCase) == true)
+        {
+            yield return new ValidationResult(
+                "Document transfer from source performed by temporary or test user account. " +
+                "Verify proper authorization and production data handling procedures.",
+                [nameof(User)]);
+        }
+
+        // Transfer velocity validation
+        var transferAge = GetTransferAgeDays();
+        if (transferAge < 0.001) // Less than ~1.4 minutes
+        {
+            yield return new ValidationResult(
+                "Extremely rapid document transfer from source detected. " +
+                "Verify transfer process integrity and prevent potential data corruption.",
+                [nameof(CreatedAt)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates advanced activity record integrity and compliance requirements.
+    /// </summary>
+    /// <returns>A collection of validation results for advanced activity validation.</returns>
+    private IEnumerable<ValidationResult> ValidateAdvancedActivityRecord()
+    {
+        // Use UserValidationHelper for enhanced activity sequence validation
+        if (User?.MatterDocumentActivityUsersFrom != null)
+        {
+            var recentSourceTransfers = User.MatterDocumentActivityUsersFrom
+                .Where(t => t.CreatedAt >= CreatedAt.AddMinutes(-UserValidationHelper.ActivityBurstWindowMinutes))
+                .Select(t => t.CreatedAt);
+
+            foreach (var result in UserValidationHelper.ValidateActivitySequence(
+                recentSourceTransfers, CreatedAt, nameof(CreatedAt)))
+                yield return result;
+        }
+
+        // Enhanced activity consistency validation
+        if (MatterDocumentActivity != null)
+        {
+            foreach (var result in UserValidationHelper.ValidateActivityConsistency(
+                UserId, DocumentId, MatterDocumentActivity.Activity, MatterId, 
+                "SourceTransferActivity"))
+                yield return result;
+        }
+
+        // Professional activity metrics validation
+        foreach (var result in UserValidationHelper.ValidateActivityMetrics(
+            1, 24.0, nameof(CreatedAt))) // This transfer in last 24 hours
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates comprehensive source-side specific requirements for enhanced compliance.
+    /// </summary>
+    /// <returns>A collection of validation results for comprehensive source validation.</returns>
+    private IEnumerable<ValidationResult> ValidateComprehensiveSourceCompliance()
+    {
+        // Bidirectional audit trail validation
+        foreach (var result in ValidateBidirectionalAuditTrailCompleteness())
+            yield return result;
+
+        // Source matter state integrity
+        foreach (var result in ValidateSourceMatterStateIntegrity())
+            yield return result;
+
+        // Document chain of custody
+        foreach (var result in ValidateDocumentChainOfCustody())
+            yield return result;
+
+        // User authorization for source operations
+        foreach (var result in ValidateUserAuthorizationForSourceOperations())
+            yield return result;
+
+        // Client confidentiality and matter context
+        foreach (var result in ValidateClientConfidentialityAndMatterContext())
+            yield return result;
+
+        // Transfer patterns and fraud detection
+        foreach (var result in ValidateTransferPatternsAndFraudDetection())
+            yield return result;
+
+        // Advanced activity record validation
+        foreach (var result in ValidateAdvancedActivityRecord())
+            yield return result;
+    }
 }
