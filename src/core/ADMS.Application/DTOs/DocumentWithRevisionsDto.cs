@@ -4,7 +4,6 @@ using ADMS.Domain.Entities;
 
 using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using System.Text.RegularExpressions;
 
 namespace ADMS.Application.DTOs;
 
@@ -1620,4 +1619,79 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         return requiredActivities.All(activity => activityCounts.ContainsKey(activity) && activityCounts[activity] != 0);
     }
     #endregion Validation Extensions
+
+    #region Revisions Validation
+
+    /// <summary>
+    /// Validates the revisions collection for DocumentWithRevisionsDto using advanced revision validation rules.
+    /// </summary>
+    /// <remarks>
+    /// This validation ensures the revisions collection is properly structured, with sequential numbering,
+    /// and that each revision adheres to professional standards and business rules.
+    /// </remarks>
+    private IEnumerable<ValidationResult> ValidateRevisionsCollection()
+    {
+        if (Revisions.Count == 0)
+        {
+            yield return new ValidationResult(
+                "Documents must have at least one revision for version control integrity.",
+                [nameof(Revisions)]);
+            yield break;
+        }
+
+        // Use RevisionValidationHelper for collection-wide validation
+        foreach (var result in RevisionValidationHelper.ValidateRevisionCollection(
+            Revisions, Id, nameof(Revisions)))
+            yield return result;
+
+        // Sequential numbering validation
+        foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionSequence(
+            Revisions, nameof(Revisions)))
+            yield return result;
+
+        // Individual revision validation with indexed error reporting
+        var index = 0;
+        foreach (var revision in Revisions)
+        {
+            foreach (var result in RevisionValidationHelper.ValidateRevisionBusinessRules(
+                revision.RevisionNumber, revision.CreationDate, revision.ModificationDate,
+                revision.DocumentId, revision.IsDeleted, $"Revisions[{index}]."))
+                yield return result;
+
+            index++;
+        }
+    }
+
+    /// <summary>
+    /// Validates the revision integrity for DocumentWithRevisionsDto using professional standards and business rules.
+    /// </summary>
+    /// <remarks>
+    /// This validation checks that revisions adhere to professional standards for document management,
+    /// including proper dating, sequencing, and compliance with business rules.
+    /// </remarks>
+    private IEnumerable<ValidationResult> ValidateRevisionIntegrity()
+    {
+        if (Revisions.Count == 0) yield break;
+
+        var index = 0;
+        foreach (var revision in Revisions)
+        {
+            // Document-revision date consistency
+            foreach (var result in RevisionValidationHelper.ValidateDocumentRevisionDates(
+                revision.CreationDate, CreationDate, revision.RevisionNumber,
+                $"Revisions[{index}].CreationDate"))
+                yield return result;
+
+            // Professional standards validation
+            var developmentTime = revision.ModificationDate - revision.CreationDate;
+            foreach (var result in RevisionValidationHelper.ValidateProfessionalStandards(
+                revision.RevisionNumber, revision.CreationDate, developmentTime,
+                revision.ActivityCount, $"Revisions[{index}]."))
+                yield return result;
+
+            index++;
+        }
+    }
+
+    #endregion Revisions Validation
 }
