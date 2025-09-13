@@ -1,6 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using ADMS.Application.Common.Validation;
+
+using System.ComponentModel.DataAnnotations;
 using System.Diagnostics.CodeAnalysis;
-using ADMS.Application.Common.Validation;
+using System.Text.RegularExpressions;
 
 namespace ADMS.Application.DTOs;
 
@@ -227,6 +229,306 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
                 "Cannot move documents from a deleted matter.",
                 [nameof(MatterDocumentActivity), nameof(Matter)]);
         }
+
+        // Validate source matter state transitions that could affect document transfers
+        if (Matter == null) yield break;
+
+        // Edge case: Source matter was archived DURING transfer operation
+        if (Matter.IsArchived && GetTransferAgeDays() < 0.1) // Less than 2.4 hours
+        {
+            yield return new ValidationResult(
+                "Source matter was archived shortly after document transfer initiation. " +
+                "Verify transfer completion and matter lifecycle consistency.",
+                [nameof(Matter)]);
+        }
+
+        // Edge case: Source matter being emptied (potential final document)
+        if (Matter.IsArchived && !Matter.IsDeleted)
+        {
+            yield return new ValidationResult(
+                "Document transferred from archived source matter. " +
+                "Verify authorization for accessing archived matter documents.",
+                [nameof(Matter)]);
+        }
+
+        // Edge case: Source matter marked for deletion
+        if (Matter.IsDeleted)
+        {
+            yield return new ValidationResult(
+                "Cannot transfer documents from deleted source matter. " +
+                "Deleted matters should not allow document transfers.",
+                [nameof(Matter)]);
+        }
+
+        // Validate edge cases specific to source-side document transfer operations
+        foreach (var result in ValidateSourceSpecificEdgeCases())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates edge cases specific to source-side document transfer operations.
+    /// </summary>
+    /// <returns>A collection of validation results for source-specific edge cases.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceSpecificEdgeCases()
+    {
+        // Source matter state transitions
+        foreach (var result in ValidateSourceMatterStateTransitions())
+            yield return result;
+
+        // Document custody release validation
+        foreach (var result in ValidateDocumentCustodyRelease())
+            yield return result;
+
+        // Source authority and permissions
+        foreach (var result in ValidateSourceAuthorityPermissions())
+            yield return result;
+
+        // Document provenance from source
+        foreach (var result in ValidateSourceDocumentProvenance())
+            yield return result;
+
+        // Source matter context validation
+        foreach (var result in ValidateSourceMatterContext())
+            yield return result;
+
+        // Professional responsibility for source operations
+        foreach (var result in ValidateSourceProfessionalResponsibility())
+            yield return result;
+
+        // Source activity pattern detection
+        foreach (var result in ValidateSourceActivityPatterns())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates document custody release from source matter perspective.
+    /// /// </summary>
+    /// <returns>A collection of validation results for custody release validation.</returns>
+    private IEnumerable<ValidationResult> ValidateDocumentCustodyRelease()
+    {
+        if (Document == null || MatterDocumentActivity == null) yield break;
+
+        // Edge case: Document was checked out at transfer time
+        if (Document.IsCheckedOut && MatterDocumentActivity.Activity == "MOVED")
+        {
+            yield return new ValidationResult(
+                "Document was checked out when MOVED from source matter. " +
+                "Checked-out documents should be checked in before custody transfer to ensure version control integrity.",
+                [nameof(Document), nameof(MatterDocumentActivity)]);
+        }
+
+        // Edge case: Last known copy being moved
+        if (MatterDocumentActivity.Activity == "MOVED")
+        {
+            yield return new ValidationResult(
+                "MOVED operation represents custody transfer from source matter. " +
+                "Ensure proper authorization and client notification for document custody changes.",
+                [nameof(MatterDocumentActivity)]);
+        }
+
+        // Edge case: Document with pending revisions
+        if (Document.IsCheckedOut && MatterDocumentActivity.Activity == "COPIED")
+        {
+            yield return new ValidationResult(
+                "Document with checked-out status being copied from source matter. " +
+                "Verify that copied version reflects intended document state.",
+                [nameof(Document)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates source-side authority and permissions for document transfers.
+    /// </summary>
+    /// <returns>A collection of validation results for source authority validation.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceAuthorityPermissions()
+    {
+        if (User == null || Matter == null) yield break;
+
+        // Edge case: Transfer during weekend hours
+        if (IsWeekend(CreatedAt))
+        {
+            yield return new ValidationResult(
+                "Document transfer from source matter during weekend hours. " +
+                "Verify authorization for off-hours document management operations.",
+                [nameof(CreatedAt)]);
+        }
+
+        // Edge case: Transfer outside business hours
+        var transferHour = CreatedAt.Hour;
+        if (transferHour < 6 || transferHour > 22)
+        {
+            yield return new ValidationResult(
+                $"Document transfer from source matter at {CreatedAt:HH:mm} (outside normal business hours). " +
+                "Unusual timing may require additional authorization verification.",
+                [nameof(CreatedAt)]);
+        }
+
+        // Edge case: Rapid succession transfers from same source
+        var transferAge = GetTransferAgeDays();
+        if (transferAge < 0.01) // Less than 14.4 minutes
+        {
+            yield return new ValidationResult(
+                "Very recent document transfer from source matter. " +
+                "Rapid succession transfers may indicate automated processing or potential data issues.",
+                [nameof(CreatedAt)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates document provenance and source authenticity.
+    /// </summary>
+    /// <returns>A collection of validation results for source provenance validation.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceDocumentProvenance()
+    {
+        if (Document == null) yield break;
+
+        // Edge case: Document creation date after transfer date
+        if (Document.CreationDate > CreatedAt)
+        {
+            yield return new ValidationResult(
+                "Document creation date is after transfer timestamp. " +
+                "This temporal inconsistency may indicate data corruption or clock synchronization issues.",
+                [nameof(Document), nameof(CreatedAt)]);
+        }
+
+        // Edge case: Document with suspicious creation patterns
+        if (Document.FileName?.StartsWith("TEMP_") == true || 
+            Document.FileName?.Contains("BACKUP") == true)
+        {
+            yield return new ValidationResult(
+                "Document with temporary or backup filename pattern being transferred from source. " +
+                "Verify this is not a system-generated file being inadvertently processed.",
+                [nameof(Document)]);
+        }
+
+        // Edge case: Zero-byte document transfer
+        if (Document.FileSize == 0)
+        {
+            yield return new ValidationResult(
+                "Zero-byte document being transferred from source matter. " +
+                "Empty files may indicate upload or storage issues requiring investigation.",
+                [nameof(Document)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates source matter context and organizational integrity.
+    /// </summary>
+    /// <returns>A collection of validation results for source context validation.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceMatterContext()
+    {
+        if (Matter == null || Document == null) yield break;
+
+        // Edge case: Confidential matter as source
+        var matterDescription = Matter.Description?.ToUpperInvariant() ?? "";
+        if (matterDescription.Contains("CONFIDENTIAL") || matterDescription.Contains("SEALED"))
+        {
+            yield return new ValidationResult(
+                "Document transferred from confidential or sealed source matter. " +
+                "Ensure proper security clearance and confidentiality protocols are maintained.",
+                [nameof(Matter)]);
+        }
+
+        // Edge case: Client-specific matter as source
+        if (matterDescription.Contains("PRIVILEGED") || matterDescription.Contains("ATTORNEY-CLIENT"))
+        {
+            yield return new ValidationResult(
+                "Document transferred from privileged source matter. " +
+                "Verify attorney-client privilege considerations and transfer authorization.",
+                [nameof(Matter)]);
+        }
+
+        // Edge case: Cross-client document transfer
+        if (!matterDescription.Contains("CLIENT") || Document.FileName.Contains("CLIENT") != true) yield break;
+        var documentClientRef = ExtractClientReference(Document.FileName);
+        var matterClientRef = ExtractClientReference(matterDescription);
+            
+        if (!string.IsNullOrEmpty(documentClientRef) && 
+            !string.IsNullOrEmpty(matterClientRef) && 
+            !documentClientRef.Equals(matterClientRef, StringComparison.OrdinalIgnoreCase))
+        {
+            yield return new ValidationResult(
+                "Potential cross-client document transfer detected from source matter. " +
+                "Verify client confidentiality and transfer authorization.",
+                [nameof(Matter), nameof(Document)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates professional responsibility requirements for source-side operations.
+    /// </summary>
+    /// <returns>A collection of validation results for professional responsibility compliance.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceProfessionalResponsibility()
+    {
+        if (MatterDocumentActivity?.Activity == "MOVED" && Matter != null)
+        {
+            yield return new ValidationResult(
+                "MOVED operation removes document from source matter. " +
+                "Ensure client notification and professional responsibility requirements are met for document custody transfer.",
+                [nameof(MatterDocumentActivity), nameof(Matter)]);
+        }
+
+        // Edge case: High-value document transfer (large files may be important)
+        if (Document is { FileSize: > 50 * 1024 * 1024 }) // 50MB
+        {
+            yield return new ValidationResult(
+                $"Large document ({Document.FormattedFileSize}) being transferred from source matter. " +
+                "High-value document transfers may require additional oversight and authorization.",
+                [nameof(Document)]);
+        }
+
+        // Edge case: Recent source matter activity
+        var sourceMatterAge = Matter != null ? (DateTime.UtcNow - Matter.CreationDate).TotalDays : 0;
+        if (sourceMatterAge < 1) // Less than 1 day old
+        {
+            yield return new ValidationResult(
+                "Document transferred from very recently created source matter. " +
+                "Verify proper matter setup and organization before document transfers.",
+                [nameof(Matter)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates source-side activity patterns for anomaly detection.
+    /// </summary>
+    /// <returns>A collection of validation results for pattern analysis.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceActivityPatterns()
+    {
+        // Edge case: Transfer on exact hour boundaries (potential automation)
+        if (CreatedAt.Minute == 0 && CreatedAt.Second == 0)
+        {
+            yield return new ValidationResult(
+                "Document transfer from source occurred exactly on hour boundary. " +
+                "This timing pattern may indicate automated processing requiring verification.",
+                [nameof(CreatedAt)]);
+        }
+
+        // Edge case: User performing transfers from multiple sources simultaneously
+        if (User?.Name?.ToUpperInvariant().Contains("ADMIN") == true ||
+            User?.Name?.ToUpperInvariant().Contains("SYSTEM") == true)
+        {
+            yield return new ValidationResult(
+                "Document transfer from source performed by administrative or system user. " +
+                "Verify proper authorization and professional oversight for system-level operations.",
+                [nameof(User)]);
+        }
+
+        // Edge case: Transfer timing patterns
+        var dayOfWeek = CreatedAt.DayOfWeek;
+        if (dayOfWeek == DayOfWeek.Sunday)
+        {
+            yield return new ValidationResult(
+                "Document transfer from source matter on Sunday. " +
+                "Weekend operations may require additional authorization verification.",
+                [nameof(CreatedAt)]);
+        }
+    }
+
+    private static string? ExtractClientReference(string text)
+    {
+        // Simple pattern matching for client references
+        var patterns = new[] { @"CLIENT[\s_-]*([A-Z]+)", @"([A-Z]{2,})\s*CLIENT" };
+        return (from pattern in patterns select Regex.Match(text, pattern, RegexOptions.IgnoreCase) into match where match.Success select match.Groups[1].Value).FirstOrDefault();
     }
 
     #endregion Validation Implementation
