@@ -1090,6 +1090,13 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         }
 
         // Continue with other business rules...
+        // Always use the same validation helper pattern
+        foreach (var result in RevisionValidationHelper.ValidateRevisionBusinessRules(
+            revision.RevisionNumber, revision.CreationDate, revision.ModificationDate,
+            revision.DocumentId, revision.IsDeleted, $"Revisions[{index}]."))
+            yield return result;
+
+        // Use FileValidationHelper for file-related validation
         foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
             MimeType, Extension, nameof(MimeType)))
             yield return result;
@@ -1670,8 +1677,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// Validates the collections associated with the current object and returns any validation errors.
     /// </summary>
     /// <remarks>This method performs validation on specific collections only if they contain items,
-    /// optimizing performance. It validates the <see cref="Revisions"/>, <see cref="DocumentActivityUsers"/>,  <see
-    /// cref="MatterDocumentActivityUsersFrom"/>, and <see cref="MatterDocumentActivityUsersTo"/> collections.</remarks>
+    /// optimizing performance. It validates the <see cref="Revisions"/>, <see cref="DocumentActivityUsers"/>,  <see cref="MatterDocumentActivityUsersFrom"/>, and <see cref="MatterDocumentActivityUsersTo"/> collections.</remarks>
     /// <returns>An <see cref="IEnumerable{ValidationResult}"/> containing the validation results.  The collection will be empty
     /// if no validation errors are found.</returns>
     protected IEnumerable<ValidationResult> ValidateCollections()
