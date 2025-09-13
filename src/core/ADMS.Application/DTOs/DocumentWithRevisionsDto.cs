@@ -863,23 +863,23 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     {
         ArgumentNullException.ThrowIfNull(validationContext);
 
-        // 1. Core Properties Validation (inherited from DocumentWithoutRevisionsDto)
+        // 1. Core Properties Validation
         foreach (var result in ValidateCoreProperties())
             yield return result;
 
-        // 2. Business Rules Validation (enhanced for revisions)
+        // 2. Business Rules Validation 
         foreach (var result in ValidateBusinessRules())
             yield return result;
 
-        // 3. Cross-Property Validation (enhanced for revisions)
+        // 3. Cross-Property Validation
         foreach (var result in ValidateCrossPropertyRules())
             yield return result;
-            
-        // 4. Collections Validation (enhanced for revisions)
+        
+        // 4. Collections Validation
         foreach (var result in ValidateCollections())
             yield return result;
 
-        // 5. Revision-Specific Validation (unique to DocumentWithRevisionsDto)
+        // 5. Revision-Specific Validation
         foreach (var result in ValidateRevisionIntegrity())
             yield return result;
 
@@ -1611,16 +1611,62 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// </remarks>
     private static bool HasValidAuditTrail(DocumentWithRevisionsDto document)
     {
-        var requiredActivities = new[] { "CREATED", "SAVED", "DELETED", "RESTORED", "CHECKED_IN", "CHECKED_OUT" };
-        var activityCounts = document.DocumentActivityUsers
-            .GroupBy(a => a.DocumentActivity?.Activity)
-            .ToDictionary(g => g.Key, g => g.Count());
+        // Check required activities based on document state
+        var requiredActivities = new[] { "CREATED" };
+        if (document.IsDeleted)
+            requiredActivities = requiredActivities.Concat(["DELETED"]).ToArray();
 
-        return requiredActivities.All(activity => activityCounts.ContainsKey(activity) && activityCounts[activity] != 0);
+        var documentActivities = document.DocumentActivityUsers
+            .Select(a => a.DocumentActivity?.Activity?.ToUpperInvariant())
+            .Where(a => !string.IsNullOrEmpty(a))
+            .ToHashSet();
+
+        // Verify all required activities are present
+        var hasRequiredActivities = requiredActivities.All(activity => 
+            documentActivities.Contains(activity));
+
+        // Verify revision audit trails
+        var hasRevisionAudits = document.Revisions.All(r => 
+            r.RevisionActivityUsers?.Count > 0 || r.IsDeleted);
+
+        return hasRequiredActivities && hasRevisionAudits;
     }
     #endregion Validation Extensions
 
     #region Revisions Validation
+
+    /// <summary>
+    /// Validates the collections associated with the current object and returns any validation errors.
+    /// </summary>
+    /// <remarks>This method performs validation on specific collections only if they contain items,
+    /// optimizing performance. It validates the <see cref="Revisions"/>, <see cref="DocumentActivityUsers"/>,  <see
+    /// cref="MatterDocumentActivityUsersFrom"/>, and <see cref="MatterDocumentActivityUsersTo"/> collections.</remarks>
+    /// <returns>An <see cref="IEnumerable{ValidationResult}"/> containing the validation results.  The collection will be empty
+    /// if no validation errors are found.</returns>
+    protected IEnumerable<ValidationResult> ValidateCollections()
+    {
+        // Validate only when collection has items (performance optimization)
+        if (Revisions.Count > 0)
+        {
+            foreach (var result in ValidateRevisionsCollection())
+                yield return result;
+        }
+
+        if (DocumentActivityUsers.Count > 0)
+        {
+            foreach (var result in ValidateDocumentActivityUsers())
+                yield return result;
+        }
+
+        // Use DtoValidationHelper for consistent collection validation
+        foreach (var result in DtoValidationHelper.ValidateCollection(
+                     MatterDocumentActivityUsersFrom, nameof(MatterDocumentActivityUsersFrom)))
+            yield return result;
+
+        foreach (var result in DtoValidationHelper.ValidateCollection(
+                     MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
+            yield return result;
+    }
 
     /// <summary>
     /// Validates the revisions collection for DocumentWithRevisionsDto using advanced revision validation rules.
