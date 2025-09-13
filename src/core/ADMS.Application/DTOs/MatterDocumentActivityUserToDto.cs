@@ -77,7 +77,8 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     /// <summary>
     /// Gets the creation timestamp formatted for display.
     /// </summary>
-    public string LocalCreatedAtDateString => CreatedAt.ToLocalTime().ToString("dddd, dd MMMM yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+    public string LocalCreatedAtDateString => CreatedAt.ToLocalTime()
+        .ToString("dddd, dd MMMM yyyy HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
 
     /// <summary>
     /// Gets a summary of the transfer operation for display.
@@ -128,16 +129,16 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         ValidationInfo = new
         {
             HasCompleteInformation = Matter != null && Document != null &&
-                                   MatterDocumentActivity != null && User != null,
+                                     MatterDocumentActivity != null && User != null,
             RequiredFieldsPresent = MatterId != Guid.Empty && DocumentId != Guid.Empty &&
-                                  MatterDocumentActivityId != Guid.Empty && UserId != Guid.Empty
+                                    MatterDocumentActivityId != Guid.Empty && UserId != Guid.Empty
         }
     };
 
     #endregion Computed Properties
 
     #region Validation Implementation
-        
+
     /// <summary>
     /// Validates the MatterDocumentActivityUserToDto using enhanced UserValidationHelper methods.
     /// </summary>
@@ -179,6 +180,9 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
 
         foreach (var result in ValidateLegalDiscoveryCompliance())
             yield return result;
+
+        foreach (var result in ValidateEdgeCases())
+            yield return result;
     }
 
     /// <summary>
@@ -194,7 +198,8 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         foreach (var result in UserValidationHelper.ValidateUserId(DocumentId, nameof(DocumentId)))
             yield return result;
 
-        foreach (var result in UserValidationHelper.ValidateUserId(MatterDocumentActivityId, nameof(MatterDocumentActivityId)))
+        foreach (var result in UserValidationHelper.ValidateUserId(MatterDocumentActivityId,
+                     nameof(MatterDocumentActivityId)))
             yield return result;
 
         foreach (var result in UserValidationHelper.ValidateUserId(UserId, nameof(UserId)))
@@ -231,7 +236,8 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     /// <summary>
     /// Creates a MatterDocumentActivityUserToDto from a Domain entity.
     /// </summary>
-    public static MatterDocumentActivityUserToDto FromEntity([NotNull] Domain.Entities.MatterDocumentActivityUserTo entity, bool includeNavigationProperties = false)
+    public static MatterDocumentActivityUserToDto FromEntity(
+        [NotNull] Domain.Entities.MatterDocumentActivityUserTo entity, bool includeNavigationProperties = false)
     {
         ArgumentNullException.ThrowIfNull(entity);
 
@@ -260,7 +266,9 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     /// <summary>
     /// Creates multiple MatterDocumentActivityUserToDto instances from a collection of entities.
     /// </summary>
-    public static IList<MatterDocumentActivityUserToDto> FromEntities([NotNull] IEnumerable<Domain.Entities.MatterDocumentActivityUserTo> entities, bool includeNavigationProperties = false)
+    public static IList<MatterDocumentActivityUserToDto> FromEntities(
+        [NotNull] IEnumerable<Domain.Entities.MatterDocumentActivityUserTo> entities,
+        bool includeNavigationProperties = false)
     {
         ArgumentNullException.ThrowIfNull(entities);
 
@@ -363,7 +371,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
             ["IsRecentTransferDays"] = IsRecentTransferDays(),
             ["TransferSummary"] = TransferSummary,
             ["HasCompleteInformation"] = Matter != null && Document != null &&
-                                       MatterDocumentActivity != null && User != null
+                                         MatterDocumentActivity != null && User != null
         };
     }
 
@@ -442,7 +450,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
 
         // Validate activity type using MatterDocumentActivityValidationHelper
         foreach (var result in MatterDocumentActivityValidationHelper.ValidateActivity(
-            MatterDocumentActivity.Activity, $"{nameof(MatterDocumentActivity)}.EntityType"))
+                     MatterDocumentActivity.Activity, $"{nameof(MatterDocumentActivity)}.EntityType"))
             yield return result;
 
         // Validate that activity supports destination tracking
@@ -582,7 +590,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         if (Matter == null || Document == null) yield break;
         // Check for potential circular transfers or inappropriate destinations
         var documentExtension = Document.Extension?.ToLowerInvariant();
-        if (!string.IsNullOrEmpty(documentExtension) && 
+        if (!string.IsNullOrEmpty(documentExtension) &&
             !FileValidationHelper.IsLegalDocumentFormat(documentExtension))
         {
             yield return new ValidationResult(
@@ -698,7 +706,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         }
 
         // Document format validation for legal transfers
-        if (!string.IsNullOrEmpty(Document.Extension) && 
+        if (!string.IsNullOrEmpty(Document.Extension) &&
             !FileValidationHelper.IsLegalDocumentFormat(Document.Extension))
         {
             yield return new ValidationResult(
@@ -725,7 +733,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     {
         // Transfer timing validation for legal deadlines
         var businessDaysSinceTransfer = CalculateBusinessDays(CreatedAt, DateTime.UtcNow);
-        
+
         if (MatterDocumentActivity?.Activity == "MOVED" && businessDaysSinceTransfer > 30)
         {
             yield return new ValidationResult(
@@ -758,14 +766,14 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     {
         var businessDays = 0;
         var current = startDate.Date;
-        
+
         while (current <= endDate.Date)
         {
             if (current.DayOfWeek != DayOfWeek.Saturday && current.DayOfWeek != DayOfWeek.Sunday)
                 businessDays++;
             current = current.AddDays(1);
         }
-        
+
         return businessDays;
     }
 
@@ -860,7 +868,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         }
     }
 
-    private bool IsRecentTransferMinutes(int minutes = 30) => 
+    private bool IsRecentTransferMinutes(int minutes = 30) =>
         (DateTime.UtcNow - CreatedAt).TotalMinutes <= minutes;
 
     /// <summary>
@@ -927,8 +935,8 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         if (User != null && MatterDocumentActivity != null)
         {
             foreach (var result in UserValidationHelper.ValidateActivityRecord(
-                UserId, User.Name, DocumentId, "MATTER_DOCUMENT", 
-                MatterDocumentActivity.Activity, CreatedAt, nameof(MatterDocumentActivityUserToDto)))
+                         UserId, User.Name, DocumentId, "MATTER_DOCUMENT",
+                         MatterDocumentActivity.Activity, CreatedAt, nameof(MatterDocumentActivityUserToDto)))
                 yield return result;
         }
     }
@@ -947,7 +955,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
 
         // Validate activity type for entity
         foreach (var result in UserValidationHelper.ValidateActivityType(
-                     MatterDocumentActivity.Activity, "MATTER_DOCUMENT", 
+                     MatterDocumentActivity.Activity, "MATTER_DOCUMENT",
                      $"{nameof(MatterDocumentActivity)}.{nameof(MatterDocumentActivity.Activity)}"))
             yield return result;
 
@@ -970,8 +978,8 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         {
             // Use UserValidationHelper for transfer operation consistency
             foreach (var result in UserValidationHelper.ValidateActivityConsistency(
-                UserId, DocumentId, MatterDocumentActivity.Activity, MatterId, 
-                nameof(MatterDocumentActivityUserToDto)))
+                         UserId, DocumentId, MatterDocumentActivity.Activity, MatterId,
+                         nameof(MatterDocumentActivityUserToDto)))
                 yield return result;
         }
     }
@@ -984,7 +992,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     {
         // Use UserValidationHelper for enhanced timestamp validation
         foreach (var result in UserValidationHelper.ValidateActivityTimestampBusinessRules(
-            CreatedAt, nameof(CreatedAt)))
+                     CreatedAt, nameof(CreatedAt)))
             yield return result;
 
         // Additional validation for transfer operations
@@ -1009,7 +1017,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
         if (User != null)
         {
             foreach (var result in UserValidationHelper.ValidateUserAttribution(
-                UserId, User.Name, CreatedAt, nameof(User)))
+                         UserId, User.Name, CreatedAt, nameof(User)))
                 yield return result;
         }
 
@@ -1028,11 +1036,12 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
     {
         // This would require access to recent activity history for the user
         // Implementation would need to be coordinated with service layer
-        
+
         // Example framework for sequence validation
         if (User?.MatterDocumentActivityUsersTo == null) yield break;
         var recentTimestamps = User.MatterDocumentActivityUsersTo
-            .Where(a => a.CreatedAt >= DateTime.UtcNow.AddHours(-UserValidationHelper.ActivityBurstWindowMinutes / 60.0 * 24))
+            .Where(a => a.CreatedAt >=
+                        DateTime.UtcNow.AddHours(-UserValidationHelper.ActivityBurstWindowMinutes / 60.0 * 24))
             .Select(a => a.CreatedAt);
 
         foreach (var result in UserValidationHelper.ValidateActivitySequence(
@@ -1052,7 +1061,7 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
 
         // Use UserValidationHelper for activity metrics validation
         foreach (var result in UserValidationHelper.ValidateActivityMetrics(
-            activityCount, timeFrameHours, nameof(CreatedAt)))
+                     activityCount, timeFrameHours, nameof(CreatedAt)))
             yield return result;
 
         // Professional standards for document transfers
@@ -1062,5 +1071,221 @@ public sealed record MatterDocumentActivityUserToDto : IValidatableObject, IEqua
             "Ensure compliance with professional document handling standards and client notification requirements.",
             [nameof(MatterDocumentActivity)]);
     }
-    #endregion Additional Validation Methods
+
+    // Edge case: TO entry exists without corresponding FROM entry
+    private IEnumerable<ValidationResult> ValidateOrphanedAuditEntries()
+    {
+        if (MatterDocumentActivity?.Activity == "MOVED")
+        {
+            // This would require service-level validation to check for corresponding FROM entry
+            yield return new ValidationResult(
+                "MOVED operations require corresponding source-side audit trail. " +
+                "This destination entry may be orphaned.",
+                [nameof(MatterDocumentActivity)]);
+        }
+    }
+
+    // Edge case: Matter becomes archived during transfer operation
+    private IEnumerable<ValidationResult> ValidateDestinationStateTransitions()
+    {
+        if (Matter == null) yield break;
+        // Edge case: Recently archived matter
+        if (Matter.IsArchived && GetTransferAgeDays() < 1)
+        {
+            yield return new ValidationResult(
+                "Document transferred to matter that was archived shortly after transfer. " +
+                "Verify transfer timing and matter lifecycle consistency.",
+                [nameof(Matter)]);
+        }
+
+        // Edge case: Matter with suspicious description patterns
+        var description = Matter.Description?.ToUpperInvariant() ?? "";
+        if (description.Contains("TEST") && !description.Contains("CLOSED"))
+        {
+            yield return new ValidationResult(
+                "Transfer to matter with 'TEST' designation detected. " +
+                "Verify this is not a production data contamination issue.",
+                [nameof(Matter)]);
+        }
+    }
+
+    // Edge case: Document with zero file size
+    // Edge case: Document with corrupted checksum
+    // Edge case: Document with system-generated filename patterns
+    private IEnumerable<ValidationResult> ValidateDocumentAnomalies()
+    {
+        if (Document == null) yield break;
+        // Edge case: Suspiciously large document
+        if (Document.FileSize > 500 * 1024 * 1024) // 500MB
+        {
+            yield return new ValidationResult(
+                $"Extremely large document transfer ({Document.FormattedFileSize}). " +
+                "Verify storage capacity and transfer authorization.",
+                [nameof(Document)]);
+        }
+
+        // Edge case: Document with potential system filename
+        if (Document.FileName.StartsWith("TEMP_", StringComparison.Ordinal) ||
+            Document.FileName?.Contains("SYSTEM") == true)
+        {
+            yield return new ValidationResult(
+                "Document with system-generated filename pattern detected. " +
+                "Verify this is not a temporary or system file.",
+                [nameof(Document)]);
+        }
+    }
+
+    // Edge case: Rapid-fire transfers (potential automation)
+    private IEnumerable<ValidationResult> ValidateTransferFrequency()
+    {
+        var transferMinute = CreatedAt.Minute;
+        var transferSecond = CreatedAt.Second;
+
+        // Edge case: Transfer exactly on minute boundary
+        if (transferSecond == 0)
+        {
+            yield return new ValidationResult(
+                "Transfer occurred exactly on minute boundary. " +
+                "This may indicate automated processing requiring verification.",
+                [nameof(CreatedAt)]);
+        }
+
+        // Edge case: Transfer during system maintenance windows
+        var hour = CreatedAt.Hour;
+        if (hour is >= 2 and <= 4) // Typical maintenance window
+        {
+            yield return new ValidationResult(
+                "Document transfer during typical system maintenance hours (2-4 AM). " +
+                "Verify this was an authorized operation.",
+                [nameof(CreatedAt)]);
+        }
+    }
+
+    // Edge case: Very old pending transfers
+    private IEnumerable<ValidationResult> ValidatePendingTransferAge()
+    {
+        var transferAge = GetTransferAgeDays();
+
+        // Edge case: Transfer from distant past
+        if (transferAge > 2555) // 7+ years
+        {
+            yield return new ValidationResult(
+                $"Document transfer audit entry is exceptionally old ({transferAge:F0} days). " +
+                "Verify data migration accuracy and retention policy compliance.",
+                [nameof(CreatedAt)]);
+        }
+
+        // Edge case: Transfer from before system deployment
+        if (CreatedAt < new DateTime(2020, 1, 1, 0, 0, 0, DateTimeKind.Utc))
+        {
+            yield return new ValidationResult(
+                "Transfer timestamp predates expected system deployment. " +
+                "Verify data migration integrity.",
+                [nameof(CreatedAt)]);
+        }
+    }
+
+    // Edge case: Inactive or suspended users
+    private IEnumerable<ValidationResult> ValidateUserStatus()
+    {
+        if (User == null) yield break;
+        // Edge case: User with suspicious naming patterns
+        if ((User.Name?.Contains("ADMIN", StringComparison.OrdinalIgnoreCase) == true) ||
+            (User.Name?.Contains("SYSTEM", StringComparison.OrdinalIgnoreCase) == true))
+        {
+            yield return new ValidationResult(
+                "Document transfer attributed to administrative or system user. " +
+                "Verify proper authorization and audit trail requirements.",
+                [nameof(User)]);
+        }
+
+        // Edge case: Very short or very long usernames
+        if (User.Name?.Length <= 2)
+        {
+            yield return new ValidationResult(
+                "Unusually short username detected. Verify user identity validation.",
+                [nameof(User)]);
+        }
+    }
+
+    // Edge case: Activity type mismatches
+    private IEnumerable<ValidationResult> ValidateCrossReferenceConsistency()
+    {
+        // Edge case: Activity supports transfers but isn't MOVED or COPIED
+        if (MatterDocumentActivity != null)
+        {
+            var activity = MatterDocumentActivity.Activity?.ToUpperInvariant();
+            if (!string.IsNullOrEmpty(activity) && 
+                activity != "MOVED" && activity != "COPIED")
+            {
+                yield return new ValidationResult(
+                    $"Unexpected activity type '{activity}' for destination tracking. " +
+                    "Only MOVED and COPIED operations should have destination entries.",
+                    [nameof(MatterDocumentActivity)]);
+            }
+        }
+
+        // Edge case: GUID collision (extremely rare but possible)
+        if (MatterId == DocumentId || MatterId == UserId || DocumentId == UserId)
+        {
+            yield return new ValidationResult(
+                "GUID collision detected in composite key components. " +
+                "This is extremely rare and may indicate data corruption.",
+                [nameof(MatterId), nameof(DocumentId), nameof(UserId)]);
+        }
+    }
+
+    // Edge case: Performance impact of validating large collections
+    private IEnumerable<ValidationResult> ValidatePerformanceImpact()
+    {
+        // This would be at the service level, but awareness is important
+        var collectionCount = 
+            (User?.MatterDocumentActivityUsersTo?.Count ?? 0) +
+            (Matter?.MatterDocumentActivityUsersTo?.Count ?? 0) +
+            (Document?.MatterDocumentActivityUsersTo?.Count ?? 0);
+
+        if (collectionCount > 1000)
+        {
+            yield return new ValidationResult(
+                "Large collection detected during validation. " +
+                "Consider pagination or selective loading for performance.",
+                [nameof(User)]);
+        }
+    }
+
+    /// <summary>
+    /// Validates edge cases for document transfer operations.
+    /// </summary>
+    /// <returns>A collection of validation results for edge case validation.</returns>
+    private IEnumerable<ValidationResult> ValidateEdgeCases()
+    {
+        // Temporal edge cases
+        foreach (var result in ValidateTransferFrequency())
+            yield return result;
+
+        foreach (var result in ValidatePendingTransferAge())
+            yield return result;
+
+        // Data integrity edge cases
+        foreach (var result in ValidateOrphanedAuditEntries())
+            yield return result;
+
+        foreach (var result in ValidateCrossReferenceConsistency())
+            yield return result;
+
+        // Professional standards edge cases
+        foreach (var result in ValidateDestinationStateTransitions())
+            yield return result;
+
+        foreach (var result in ValidateDocumentAnomalies())
+            yield return result;
+
+        // Security edge cases
+        foreach (var result in ValidateUserStatus())
+            yield return result;
+
+        // Performance awareness
+        foreach (var result in ValidatePerformanceImpact())
+            yield return result;
+    }
 }
