@@ -177,22 +177,17 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
     /// <returns>A collection of validation results for business rule validation.</returns>
     protected override IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        // Validate that user has sufficient context for operations
-        if (!IsSufficientForOperations)
-        {
-            yield return CreateValidationResult(
-                "User does not have sufficient data for professional operations.",
-                nameof(Id), nameof(Name));
-        }
+        // Professional user activity validation
+        foreach (var result in ValidateUserActivityPatterns())
+            yield return result;
 
-        // Validate normalized name consistency
-        var normalizedName = NormalizeUsername();
-        if (!string.IsNullOrEmpty(normalizedName) && normalizedName != Name?.Trim())
-        {
-            yield return CreateValidationResult(
-                "User name contains formatting that will be normalized. Consider using the normalized format.",
-                nameof(Name));
-        }
+        // User role and permissions validation
+        foreach (var result in ValidateUserRoleConsistency())
+            yield return result;
+
+        // Audit trail completeness validation
+        foreach (var result in ValidateAuditTrailCompleteness())
+            yield return result;
     }
 
     /// <summary>
@@ -201,13 +196,73 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
     /// <returns>A collection of validation results for cross-property validation.</returns>
     protected override IEnumerable<ValidationResult> ValidateCrossPropertyRules()
     {
-        // Validate name and ID consistency for professional standards
-        if (Id == Guid.Empty || string.IsNullOrWhiteSpace(Name)) yield break;
-        // Check for reserved names that conflict with system operations
-        if (UserValidationHelper.IsReservedUsername(Name))
+        // Base cross-property validation
+        foreach (var result in base.ValidateCrossPropertyRules())
+            yield return result;
+
+        // User activity consistency validation
+        foreach (var result in ValidateActivityConsistency())
+            yield return result;
+
+        // Professional naming validation
+        foreach (var result in ValidateProfessionalNaming())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates activity consistency across different activity types.
+    /// </summary>
+    /// <returns>A collection of validation results for activity consistency.</returns>
+    private IEnumerable<ValidationResult> ValidateActivityConsistency()
+    {
+        if (!HasActivities) yield break;
+
+        // Validate temporal consistency across activity types
+        var activityDates = GetAllActivityDates();
+        if (activityDates.Any())
+        {
+            var earliestActivity = activityDates.Min();
+            var latestActivity = activityDates.Max();
+            var activitySpan = (latestActivity - earliestActivity).TotalDays;
+
+            // Check for suspicious activity compression
+            if (TotalActivityCount > 100 && activitySpan < 1)
+            {
+                yield return CreateValidationResult(
+                    "High volume of activities compressed into short timeframe detected. " +
+                    "Verify activity authenticity and professional authorization.",
+                    nameof(TotalActivityCount));
+            }
+        }
+
+        // Validate user attribution consistency
+        foreach (var result in ValidateUserAttributionConsistency())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates professional naming conventions and standards.
+    /// </summary>
+    /// <returns>A collection of validation results for professional naming validation.</returns>
+    private IEnumerable<ValidationResult> ValidateProfessionalNaming()
+    {
+        var normalizedName = UserValidationHelper.NormalizeUsername(Name);
+        
+        // Check for professional naming standards
+        if (!string.IsNullOrEmpty(normalizedName) && normalizedName.Length < 3)
         {
             yield return CreateValidationResult(
-                "User name conflicts with system reserved names.",
+                "User name is too short for professional identification. " +
+                "Legal practice users should have clear, professional identifiers.",
+                nameof(Name));
+        }
+
+        // Validate professional character usage
+        if (Name.Count(c => char.IsDigit(c)) > Name.Length / 2)
+        {
+            yield return CreateValidationResult(
+                "User name contains excessive numeric characters. " +
+                "Professional users should have primarily alphabetic identifiers.",
                 nameof(Name));
         }
     }
@@ -218,6 +273,14 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
     /// <returns>A collection of validation results for collection validation.</returns>
     protected override IEnumerable<ValidationResult> ValidateCollections()
     {
+        // Base collection validation
+        foreach (var result in base.ValidateCollections())
+            yield return result;
+
+        // Enhanced activity collection validation
+        foreach (var result in ValidateActivityCollectionsEnhanced())
+            yield return result;
+        
         // Validate MatterActivityUsers collection if loaded
         if (MatterActivityUsers != null)
         {
@@ -247,10 +310,129 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
         }
 
         // Validate MatterDocumentActivityUsersTo collection if loaded
-        if (MatterDocumentActivityUsersTo != null)
+        if (MatterDocumentActivityUsersTo == null) yield break;
+        foreach (var result in ValidateCollection(MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates activity collections with enhanced compliance and professional standards.
+    /// </summary>
+    /// <returns>A collection of validation results for enhanced collection validation.</returns>
+    private IEnumerable<ValidationResult> ValidateActivityCollectionsEnhanced()
+    {
+        // Validate transfer activity collections for bidirectional compliance
+        if (MatterDocumentActivityUsersFrom != null && MatterDocumentActivityUsersTo != null)
         {
-            foreach (var result in ValidateCollection(MatterDocumentActivityUsersTo, nameof(MatterDocumentActivityUsersTo)))
+            foreach (var result in ValidateBidirectionalTransferCompliance())
                 yield return result;
+        }
+
+        // Validate activity temporal consistency
+        foreach (var result in ValidateActivityTemporalConsistency())
+            yield return result;
+
+        // Validate professional activity attribution
+        foreach (var result in ValidateProfessionalActivityAttribution())
+            yield return result;
+    }
+
+    /// <summary>
+    /// Validates bidirectional transfer compliance for document transfer activities.
+    /// </summary>
+    /// <returns>A collection of validation results for transfer compliance validation.</returns>
+    private IEnumerable<ValidationResult> ValidateBidirectionalTransferCompliance()
+    {
+        // Example validation: Ensure that for every FROM transfer, there is a corresponding TO transfer
+        var unmatchedFromTransfers = MatterDocumentActivityUsersFrom
+            ?.Where(fromActivity => !MatterDocumentActivityUsersTo
+                ?.Any(toActivity => toActivity.DocumentId == fromActivity.DocumentId) ?? true)
+            .ToList();
+
+        if (unmatchedFromTransfers is { Count: > 0 })
+        {
+            yield return CreateValidationResult(
+                "Some document transfers initiated by the user do not have corresponding received transfers. " +
+                "Ensure bidirectional audit trail completeness for document custody tracking.",
+                nameof(MatterDocumentActivityUsersFrom));
+        }
+
+        // Example validation: Check for suspiciously high volume of transfers
+        if (MatterDocumentActivityUsersFrom?.Count > 1000)
+        {
+            yield return CreateValidationResult(
+                "Detected unusually high volume of document transfers initiated by the user. " +
+                "Review for compliance with professional transfer authorization standards.",
+                nameof(MatterDocumentActivityUsersFrom));
+        }
+    }
+
+    /// <summary>
+    /// Validates the temporal consistency of activities across different types.
+    /// </summary>
+    /// <returns>A collection of validation results for temporal consistency validation.</returns>
+    private IEnumerable<ValidationResult> ValidateActivityTemporalConsistency()
+    {
+        // Ensure all activity types have consistent timing for the same user
+        var allActivities = (MatterActivityUsers ?? Enumerable.Empty<MatterActivityUserDto>()
+            ).Concat(DocumentActivityUsers ?? Enumerable.Empty<DocumentActivityUserDto>())
+            .Concat(RevisionActivityUsers ?? Enumerable.Empty<RevisionActivityUserDto>())
+            .Concat(MatterDocumentActivityUsersFrom ?? Enumerable.Empty<MatterDocumentActivityUserFromDto>())
+            .Concat(MatterDocumentActivityUsersTo ?? Enumerable.Empty<MatterDocumentActivityUserToDto>());
+
+        var groupedByUser = allActivities.GroupBy(a => a.UserId);
+        foreach (var group in groupedByUser)
+        {
+            var activityTimes = group.Select(a => a.Timestamp).ToList();
+            var minTime = activityTimes.Min();
+            var maxTime = activityTimes.Max();
+
+            // Check for activities that are too close together in time
+            var suspiciouslyCloseActivities = activityTimes
+                .Where((time, index) => index > 0 && (time - activityTimes[index - 1]).TotalSeconds < 1)
+                .ToList();
+
+            if (suspiciouslyCloseActivities.Any())
+            {
+                yield return CreateValidationResult(
+                    "Detected activities with suspiciously close timing. " +
+                    "Verify activity authenticity and effective user engagement.",
+                    nameof(TotalActivityCount));
+            }
+
+            // Check for activities spanning an implausibly long time without change
+            if ((maxTime - minTime).TotalDays > 30)
+            {
+                yield return CreateValidationResult(
+                    "Activity timeline spans an implausibly long period without significant gaps. " +
+                    "Review for potential data integrity issues or unusual user behavior.",
+                    nameof(TotalActivityCount));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Validates professional attribution of activities ensuring accountability and traceability.
+    /// </summary>
+    /// <returns>A collection of validation results for professional attribution validation.</returns>
+    private IEnumerable<ValidationResult> ValidateProfessionalActivityAttribution()
+    {
+        // Example validation: Ensure all activities have valid user attribution
+        var allActivities = (MatterActivityUsers ?? Enumerable.Empty<MatterActivityUserDto>()
+            ).Concat(DocumentActivityUsers ?? Enumerable.Empty<DocumentActivityUserDto>())
+            .Concat(RevisionActivityUsers ?? Enumerable.Empty<RevisionActivityUserDto>())
+            .Concat(MatterDocumentActivityUsersFrom ?? Enumerable.Empty<MatterDocumentActivityUserFromDto>())
+            .Concat(MatterDocumentActivityUsersTo ?? Enumerable.Empty<MatterDocumentActivityUserToDto>());
+
+        foreach (var activity in allActivities)
+        {
+            if (activity.UserId == Guid.Empty)
+            {
+                yield return CreateValidationResult(
+                    "Detected activity with invalid or missing user attribution. " +
+                    "Ensure all activities are properly attributed to a valid user.",
+                    nameof(TotalActivityCount));
+            }
         }
     }
 
@@ -268,7 +450,7 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
     {
         if (id == Guid.Empty)
             return Result.Failure<UserDto>(DomainError.Create("INVALID_USER_ID", "User ID cannot be empty"));
-
+            
         if (string.IsNullOrWhiteSpace(name))
             return Result.Failure<UserDto>(DomainError.Create("INVALID_USER_NAME", "User name is required"));
 
@@ -312,8 +494,6 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
         {
             // Note: In a real implementation, you would map the activity collections
             // This would typically be done by a mapping framework like Mapster or AutoMapper
-            // dto.MatterActivityUsers = /* mapping logic */;
-            // dto.DocumentActivityUsers = /* mapping logic */;
             // etc.
         }
 
@@ -353,7 +533,7 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
     /// Normalizes the user's name using the validation helper.
     /// </summary>
     /// <returns>Normalized username or null if invalid.</returns>
-    public string? NormalizeUsername()
+    public string NormalizeUsername()
     {
         return UserValidationHelper.NormalizeUsername(Name);
     }
@@ -448,4 +628,221 @@ public sealed class UserDto : BaseValidationDto, IEquatable<UserDto>
     public override string ToString() => $"{DisplayName} ({Id})";
 
     #endregion String Representation
+
+    /// <summary>
+    /// Validates user activity patterns for professional standards and anomaly detection.
+    /// </summary>
+    /// <returns>A collection of validation results for activity pattern validation.</returns>
+    private IEnumerable<ValidationResult> ValidateUserActivityPatterns()
+    {
+        if (TotalActivityCount == 0) yield break;
+
+        // Validate activity distribution across different types
+        var activityDistribution = GetActivityDistribution();
+        
+        // Check for suspicious activity concentrations
+        if (activityDistribution.TryGetValue("DocumentTransfers", out var transferCount) && 
+            transferCount > 0.8 * TotalActivityCount)
+        {
+            yield return CreateValidationResult(
+                "User has unusually high concentration of document transfer activities. " +
+                "Verify professional authorization for extensive transfer operations.",
+                nameof(MatterDocumentActivityUsersFrom), nameof(MatterDocumentActivityUsersTo));
+        }
+
+        // Validate activity velocity for compliance monitoring
+        if (HasActivities && GetRecentActivityCount(days: 7) > UserValidationHelper.MaxDailyActivityCount * 7)
+        {
+            yield return CreateValidationResult(
+                "User has exceeded recommended weekly activity limits. " +
+                "Review activity patterns for compliance and professional oversight.",
+                nameof(TotalActivityCount));
+        }
+
+        // Professional responsibility validation for high-activity users
+        if (TotalActivityCount > 1000)
+        {
+            yield return CreateValidationResult(
+                "High-activity user detected. Ensure proper professional oversight " +
+                "and compliance monitoring for users with extensive system activity.",
+                nameof(TotalActivityCount));
+        }
+    }
+
+    /// <summary>
+    /// Validates user role consistency and professional responsibility requirements.
+    /// </summary>
+    /// <returns>A collection of validation results for role consistency validation.</returns>
+    private IEnumerable<ValidationResult> ValidateUserRoleConsistency()
+    {
+        // Validate user name for professional standards
+        if (UserValidationHelper.IsReservedUsername(Name))
+        {
+            yield return CreateValidationResult(
+                "User name conflicts with system reserved names. Professional users " +
+                "should have unique, professional identifiers.",
+                nameof(Name));
+        }
+
+        // Validate administrative pattern detection
+        if (Name.Contains("ADMIN", StringComparison.OrdinalIgnoreCase) || Name.Contains("SYSTEM", StringComparison.OrdinalIgnoreCase))
+        {
+            yield return CreateValidationResult(
+                "Administrative user pattern detected. Ensure proper authorization " +
+                "and security protocols for administrative access.",
+                nameof(Name));
+        }
+
+        // Validate user context sufficiency for operations
+        if (!IsSufficientForOperations)
+        {
+            yield return CreateValidationResult(
+                "User does not meet minimum requirements for professional operations. " +
+                "Complete user profile information is required for legal compliance.",
+                nameof(Id), nameof(Name));
+        }
+    }
+
+    /// <summary>
+    /// Validates audit trail completeness for legal compliance requirements.
+    /// </summary>
+    /// <returns>A collection of validation results for audit trail validation.</returns>
+    private IEnumerable<ValidationResult> ValidateAuditTrailCompleteness()
+    {
+        // Validate bidirectional transfer audit completeness
+        var fromTransfers = MatterDocumentActivityUsersFrom?.Count ?? 0;
+        var toTransfers = MatterDocumentActivityUsersTo?.Count ?? 0;
+        
+        // Check for unbalanced transfer patterns
+        if (fromTransfers > 0 && toTransfers == 0)
+        {
+            yield return CreateValidationResult(
+                "User has document transfer initiation activities but no destination activities. " +
+                "Bidirectional audit trail may be incomplete for compliance tracking.",
+                nameof(MatterDocumentActivityUsersFrom), nameof(MatterDocumentActivityUsersTo));
+        }
+
+        // Validate activity attribution completeness
+        if (!HasActivities) yield break;
+        var incompleteActivities = GetIncompleteActivityCount();
+        if (incompleteActivities > 0)
+        {
+            yield return CreateValidationResult(
+                $"User has {incompleteActivities} activities with incomplete attribution. " +
+                "Complete user attribution is required for professional responsibility compliance.",
+                nameof(MatterActivityUsers), nameof(DocumentActivityUsers));
+        }
+    }
+    
+    /// <summary>
+    /// Gets activity distribution across different activity types.
+    /// </summary>
+    /// <returns>Dictionary containing activity type distribution.</returns>
+    private Dictionary<string, int> GetActivityDistribution()
+    {
+        return new Dictionary<string, int>
+        {
+            ["MatterActivities"] = MatterActivityUsers?.Count ?? 0,
+            ["DocumentActivities"] = DocumentActivityUsers?.Count ?? 0,
+            ["RevisionActivities"] = RevisionActivityUsers?.Count ?? 0,
+            ["DocumentTransfers"] = (MatterDocumentActivityUsersFrom?.Count ?? 0) + 
+                                   (MatterDocumentActivityUsersTo?.Count ?? 0)
+        };
+    }
+
+    /// <summary>
+    /// Gets recent activity count within specified days.
+    /// </summary>
+    /// <param name="days">Number of days to look back.</param>
+    /// <returns>Count of activities within the timeframe.</returns>
+    private int GetRecentActivityCount(int days = 7)
+    {
+        var cutoffDate = DateTime.UtcNow.AddDays(-days);
+        var recentCount = 0;
+
+        if (MatterActivityUsers != null)
+            recentCount += MatterActivityUsers.Count(a => a.CreatedAt >= cutoffDate);
+        if (DocumentActivityUsers != null)
+            recentCount += DocumentActivityUsers.Count(a => a.CreatedAt >= cutoffDate);
+        if (RevisionActivityUsers != null)
+            recentCount += RevisionActivityUsers.Count(a => a.CreatedAt >= cutoffDate);
+        if (MatterDocumentActivityUsersFrom != null)
+            recentCount += MatterDocumentActivityUsersFrom.Count(a => a.CreatedAt >= cutoffDate);
+        if (MatterDocumentActivityUsersTo != null)
+            recentCount += MatterDocumentActivityUsersTo.Count(a => a.CreatedAt >= cutoffDate);
+
+        return recentCount;
+    }
+
+    /// <summary>
+    /// Gets all activity dates for temporal analysis.
+    /// </summary>
+    /// <returns>List of all activity timestamps.</returns>
+    private List<DateTime> GetAllActivityDates()
+    {
+        var dates = new List<DateTime>();
+
+        if (MatterActivityUsers != null)
+            dates.AddRange(MatterActivityUsers.Select(a => a.CreatedAt));
+        if (DocumentActivityUsers != null)
+            dates.AddRange(DocumentActivityUsers.Select(a => a.CreatedAt));
+        if (RevisionActivityUsers != null)
+            dates.AddRange(RevisionActivityUsers.Select(a => a.CreatedAt));
+        if (MatterDocumentActivityUsersFrom != null)
+            dates.AddRange(MatterDocumentActivityUsersFrom.Select(a => a.CreatedAt));
+        if (MatterDocumentActivityUsersTo != null)
+            dates.AddRange(MatterDocumentActivityUsersTo.Select(a => a.CreatedAt));
+
+        return dates;
+    }
+
+    /// <summary>
+    /// Validates user attribution consistency across all activities.
+    /// </summary>
+    /// <returns>A collection of validation results for user attribution consistency.</returns>
+    private IEnumerable<ValidationResult> ValidateUserAttributionConsistency()
+    {
+        // Example: Ensure all activities reference the current user's Id
+        var allActivities = (MatterActivityUsers ?? Enumerable.Empty<MatterActivityUserDto>())
+            .Concat(DocumentActivityUsers ?? Enumerable.Empty<DocumentActivityUserDto>())
+            .Concat(RevisionActivityUsers ?? Enumerable.Empty<RevisionActivityUserDto>())
+            .Concat(MatterDocumentActivityUsersFrom ?? Enumerable.Empty<MatterDocumentActivityUserFromDto>())
+            .Concat(MatterDocumentActivityUsersTo ?? Enumerable.Empty<MatterDocumentActivityUserToDto>());
+
+        foreach (var activity in allActivities)
+        {
+            if (activity.UserId != Id)
+            {
+                yield return CreateValidationResult(
+                    "Activity attribution inconsistency detected. All activities should reference the current user's Id.",
+                    nameof(Id));
+            }
+        }
+    }
+
+    /// <summary>
+    /// Gets the count of activities with incomplete attribution.
+    /// </summary>
+    /// <returns>Count of activities missing required attribution.</returns>
+    private int GetIncompleteActivityCount()
+    {
+        var count = 0;
+
+        if (MatterActivityUsers != null)
+            count += MatterActivityUsers.Count(a => a.UserId == Guid.Empty);
+
+        if (DocumentActivityUsers != null)
+            count += DocumentActivityUsers.Count(a => a.UserId == Guid.Empty);
+
+        if (RevisionActivityUsers != null)
+            count += RevisionActivityUsers.Count(a => a.UserId == Guid.Empty);
+
+        if (MatterDocumentActivityUsersFrom != null)
+            count += MatterDocumentActivityUsersFrom.Count(a => a.UserId == Guid.Empty);
+
+        if (MatterDocumentActivityUsersTo != null)
+            count += MatterDocumentActivityUsersTo.Count(a => a.UserId == Guid.Empty);
+
+        return count;
+    }
 }

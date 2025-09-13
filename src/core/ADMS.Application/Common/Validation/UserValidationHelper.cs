@@ -63,7 +63,7 @@ public static partial class UserValidationHelper
     /// <summary>
     /// Reserved usernames that cannot be used (optimized with FrozenSet for O(1) lookup).
     /// </summary>
-    private static readonly string[] _reservedNamesArray =
+    private static readonly string[] ReservedNamesArray =
     [
         // System accounts
         "admin", "administrator", "system", "root", "sa", "sysadmin",
@@ -93,13 +93,13 @@ public static partial class UserValidationHelper
     /// <summary>
     /// High-performance frozen set for reserved name lookups.
     /// </summary>
-    private static readonly FrozenSet<string> _reservedNamesSet =
-        _reservedNamesArray.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+    private static readonly FrozenSet<string> ReservedNamesSet =
+        ReservedNamesArray.ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gets the immutable list of reserved names.
     /// </summary>
-    public static IReadOnlyList<string> ReservedNames => _reservedNamesArray.ToImmutableArray();
+    public static IReadOnlyList<string> ReservedNames => ReservedNamesArray.ToImmutableArray();
 
     #endregion Reserved Names
 
@@ -166,7 +166,7 @@ public static partial class UserValidationHelper
         }
 
         // Reserved name validation
-        if (_reservedNamesSet.Contains(trimmed))
+        if (ReservedNamesSet.Contains(trimmed))
         {
             yield return new ValidationResult(
                 $"{propertyName} is a reserved name and cannot be used.",
@@ -237,9 +237,8 @@ public static partial class UserValidationHelper
 
         var trimmed = username.Trim();
 
-        return trimmed.Length >= MinUserNameLength &&
-               trimmed.Length <= MaxUserNameLength &&
-               !_reservedNamesSet.Contains(trimmed) &&
+        return trimmed.Length is >= MinUserNameLength and <= MaxUserNameLength &&
+               !ReservedNamesSet.Contains(trimmed) &&
                IsValidUsernameFormat(trimmed);
     }
 
@@ -265,7 +264,7 @@ public static partial class UserValidationHelper
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsReservedUsername([NotNullWhen(true)] string? username)
     {
-        return !string.IsNullOrWhiteSpace(username) && _reservedNamesSet.Contains(username.Trim());
+        return !string.IsNullOrWhiteSpace(username) && ReservedNamesSet.Contains(username.Trim());
     }
 
     #endregion Quick Validation Methods
@@ -348,6 +347,56 @@ public static partial class UserValidationHelper
         }
     }
 
+    /// <summary>
+    /// Validates user activity metrics for compliance monitoring.
+    /// </summary>
+    public static IEnumerable<ValidationResult> ValidateUserActivityMetrics(
+        int totalActivities, 
+        int recentActivities, 
+        string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        if (totalActivities < 0)
+        {
+            yield return new ValidationResult(
+                $"{propertyName} cannot be negative.",
+                [propertyName]);
+        }
+
+        if (recentActivities > MaxDailyActivityCount * 7) // Weekly limit
+        {
+            yield return new ValidationResult(
+                $"{propertyName} exceeds reasonable weekly activity limit. " +
+                "Review activity patterns for compliance monitoring.",
+                [propertyName]);
+        }
+    }
+
+    /// <summary>
+    /// Validates user attribution consistency across activities.
+    /// </summary>
+    public static IEnumerable<ValidationResult> ValidateUserAttributionConsistency(
+        Guid userId, 
+        string userName, 
+        string propertyName)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(propertyName);
+
+        foreach (var result in ValidateUserId(userId, $"{propertyName}.UserId"))
+            yield return result;
+
+        foreach (var result in ValidateUsername(userName, $"{propertyName}.UserName"))
+            yield return result;
+
+        if (!IsSufficientUserContext(userId, userName, DateTime.UtcNow))
+        {
+            yield return new ValidationResult(
+                $"{propertyName} has insufficient user context for professional operations.",
+                [propertyName]);
+        }
+    }
+
     #endregion Activity Context Validation
 
     #region Normalization Methods
@@ -389,7 +438,6 @@ public static partial class UserValidationHelper
         {
             DateTimeKind.Utc => timestamp,
             DateTimeKind.Local => timestamp.ToUniversalTime(),
-            DateTimeKind.Unspecified => DateTime.SpecifyKind(timestamp, DateTimeKind.Utc),
             _ => DateTime.SpecifyKind(timestamp, DateTimeKind.Utc)
         };
     }
@@ -551,16 +599,16 @@ public static partial class UserValidationHelper
     /// <summary>
     /// Valid activity types for each entity category in the system.
     /// </summary>
-    private static readonly Dictionary<string, string[]> _validActivityTypes = new()
+    private static readonly Dictionary<string, string[]> ValidActivityTypes = new()
     {
-        ["MATTER"] = ["CREATED", "ARCHIVED", "DELETED", "RESTORED", "UNARCHIVED", "VIEWED"],
-        ["DOCUMENT"] = ["CREATED", "SAVED", "DELETED", "RESTORED", "CHECKED_IN", "CHECKED_OUT"],
-        ["REVISION"] = ["CREATED", "SAVED", "DELETED", "RESTORED"],
-        ["MATTER_DOCUMENT"] = ["MOVED", "COPIED"]
+        ["MATTER"] = new[] { "CREATED", "ARCHIVED", "DELETED", "RESTORED", "UNARCHIVED", "VIEWED" },
+        ["DOCUMENT"] = new[] { "CREATED", "SAVED", "DELETED", "RESTORED", "CHECKED_IN", "CHECKED_OUT" },
+        ["REVISION"] = new[] { "CREATED", "SAVED", "DELETED", "RESTORED" },
+        ["MATTER_DOCUMENT"] = new[] { "MOVED", "COPIED" }
     };
 
-    private static readonly FrozenSet<string> _allValidActivityTypes =
-        _validActivityTypes.Values.SelectMany(x => x).ToFrozenSet(StringComparer.OrdinalIgnoreCase);
+    private static readonly FrozenSet<string> AllValidActivityTypes =
+        ValidActivityTypes.Values.SelectMany(x => x).ToFrozenSet(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Maximum time gap between related activities (prevents backdating).
@@ -650,9 +698,9 @@ public static partial class UserValidationHelper
 
         var normalizedType = entityType.Trim().ToUpperInvariant();
 
-        if (!_validActivityTypes.ContainsKey(normalizedType))
+        if (!ValidActivityTypes.ContainsKey(normalizedType))
         {
-            var validTypes = string.Join(", ", _validActivityTypes.Keys);
+            var validTypes = string.Join(", ", ValidActivityTypes.Keys);
             yield return new ValidationResult(
                 $"{propertyName} must be one of: {validTypes}.",
                 [propertyName]);
@@ -686,9 +734,9 @@ public static partial class UserValidationHelper
         var normalizedEntity = entityType?.Trim().ToUpperInvariant();
 
         // Check if activity type is valid overall
-        if (!_allValidActivityTypes.Contains(normalizedActivity))
+        if (!AllValidActivityTypes.Contains(normalizedActivity))
         {
-            var validActivities = string.Join(", ", _allValidActivityTypes);
+            var validActivities = string.Join(", ", AllValidActivityTypes);
             yield return new ValidationResult(
                 $"{propertyName} must be one of: {validActivities}.",
                 [propertyName]);
@@ -697,7 +745,7 @@ public static partial class UserValidationHelper
 
         // Check if activity type is valid for the specific entity type
         if (normalizedEntity != null &&
-            _validActivityTypes.TryGetValue(normalizedEntity, out var validActivitiesForEntity) &&
+            ValidActivityTypes.TryGetValue(normalizedEntity, out var validActivitiesForEntity) &&
             !validActivitiesForEntity.Contains(normalizedActivity, StringComparer.OrdinalIgnoreCase))
         {
             var validForEntity = string.Join(", ", validActivitiesForEntity);
@@ -740,7 +788,7 @@ public static partial class UserValidationHelper
         }
 
         // Business rule: check for suspicious precision (microsecond precision might indicate automation)
-        if (timestamp.Millisecond == 0 && timestamp.Second == 0 && timestamp.Minute % 5 == 0)
+        if (timestamp is { Millisecond: 0, Second: 0 } && timestamp.Minute % 5 == 0)
         {
             // This is just a warning-level validation - exact times on 5-minute boundaries might indicate automation
             // In a real system, you might want to log this for investigation rather than fail validation
@@ -878,7 +926,7 @@ public static partial class UserValidationHelper
             return [];
 
         var normalizedType = entityType.Trim().ToUpperInvariant();
-        return _validActivityTypes.TryGetValue(normalizedType, out var activities)
+        return ValidActivityTypes.TryGetValue(normalizedType, out var activities)
             ? activities
             : [];
     }
@@ -898,7 +946,7 @@ public static partial class UserValidationHelper
         var normalizedActivity = activityType.Trim().ToUpperInvariant();
         var normalizedEntity = entityType.Trim().ToUpperInvariant();
 
-        return _validActivityTypes.TryGetValue(normalizedEntity, out var validActivities) &&
+        return ValidActivityTypes.TryGetValue(normalizedEntity, out var validActivities) &&
                validActivities.Contains(normalizedActivity, StringComparer.OrdinalIgnoreCase);
     }
 
