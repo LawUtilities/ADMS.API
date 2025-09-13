@@ -1593,7 +1593,7 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
         FileValidationHelper.IsMimeTypeAllowed(dto.MimeType) &&
         FileValidationHelper.IsValidChecksum(dto.Checksum) &&
         RevisionValidationHelper.IsValidDate(dto.CreationDate) && // Use RevisionValidationHelper for dates
-        !(dto.IsCheckedOut && dto.IsDeleted) &&
+        dto is not { IsCheckedOut: true, IsDeleted: true } &&
         dto.Revisions.Count > 0 &&
         dto.Revisions.All(r => 
             RevisionValidationHelper.IsValidRevisionNumber(r.RevisionNumber) &&
