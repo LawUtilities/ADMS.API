@@ -13,7 +13,7 @@ namespace ADMS.Application.DTOs;
 /// Represents the source side of document transfer operations between matters.
 /// Links document transfer origins to users for accountability and compliance tracking.
 /// </remarks>
-public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEquatable<MatterDocumentActivityUserFromDto>
+public sealed record MatterDocumentActivityUserFromDto : IValidatableObject
 {
     #region Core Properties
 
@@ -355,7 +355,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
 
         // Edge case: Transfer outside business hours
         var transferHour = CreatedAt.Hour;
-        if (transferHour < 6 || transferHour > 22)
+        if (transferHour is < 6 or > 22)
         {
             yield return new ValidationResult(
                 $"Document transfer from source matter at {CreatedAt:HH:mm} (outside normal business hours). " +
@@ -392,8 +392,8 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         }
 
         // Edge case: Document with suspicious creation patterns
-        if (Document.FileName?.StartsWith("TEMP_") == true || 
-            Document.FileName?.Contains("BACKUP") == true)
+        if (Document.FileName.StartsWith("TEMP_", StringComparison.Ordinal) || 
+            Document.FileName.Contains("BACKUP"))
         {
             yield return new ValidationResult(
                 "Document with temporary or backup filename pattern being transferred from source. " +
@@ -420,7 +420,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         if (Matter == null || Document == null) yield break;
 
         // Edge case: Confidential matter as source
-        var matterDescription = Matter.Description?.ToUpperInvariant() ?? "";
+        var matterDescription = Matter.Description.ToUpperInvariant();
         if (matterDescription.Contains("CONFIDENTIAL") || matterDescription.Contains("SEALED"))
         {
             yield return new ValidationResult(
@@ -439,7 +439,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         }
 
         // Edge case: Cross-client document transfer
-        if (!matterDescription.Contains("CLIENT") || Document.FileName.Contains("CLIENT") != true) yield break;
+        if (!matterDescription.Contains("CLIENT") || Document.FileName.Contains("CLIENT")) yield break;
         var documentClientRef = ExtractClientReference(Document.FileName);
         var matterClientRef = ExtractClientReference(matterDescription);
             
@@ -495,7 +495,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     private IEnumerable<ValidationResult> ValidateSourceActivityPatterns()
     {
         // Edge case: Transfer on exact hour boundaries (potential automation)
-        if (CreatedAt.Minute == 0 && CreatedAt.Second == 0)
+        if (CreatedAt is { Minute: 0, Second: 0 })
         {
             yield return new ValidationResult(
                 "Document transfer from source occurred exactly on hour boundary. " +
@@ -504,8 +504,8 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         }
 
         // Edge case: User performing transfers from multiple sources simultaneously
-        if (User?.Name?.ToUpperInvariant().Contains("ADMIN") == true ||
-            User?.Name?.ToUpperInvariant().Contains("SYSTEM") == true)
+        if (User?.Name.Contains("ADMIN", StringComparison.OrdinalIgnoreCase) == true ||
+            User?.Name.Contains("SYSTEM", StringComparison.OrdinalIgnoreCase) == true)
         {
             yield return new ValidationResult(
                 "Document transfer from source performed by administrative or system user. " +
@@ -818,7 +818,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         }
 
         // Validate source matter lifecycle state
-        if (Matter.IsArchived && !MatterDocumentActivity?.Activity?.Equals("MOVED", StringComparison.OrdinalIgnoreCase) == true)
+        if (Matter.IsArchived && !MatterDocumentActivity?.Activity.Equals("MOVED", StringComparison.OrdinalIgnoreCase) == true)
         {
             yield return new ValidationResult(
                 "Source matter is archived. Only MOVED operations should be performed on archived matters " +
@@ -896,7 +896,7 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
             yield return new ValidationResult(
                 "MOVED operation represents document custody release from source matter. " +
                 "Ensure user has proper authorization and professional oversight for document custody changes.",
-                [nameof(User), nameof(MatterDocumentActivity)];
+                [nameof(User), nameof(MatterDocumentActivity)]);
         }
 
         // Validate user activity patterns using UserValidationHelper
@@ -913,8 +913,8 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     {
         if (Matter == null || Document == null) yield break;
 
-        var matterDescription = Matter.Description?.ToUpperInvariant() ?? "";
-        var documentFileName = Document.FileName?.ToUpperInvariant() ?? "";
+        var matterDescription = Matter.Description.ToUpperInvariant();
+        var documentFileName = Document.FileName.ToUpperInvariant();
 
         // Enhanced confidentiality validation
         if (matterDescription.Contains("CONFIDENTIAL") || matterDescription.Contains("PRIVILEGED"))
@@ -999,6 +999,18 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
     }
 
     /// <summary>
+    /// Determines whether the specified date falls on a weekend.
+    /// </summary>
+    /// <param name="transferTime">The date and time to evaluate.</param>
+    /// <returns><see langword="true"/> if the specified date falls on a Saturday or Sunday; otherwise, <see langword="false"/>.</returns>
+    /// <exception cref="NotImplementedException"></exception>
+    private static bool IsWeekend(DateTime transferTime)
+    {
+        // Returns true if the day is Saturday or Sunday
+        return transferTime.DayOfWeek == DayOfWeek.Saturday || transferTime.DayOfWeek == DayOfWeek.Sunday;
+    }
+
+    /// <summary>
     /// Validates advanced activity record integrity and compliance requirements.
     /// </summary>
     /// <returns>A collection of validation results for advanced activity validation.</returns>
@@ -1029,6 +1041,32 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         foreach (var result in UserValidationHelper.ValidateActivityMetrics(
             1, 24.0, nameof(CreatedAt))) // This transfer in last 24 hours
             yield return result;
+    }
+
+    /// <summary>
+    /// Validates source matter state transitions for document transfer operations.
+    /// </summary>
+    /// <returns>A collection of validation results for source matter state transitions.</returns>
+    private IEnumerable<ValidationResult> ValidateSourceMatterStateTransitions()
+    {
+        // Example implementation: checks for archived or deleted state transitions
+        if (Matter == null) yield break;
+
+        if (Matter.IsDeleted)
+        {
+            yield return new ValidationResult(
+                "Source matter is deleted. Document transfers from deleted matters are not allowed.",
+                [nameof(Matter)]);
+        }
+
+        if (Matter.IsArchived && MatterDocumentActivity?.Activity != "MOVED")
+        {
+            yield return new ValidationResult(
+                "Source matter is archived. Only MOVED operations should be performed on archived matters.",
+                [nameof(Matter), nameof(MatterDocumentActivity)]);
+        }
+
+        // Add further state transition checks as needed
     }
 
     /// <summary>
@@ -1064,5 +1102,6 @@ public sealed record MatterDocumentActivityUserFromDto : IValidatableObject, IEq
         // Advanced activity record validation
         foreach (var result in ValidateAdvancedActivityRecord())
             yield return result;
+
     }
 }
