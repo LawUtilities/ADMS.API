@@ -1080,7 +1080,16 @@ public partial class DocumentWithRevisionsDto : IValidatableObject, IEquatable<D
     /// <returns>A collection of validation results for business rule compliance.</returns>
     private IEnumerable<ValidationResult> ValidateBusinessRules()
     {
-        // Base business rules from DocumentWithoutRevisionsDto
+        // Early termination for critical errors
+        if (Revisions.Count == 0)
+        {
+            yield return new ValidationResult(
+                "Documents must have at least one revision for version control integrity.",
+                [nameof(Revisions)]);
+            yield break; // Stop validation here for critical error
+        }
+
+        // Continue with other business rules...
         foreach (var result in FileValidationHelper.ValidateMimeTypeConsistency(
             MimeType, Extension, nameof(MimeType)))
             yield return result;
